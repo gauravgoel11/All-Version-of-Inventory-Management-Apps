@@ -147,7 +147,7 @@ public class LoginPage extends javax.swing.JFrame {
         );
 
         getContentPane().add(jPanel3);
-        jPanel3.setBounds(200, 150, 810, 411);
+        jPanel3.setBounds(400, 200, 810, 411);
 
         pack();
         setLocationRelativeTo(null);

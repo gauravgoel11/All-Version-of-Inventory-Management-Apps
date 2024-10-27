@@ -228,7 +228,7 @@ public class EditItems extends javax.swing.JFrame {
         jPanel1.add(jBtnDelete1);
         jBtnDelete1.setBounds(500, 130, 150, 27);
 
-        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 150, 760, 610));
+        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(425, 180, 760, 610));
 
         pack();
         setLocationRelativeTo(null);

@@ -383,7 +383,7 @@ public class ViewInventoryStock extends javax.swing.JFrame {
                 .addContainerGap(16, Short.MAX_VALUE))
         );
 
-        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 140, 1070, 640));
+        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(310, 150, 1070, 640));
 
         pack();
         setLocationRelativeTo(null);

@@ -273,7 +273,7 @@ public class AdminEntry extends javax.swing.JFrame {
         jPanel1.add(itemCode);
         itemCode.setBounds(10, 270, 200, 30);
 
-        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 150, 610, 530));
+        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(425, 150, 610, 530));
 
         pack();
         setLocationRelativeTo(null);

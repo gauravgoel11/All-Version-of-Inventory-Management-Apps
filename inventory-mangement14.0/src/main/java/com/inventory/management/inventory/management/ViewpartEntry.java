@@ -562,74 +562,79 @@ try {
 
     private void jButtonDeleteEntryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonDeleteEntryActionPerformed
 int row = jTable1.getSelectedRow();
-    if (row >= 0) {
-        DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
-        String partNameValue = model.getValueAt(row, 0).toString();
-        String entryDate = model.getValueAt(row, 2).toString();
+if (row >= 0) {
+    DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+    String partNameValue = model.getValueAt(row, 0).toString();
+    String quantityValue = model.getValueAt(row, 1).toString(); // Assuming quantity is in column 1
+    String entryDate = model.getValueAt(row, 2).toString(); // Assuming entryDate is in column 2
 
-        int response = JOptionPane.showConfirmDialog(null,
-            "Do you want to delete the entry for part: " + partNameValue +
-            " on " + entryDate + "?",
-            "Confirm Deletion",
-            JOptionPane.YES_NO_OPTION,
-            JOptionPane.WARNING_MESSAGE);
+    int response = JOptionPane.showConfirmDialog(null,
+        "Do you want to delete the entry for part: " + partNameValue +
+        " with quantity: " + quantityValue + " on " + entryDate + "?",
+        "Confirm Deletion",
+        JOptionPane.YES_NO_OPTION,
+        JOptionPane.WARNING_MESSAGE);
 
-        if (response == JOptionPane.YES_OPTION) {
-            String sql = "DELETE FROM partentry WHERE partName = ? AND entryDate = ?";
-            try (Connection conn = DriverManager.getConnection("jdbc:sqlite:inven.db");
-                PreparedStatement pstmt = conn.prepareStatement(sql)) {
-                pstmt.setString(1, partNameValue);
-                pstmt.setString(2, entryDate);
-                pstmt.executeUpdate();
+    if (response == JOptionPane.YES_OPTION) {
+        String sql = "DELETE FROM partentry WHERE partName = ? AND quantity = ? AND entryDate = ?";
+        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:inven.db");
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, partNameValue);
+            pstmt.setString(2, quantityValue);
+            pstmt.setString(3, entryDate);
+            pstmt.executeUpdate();
 
-                model.removeRow(row);
-                JOptionPane.showMessageDialog(null, "Entry deleted successfully.");
-            } catch (SQLException e) {
-                JOptionPane.showMessageDialog(null, e.getMessage());
-            }
+            model.removeRow(row);
+            JOptionPane.showMessageDialog(null, "Entry deleted successfully.");
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, e.getMessage());
         }
-    } else {
-        JOptionPane.showMessageDialog(null, "Please select an entry to delete.");
     }
-    oneMonthEntryView();
+} else {
+    JOptionPane.showMessageDialog(null, "Please select an entry to delete.");
+}
+oneMonthEntryView();
+
     }//GEN-LAST:event_jButtonDeleteEntryActionPerformed
 
     private void jButtonChangeQuantityActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonChangeQuantityActionPerformed
 int row = jTable1.getSelectedRow();
-    if (row >= 0) {
-        DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
-        String partNameValue = model.getValueAt(row, 0).toString();
-        String entryDate = model.getValueAt(row, 2).toString();
-        String oldQuantity = model.getValueAt(row, 1).toString();
-        String newQuantity = jTextFieldQuantity.getText();
+if (row >= 0) {
+    DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+    String partNameValue = model.getValueAt(row, 0).toString();
+    String entryDate = model.getValueAt(row, 2).toString();
+    String oldQuantity = model.getValueAt(row, 1).toString();
+    String newQuantity = jTextFieldQuantity.getText();
 
-        int response = JOptionPane.showConfirmDialog(null,
-            "Do you want to change the quantity for part " + partNameValue +
-            " from " + oldQuantity + " to " + newQuantity + "?",
-            "Confirm Quantity Update",
-            JOptionPane.YES_NO_OPTION,
-            JOptionPane.QUESTION_MESSAGE);
+    int response = JOptionPane.showConfirmDialog(null,
+        "Do you want to change the quantity for part " + partNameValue +
+        " from " + oldQuantity + " to " + newQuantity + "?",
+        "Confirm Quantity Update",
+        JOptionPane.YES_NO_OPTION,
+        JOptionPane.QUESTION_MESSAGE);
 
-        if (response == JOptionPane.YES_OPTION) {
-            try {
-                Connection conn = DriverManager.getConnection("jdbc:sqlite:inven.db");
-                String sql = "UPDATE partentry SET quantity = ? WHERE partName = ? AND entryDate = ?";
-                PreparedStatement pstmt = conn.prepareStatement(sql);
-                pstmt.setString(1, newQuantity);
-                pstmt.setString(2, partNameValue);
-                pstmt.setString(3, entryDate);
-                pstmt.executeUpdate();
+    if (response == JOptionPane.YES_OPTION) {
+        try {
+            Connection conn = DriverManager.getConnection("jdbc:sqlite:inven.db");
+            String sql = "UPDATE partentry SET quantity = ? WHERE partName = ? AND entryDate = ? AND quantity = ?";
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, newQuantity);
+            pstmt.setString(2, partNameValue);
+            pstmt.setString(3, entryDate);
+            pstmt.setString(4, oldQuantity);
+            pstmt.executeUpdate();
 
-                model.setValueAt(newQuantity, row, 1);
-                JOptionPane.showMessageDialog(null, "Quantity updated successfully.");
-            } catch (SQLException e) {
-                JOptionPane.showMessageDialog(null, e.getMessage());
-            }
+            model.setValueAt(newQuantity, row, 1);
+            JOptionPane.showMessageDialog(null, "Quantity updated successfully.");
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, e.getMessage());
         }
-    } else {
-        JOptionPane.showMessageDialog(null, "Please select an entry to update.");
     }
-    oneMonthEntryView();
+} else {
+    JOptionPane.showMessageDialog(null, "Please select an entry to update.");
+}
+oneMonthEntryView();
+
 
         // TODO add your handling code here:
     }//GEN-LAST:event_jButtonChangeQuantityActionPerformed

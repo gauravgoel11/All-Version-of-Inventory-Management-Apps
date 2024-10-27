@@ -67,6 +67,7 @@ public class RecycleViewpartEntry extends javax.swing.JFrame {
         jcombopartname.setSelectedIndex(-1);
          setExtendedState(this.MAXIMIZED_BOTH);
           setupKeyBindings();
+          oneMonthEntry();
     }
          private void setupKeyBindings() {
         // Get the input map for the root pane
@@ -91,6 +92,46 @@ public class RecycleViewpartEntry extends javax.swing.JFrame {
         new RecycleMenu().setVisible(true);
         this.dispose();
     }
+    private void oneMonthEntry(){
+    try {
+    // Connect to the database
+    Connection conn = DriverManager.getConnection("jdbc:sqlite:inven.db");
+
+    // Calculate the date one month ago from today
+    java.util.Calendar cal = java.util.Calendar.getInstance();
+    cal.add(java.util.Calendar.MONTH, -1);
+    java.util.Date oneMonthAgo = cal.getTime();
+    SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+    String formattedDate = formatter.format(oneMonthAgo);
+
+    // Prepare SQL query to select entries from the last month
+    String sql = "SELECT partName, quantity, entryDate FROM temp_partentry WHERE entryDate >= ?";
+    PreparedStatement pstmt = conn.prepareStatement(sql);
+    pstmt.setString(1, formattedDate);
+
+    ResultSet rs = pstmt.executeQuery();
+
+    // Get table model
+    DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+    // Clear existing data
+    model.setRowCount(0);
+
+    // Add rows to the model
+    while (rs.next()) {
+        String partName = rs.getString("partName");
+        int quantity = rs.getInt("quantity");
+        String entryDate = rs.getString("entryDate");
+        model.addRow(new Object[]{partName, quantity, entryDate});
+    }
+
+    // Close connections
+    rs.close();
+    pstmt.close();
+    conn.close();
+} catch (SQLException e) {
+    JOptionPane.showMessageDialog(null, e.getMessage());
+}
+}
     
 
     /**

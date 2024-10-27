@@ -136,7 +136,7 @@ public class ViewEntry extends javax.swing.JFrame {
 
         empEnt.setFont(new java.awt.Font("Segoe UI", 1, 48)); // NOI18N
         empEnt.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        empEnt.setText("View Employee Entry");
+        empEnt.setText("View Worker Entry");
 
         empName.setEditable(true);
         empName.setToolTipText("");

@@ -298,13 +298,13 @@ public class Employee extends javax.swing.JFrame {
         jLabel6.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         jLabel6.setText("Aadhar No.");
         jPanel1.add(jLabel6);
-        jLabel6.setBounds(20, 290, 130, 38);
+        jLabel6.setBounds(20, 290, 128, 38);
 
         jTxtAadharNumber.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         jPanel1.add(jTxtAadharNumber);
         jTxtAadharNumber.setBounds(180, 290, 257, 38);
 
-        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 150, 807, 660));
+        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 150, 807, 660));
 
         pack();
         setLocationRelativeTo(null);

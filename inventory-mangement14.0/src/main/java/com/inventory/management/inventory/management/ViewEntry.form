@@ -244,7 +244,7 @@
               <Font name="Segoe UI" size="48" style="1"/>
             </Property>
             <Property name="horizontalAlignment" type="int" value="0"/>
-            <Property name="text" type="java.lang.String" value="View Employee Entry"/>
+            <Property name="text" type="java.lang.String" value="View Worker Entry"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JComboBox" name="empName">

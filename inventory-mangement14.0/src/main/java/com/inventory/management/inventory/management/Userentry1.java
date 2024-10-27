@@ -27,6 +27,28 @@ import java.sql.*;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import java.sql.*;
+import java.util.*;
+import org.sqlite.JDBC;
+import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
+import java.sql.*;
+import java.util.Date;  // For Date handling
+import java.text.SimpleDateFormat;  // For formatting Date to string
+import com.toedter.calendar.JDateChooser;  // JDateChooser for date selection
+import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
+import java.util.Date;  // For handling Date objects
+import java.text.SimpleDateFormat; 
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.text.Document;
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+
+
 /**
  *
  * @author gaura
@@ -40,11 +62,14 @@ public class Userentry1 extends javax.swing.JFrame {
         initComponents();
                 totalTA.setLineWrap(true);
         totalTA.setWrapStyleWord(true); 
-        jDateChooser.setDate(new Date());
+//        jDateChooser.setDate(new Date());
          setExtendedState(this.MAXIMIZED_BOTH);
           setupKeyBindings();
                   loadItems(); // Load items into the map and combo boxes
-        setupComboBoxListeners(); // Setup listeners for combo boxes
+        setupComboBoxListeners();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        String currentDate = dateFormat.format(new Date());
+        jTextFieldDate.setText(currentDate);// Setup listeners for combo boxes
          
          /**new code*/
  
@@ -136,7 +161,6 @@ public class Userentry1 extends javax.swing.JFrame {
         jLabel3 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
-        jDateChooser = new com.toedter.calendar.JDateChooser();
         jLabel1 = new javax.swing.JLabel();
         quan = new javax.swing.JTextField();
         jButton1 = new javax.swing.JButton();
@@ -162,6 +186,7 @@ public class Userentry1 extends javax.swing.JFrame {
         jLabel5 = new javax.swing.JLabel();
         itemCode = new javax.swing.JComboBox<>();
         AutoCompleteDecorator.decorate(itemCode);
+        jTextFieldDate = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -195,8 +220,6 @@ public class Userentry1 extends javax.swing.JFrame {
         jLabel4.setText("Date");
         jPanel1.add(jLabel4);
         jLabel4.setBounds(350, 76, 100, 20);
-        jPanel1.add(jDateChooser);
-        jDateChooser.setBounds(350, 110, 160, 30);
 
         jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jLabel1.setText("Item Code");
@@ -236,7 +259,7 @@ public class Userentry1 extends javax.swing.JFrame {
             }
         });
         jPanel1.add(jButton2);
-        jButton2.setBounds(520, 110, 80, 30);
+        jButton2.setBounds(530, 110, 80, 30);
 
         empName.setEditable(true);
         empName.setToolTipText("");
@@ -253,7 +276,16 @@ public class Userentry1 extends javax.swing.JFrame {
         jPanel1.add(itemCode);
         itemCode.setBounds(10, 270, 200, 30);
 
-        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 150, 610, 490));
+        jTextFieldDate.setEditable(false);
+        jTextFieldDate.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jTextFieldDateActionPerformed(evt);
+            }
+        });
+        jPanel1.add(jTextFieldDate);
+        jTextFieldDate.setBounds(350, 110, 160, 30);
+
+        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(425, 200, 620, 490));
 
         pack();
         setLocationRelativeTo(null);
@@ -270,7 +302,7 @@ String empName = empDetails[0];
 String empID = empDetails[1];
 
 // Get the selected date
-Date selectedDate = jDateChooser.getDate();
+Date selectedDate = new Date(); 
 
 // Format the date to "yyyy-MM-dd"
 SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
@@ -329,6 +361,10 @@ new UserMenu1().setVisible(true);
         // TODO add your handling code here:
     }//GEN-LAST:event_quanActionPerformed
 
+    private void jTextFieldDateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextFieldDateActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jTextFieldDateActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -379,7 +415,6 @@ new UserMenu1().setVisible(true);
     private javax.swing.JComboBox<String> itemName;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
-    private com.toedter.calendar.JDateChooser jDateChooser;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -388,6 +423,7 @@ new UserMenu1().setVisible(true);
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JSeparator jSeparator1;
+    private javax.swing.JTextField jTextFieldDate;
     private javax.swing.JTextField quan;
     private javax.swing.JTextArea totalTA;
     // End of variables declaration//GEN-END:variables

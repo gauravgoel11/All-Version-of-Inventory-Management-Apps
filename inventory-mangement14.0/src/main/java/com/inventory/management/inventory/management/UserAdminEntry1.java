@@ -41,11 +41,14 @@ public class UserAdminEntry1 extends javax.swing.JFrame {
         initComponents();
                 totalTA.setLineWrap(true);
         totalTA.setWrapStyleWord(true); 
-        jDateChooser.setDate(new Date());
+//        jDateChooser.setDate(new Date());
          setExtendedState(this.MAXIMIZED_BOTH);
           setupKeyBindings();
           loadItems(); // Load items into the map and combo boxes
         setupComboBoxListeners();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        String currentDate = dateFormat.format(new Date());
+        jTextFieldDate.setText(currentDate);
          
          /**new code*/
  
@@ -137,7 +140,6 @@ public class UserAdminEntry1 extends javax.swing.JFrame {
         jLabel2 = new javax.swing.JLabel();
         jTextFieldAdminName = new javax.swing.JTextField();
         jLabel4 = new javax.swing.JLabel();
-        jDateChooser = new com.toedter.calendar.JDateChooser();
         jLabel1 = new javax.swing.JLabel();
         jTextFieldQuantity = new javax.swing.JTextField();
         jButton1 = new javax.swing.JButton();
@@ -170,6 +172,7 @@ public class UserAdminEntry1 extends javax.swing.JFrame {
         jLabel6 = new javax.swing.JLabel();
         itemCode = new javax.swing.JComboBox<>();
         AutoCompleteDecorator.decorate(itemCode);
+        jTextFieldDate = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -205,8 +208,6 @@ public class UserAdminEntry1 extends javax.swing.JFrame {
         jLabel4.setText("Date");
         jPanel1.add(jLabel4);
         jLabel4.setBounds(351, 76, 100, 20);
-        jPanel1.add(jDateChooser);
-        jDateChooser.setBounds(350, 110, 160, 30);
 
         jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jLabel1.setText("Quantity");
@@ -273,7 +274,16 @@ public class UserAdminEntry1 extends javax.swing.JFrame {
         jPanel1.add(itemCode);
         itemCode.setBounds(10, 270, 200, 30);
 
-        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 150, 610, 490));
+        jTextFieldDate.setEditable(false);
+        jTextFieldDate.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jTextFieldDateActionPerformed(evt);
+            }
+        });
+        jPanel1.add(jTextFieldDate);
+        jTextFieldDate.setBounds(350, 110, 160, 30);
+
+        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(425, 150, 610, 490));
 
         pack();
         setLocationRelativeTo(null);
@@ -286,7 +296,7 @@ public class UserAdminEntry1 extends javax.swing.JFrame {
     String UpperadminName = adminName.toUpperCase();
     String selectedItem = itemName.getSelectedItem().toString();
     String quantityText = jTextFieldQuantity.getText();
-    java.util.Date selectedDate = jDateChooser.getDate();
+   Date selectedDate = new Date(); 
 
     if (UpperadminName.isEmpty() || selectedItem.isEmpty() || quantityText.isEmpty() || selectedDate == null) {
         totalTA.setText("Please fill in all fields.");
@@ -354,6 +364,10 @@ new UserMenu1().setVisible(true);
         jTextFieldAdminName.setText(selectedEmpName);        // TODO add your handling code here:
     }//GEN-LAST:event_empNameActionPerformed
 
+    private void jTextFieldDateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextFieldDateActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jTextFieldDateActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -400,7 +414,6 @@ new UserMenu1().setVisible(true);
     private javax.swing.JComboBox<String> itemName;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
-    private com.toedter.calendar.JDateChooser jDateChooser;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -411,6 +424,7 @@ new UserMenu1().setVisible(true);
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JTextField jTextFieldAdminName;
+    private javax.swing.JTextField jTextFieldDate;
     private javax.swing.JTextField jTextFieldQuantity;
     private javax.swing.JTextArea totalTA;
     // End of variables declaration//GEN-END:variables

@@ -356,7 +356,7 @@ public class Part_items extends javax.swing.JFrame {
         itemCode.setBounds(30, 270, 200, 30);
 
         getContentPane().add(jPanel1);
-        jPanel1.setBounds(200, 150, 710, 660);
+        jPanel1.setBounds(425, 130, 710, 660);
 
         setSize(new java.awt.Dimension(1394, 892));
         setLocationRelativeTo(null);

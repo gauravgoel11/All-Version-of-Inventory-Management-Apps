@@ -265,7 +265,7 @@ public class RecycleViewAdminEntry extends javax.swing.JFrame {
         jButtonDeleteEntry.setBounds(700, 160, 130, 30);
 
         getContentPane().add(jPanel1);
-        jPanel1.setBounds(150, 150, 1090, 590);
+        jPanel1.setBounds(310, 150, 1090, 590);
 
         pack();
         setLocationRelativeTo(null);

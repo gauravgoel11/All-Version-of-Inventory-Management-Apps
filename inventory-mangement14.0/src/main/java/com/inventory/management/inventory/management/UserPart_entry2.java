@@ -180,6 +180,8 @@ public class UserPart_entry2 extends javax.swing.JFrame {
         jcombopartname.setToolTipText("");
         jPanel1.add(jcombopartname);
         jcombopartname.setBounds(10, 110, 200, 30);
+
+        jTextFieldDate.setEditable(false);
         jPanel1.add(jTextFieldDate);
         jTextFieldDate.setBounds(335, 110, 160, 30);
 

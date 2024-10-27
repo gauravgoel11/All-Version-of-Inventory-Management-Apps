@@ -329,7 +329,7 @@ public class ViewAdminEntry extends javax.swing.JFrame {
         jButtonChangeName.setBounds(940, 150, 130, 23);
 
         getContentPane().add(jPanel1);
-        jPanel1.setBounds(150, 150, 1110, 610);
+        jPanel1.setBounds(310, 150, 1110, 610);
 
         pack();
         setLocationRelativeTo(null);
