@@ -67,7 +67,6 @@ public class AdminMenu extends javax.swing.JFrame {
         jButton8 = new javax.swing.JButton();
         jButton10 = new javax.swing.JButton();
         jButton11 = new javax.swing.JButton();
-        jButton12 = new javax.swing.JButton();
         jButton13 = new javax.swing.JButton();
         jButton14 = new javax.swing.JButton();
 
@@ -167,15 +166,6 @@ public class AdminMenu extends javax.swing.JFrame {
         });
         jPanel1.add(jButton11, new org.netbeans.lib.awtextra.AbsoluteConstraints(550, 150, 390, 60));
 
-        jButton12.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
-        jButton12.setText("View Worker Stock");
-        jButton12.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton12ActionPerformed(evt);
-            }
-        });
-        jPanel1.add(jButton12, new org.netbeans.lib.awtextra.AbsoluteConstraints(550, 390, 390, 60));
-
         jButton13.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         jButton13.setText("Recycle Bin");
         jButton13.addActionListener(new java.awt.event.ActionListener() {
@@ -192,7 +182,7 @@ public class AdminMenu extends javax.swing.JFrame {
                 jButton14ActionPerformed(evt);
             }
         });
-        jPanel1.add(jButton14, new org.netbeans.lib.awtextra.AbsoluteConstraints(550, 470, 390, 60));
+        jPanel1.add(jButton14, new org.netbeans.lib.awtextra.AbsoluteConstraints(550, 390, 390, 60));
 
         getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 150, 1120, 720));
 
@@ -246,12 +236,6 @@ new Part_items().setVisible(true);
 new EditEntry().setVisible(true);
             this.dispose();          // TODO add your handling code here:
     }//GEN-LAST:event_jButton11ActionPerformed
-
-    private void jButton12ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton12ActionPerformed
- new ViewEmployeeStock().setVisible(true);
-            this.dispose();         // TODO add your handling code here:
-        
-    }//GEN-LAST:event_jButton12ActionPerformed
 
     private void formKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_formKeyPressed
         // TODO add your handling code here:
@@ -318,7 +302,6 @@ new EditEntry().setVisible(true);
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton10;
     private javax.swing.JButton jButton11;
-    private javax.swing.JButton jButton12;
     private javax.swing.JButton jButton13;
     private javax.swing.JButton jButton14;
     private javax.swing.JButton jButton2;

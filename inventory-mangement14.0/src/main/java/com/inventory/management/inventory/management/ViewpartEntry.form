@@ -28,7 +28,7 @@
     <Container class="javax.swing.JPanel" name="jPanel1">
       <Constraints>
         <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
-          <AbsoluteConstraints x="150" y="150" width="-1" height="-1"/>
+          <AbsoluteConstraints x="310" y="150" width="-1" height="-1"/>
         </Constraint>
       </Constraints>
 
@@ -42,7 +42,7 @@
                       <Component id="jScrollPane1" alignment="0" max="32767" attributes="0"/>
                       <Group type="102" attributes="0">
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="empName" min="-2" pref="200" max="-2" attributes="0"/>
+                              <Component id="jcombopartname" min="-2" pref="200" max="-2" attributes="0"/>
                               <Component id="jLabel2" min="-2" pref="151" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace type="separate" max="-2" attributes="0"/>
@@ -105,7 +105,7 @@
                   <EmptySpace min="-2" pref="7" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                          <Component id="empName" min="-2" pref="39" max="-2" attributes="0"/>
+                          <Component id="jcombopartname" min="-2" pref="39" max="-2" attributes="0"/>
                           <Component id="jDateChooserFrom" pref="40" max="32767" attributes="0"/>
                           <Component id="jDateChooserTo" alignment="0" pref="40" max="32767" attributes="0"/>
                           <Component id="jTextFieldQuantity" alignment="0" max="32767" attributes="0"/>
@@ -142,9 +142,7 @@
             <Component class="javax.swing.JTable" name="jTable1">
               <Properties>
                 <Property name="model" type="javax.swing.table.TableModel" editor="org.netbeans.modules.form.editors2.TableModelEditor">
-                  <Table columnCount="5" rowCount="4">
-                    <Column editable="true" title="Name" type="java.lang.Object"/>
-                    <Column editable="true" title="EmployeeId" type="java.lang.Object"/>
+                  <Table columnCount="3" rowCount="4">
                     <Column editable="true" title="part" type="java.lang.Object"/>
                     <Column editable="true" title="Quantity" type="java.lang.Object"/>
                     <Column editable="true" title="Date" type="java.lang.Object"/>
@@ -227,7 +225,7 @@
             <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
               <Font name="Segoe UI" size="14" style="1"/>
             </Property>
-            <Property name="text" type="java.lang.String" value="Worker name"/>
+            <Property name="text" type="java.lang.String" value="Product name"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel4">
@@ -259,7 +257,7 @@
             <Property name="text" type="java.lang.String" value="View And Edit Production Entry"/>
           </Properties>
         </Component>
-        <Component class="javax.swing.JComboBox" name="empName">
+        <Component class="javax.swing.JComboBox" name="jcombopartname">
           <Properties>
             <Property name="editable" type="boolean" value="true"/>
             <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
@@ -268,7 +266,7 @@
             <Property name="toolTipText" type="java.lang.String" value=""/>
           </Properties>
           <AuxValues>
-            <AuxValue name="JavaCodeGenerator_CreateCodePost" type="java.lang.String" value="try{&#xa;    Class.forName(&quot;org.sqlite.JDBC&quot;);&#xa;    Connection con = DriverManager.getConnection(&quot;jdbc:sqlite:inven.db&quot;);&#xa;    Statement st = con.createStatement();&#xa;    ResultSet rs = st.executeQuery(&quot;Select * from emp&quot;);&#xa;    while(rs.next()){&#xa;        String s = rs.getString(&quot;empName&quot;)+&quot; &quot;+rs.getString(&quot;empID&quot;);&#xa;        empName.addItem(s);&#xa;    }&#xa;    con.close();&#xa;}&#xa;catch(ClassNotFoundException | SQLException e){&#xa;    System.out.println(&quot;Error is &quot;+e.getMessage());&#xa;}&#xa;AutoCompleteDecorator.decorate(empName);"/>
+            <AuxValue name="JavaCodeGenerator_CreateCodePost" type="java.lang.String" value="try {&#xa;    Class.forName(&quot;org.sqlite.JDBC&quot;);&#xa;    Connection con = DriverManager.getConnection(&quot;jdbc:sqlite:inven.db&quot;);&#xa;    Statement st = con.createStatement();&#xa;    ResultSet rs = st.executeQuery(&quot;Select * from part_items&quot;);&#xa;&#xa;    Set&lt;String&gt; partNames = new HashSet&lt;&gt;();&#xa;    while (rs.next()) {&#xa;        String s = rs.getString(&quot;partName&quot;);&#xa;        partNames.add(s);&#xa;    }&#xa;    con.close();&#xa;&#xa;    for (String partName : partNames) {&#xa;        jcombopartname.addItem(partName);&#xa;    }&#xa;} catch (ClassNotFoundException | SQLException e) {&#xa;    System.out.println(&quot;Error is &quot; + e.getMessage());&#xa;}&#xa;&#xa;AutoCompleteDecorator.decorate(jcombopartname);&#xa;"/>
             <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
           </AuxValues>
         </Component>

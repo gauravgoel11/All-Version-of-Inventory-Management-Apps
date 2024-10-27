@@ -34,9 +34,13 @@ public class UserPart_entry2 extends javax.swing.JFrame {
         initComponents();
                 totalTA.setLineWrap(true);
         totalTA.setWrapStyleWord(true); 
-        jDateChooser.setDate(new Date());
+        
          setExtendedState(this.MAXIMIZED_BOTH);
           setupKeyBindings();
+                           jTextFieldDate.setEditable(false);
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        String currentDate = dateFormat.format(new Date());
+        jTextFieldDate.setText(currentDate);
          
          /**new code*/
  
@@ -80,7 +84,6 @@ public class UserPart_entry2 extends javax.swing.JFrame {
         jLabel3 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
-        jDateChooser = new com.toedter.calendar.JDateChooser();
         quan = new javax.swing.JTextField();
         jButton1 = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
@@ -108,23 +111,7 @@ public class UserPart_entry2 extends javax.swing.JFrame {
         }
 
         AutoCompleteDecorator.decorate(jcombopartname);
-        jLabel5 = new javax.swing.JLabel();
-        empName = new javax.swing.JComboBox<>();
-        try{
-            Class.forName("org.sqlite.JDBC");
-            Connection con = DriverManager.getConnection("jdbc:sqlite:inven.db");
-            Statement st = con.createStatement();
-            ResultSet rs = st.executeQuery("Select * from emp");
-            while(rs.next()){
-                String s = rs.getString("empName")+" "+rs.getString("empID");
-                empName.addItem(s);
-            }
-            con.close();
-        }
-        catch(ClassNotFoundException | SQLException e){
-            System.out.println("Error is "+e.getMessage());
-        }
-        AutoCompleteDecorator.decorate(empName);
+        jTextFieldDate = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -135,26 +122,24 @@ public class UserPart_entry2 extends javax.swing.JFrame {
         empEnt.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         empEnt.setText("Production Entry");
         jPanel1.add(empEnt);
-        empEnt.setBounds(0, 0, 610, 60);
+        empEnt.setBounds(0, 0, 610, 70);
         jPanel1.add(jSeparator1);
-        jSeparator1.setBounds(0, 60, 610, 10);
+        jSeparator1.setBounds(0, 70, 610, 10);
 
         jLabel3.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jLabel3.setText("Quantity");
         jPanel1.add(jLabel3);
-        jLabel3.setBounds(351, 160, 100, 20);
+        jLabel3.setBounds(10, 160, 100, 20);
 
         jLabel2.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jLabel2.setText("Product name");
         jPanel1.add(jLabel2);
-        jLabel2.setBounds(11, 160, 140, 20);
+        jLabel2.setBounds(10, 76, 140, 20);
 
         jLabel4.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jLabel4.setText("Date");
         jPanel1.add(jLabel4);
-        jLabel4.setBounds(351, 76, 100, 20);
-        jPanel1.add(jDateChooser);
-        jDateChooser.setBounds(350, 110, 160, 30);
+        jLabel4.setBounds(350, 76, 100, 20);
 
         quan.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -162,7 +147,7 @@ public class UserPart_entry2 extends javax.swing.JFrame {
             }
         });
         jPanel1.add(quan);
-        quan.setBounds(350, 190, 160, 30);
+        quan.setBounds(10, 190, 200, 30);
 
         jButton1.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         jButton1.setText("Add");
@@ -194,29 +179,20 @@ public class UserPart_entry2 extends javax.swing.JFrame {
         jcombopartname.setEditable(true);
         jcombopartname.setToolTipText("");
         jPanel1.add(jcombopartname);
-        jcombopartname.setBounds(10, 190, 200, 30);
+        jcombopartname.setBounds(10, 110, 200, 30);
+        jPanel1.add(jTextFieldDate);
+        jTextFieldDate.setBounds(335, 110, 160, 30);
 
-        jLabel5.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        jLabel5.setText("Worker Name");
-        jPanel1.add(jLabel5);
-        jLabel5.setBounds(11, 76, 140, 20);
-
-        empName.setEditable(true);
-        empName.setToolTipText("");
-        jPanel1.add(empName);
-        empName.setBounds(10, 110, 200, 30);
-
-        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 150, 610, 490));
+        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(425, 200, 610, 490));
 
         pack();
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-String emp = (String) empName.getSelectedItem();
-String item = (String) jcombopartname.getSelectedItem();
-int qn;
 
+ String item = (String) jcombopartname.getSelectedItem();
+int qn;
 try {
     qn = Integer.parseInt(quan.getText());
 } catch (NumberFormatException e) {
@@ -224,13 +200,8 @@ try {
     return;
 }
 
-// Split the employee name to get empName and empID
-String[] empDetails = emp.split(" ");
-String empName = empDetails[0];
-String empID = empDetails[1];
-
 // Get the selected date
-Date selectedDate = jDateChooser.getDate();
+Date selectedDate = new Date(); 
 if (selectedDate == null) {
     totalTA.append("\nPlease select a date.");
     return;
@@ -246,29 +217,25 @@ try {
     Connection con = DriverManager.getConnection("jdbc:sqlite:inven.db");
 
     // Insert into partentry table
-    String query1 = "INSERT INTO partentry(empName, empID, partName, quantity, entryDate) VALUES (?, ?, ?, ?, ?)";
+    String query1 = "INSERT INTO partentry(partName, quantity, entryDate) VALUES (?, ?, ?)";
     PreparedStatement pst1 = con.prepareStatement(query1);
-    pst1.setString(1, empName);
-    pst1.setString(2, empID);
-    pst1.setString(3, item);
-    pst1.setInt(4, qn);
-    pst1.setString(5, entryDate);
+    pst1.setString(1, item);
+    pst1.setInt(2, qn);
+    pst1.setString(3, entryDate);
 
     int result1 = pst1.executeUpdate();
 
     // Insert into temp_partentry table
-    String query2 = "INSERT INTO temp_partentry(empName, empID, partName, quantity, entryDate) VALUES (?, ?, ?, ?, ?)";
+    String query2 = "INSERT INTO temp_partentry(partName, quantity, entryDate) VALUES (?, ?, ?)";
     PreparedStatement pst2 = con.prepareStatement(query2);
-    pst2.setString(1, empName);
-    pst2.setString(2, empID);
-    pst2.setString(3, item);
-    pst2.setInt(4, qn);
-    pst2.setString(5, entryDate);
+    pst2.setString(1, item);
+    pst2.setInt(2, qn);
+    pst2.setString(3, entryDate);
 
     int result2 = pst2.executeUpdate();
 
     if (result1 > 0 && result2 > 0) {
-        totalTA.append("\nEntry added to both tables: " + item + " : " + qn + " on " + entryDate);
+        totalTA.append("\nEntry added to the table: " + item + " : " + qn + " on " + entryDate);
     } else {
         totalTA.append("\nFailed to add entry to one or both tables.");
     }
@@ -280,9 +247,7 @@ try {
     System.out.println("Error: " + e.getMessage());
     totalTA.append("\nError: " + e.getMessage());
 }
-
 quan.setText("");
-
 
     }//GEN-LAST:event_jButton1ActionPerformed
 
@@ -336,6 +301,22 @@ new UserMenu1().setVisible(true);
         //</editor-fold>
         //</editor-fold>
         //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
@@ -348,17 +329,15 @@ new UserMenu1().setVisible(true);
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel empEnt;
-    private javax.swing.JComboBox<String> empName;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
-    private com.toedter.calendar.JDateChooser jDateChooser;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JSeparator jSeparator1;
+    private javax.swing.JTextField jTextFieldDate;
     private javax.swing.JComboBox<String> jcombopartname;
     private javax.swing.JTextField quan;
     private javax.swing.JTextArea totalTA;

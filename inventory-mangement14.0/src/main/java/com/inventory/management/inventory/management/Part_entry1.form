@@ -28,7 +28,7 @@
     <Container class="javax.swing.JPanel" name="jPanel1">
       <Constraints>
         <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
-          <AbsoluteConstraints x="200" y="150" width="610" height="490"/>
+          <AbsoluteConstraints x="425" y="200" width="610" height="490"/>
         </Constraint>
       </Constraints>
 
@@ -66,7 +66,7 @@
           </Properties>
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
-              <AbsoluteConstraints x="351" y="160" width="100" height="20"/>
+              <AbsoluteConstraints x="10" y="160" width="100" height="20"/>
             </Constraint>
           </Constraints>
         </Component>
@@ -79,7 +79,7 @@
           </Properties>
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
-              <AbsoluteConstraints x="10" y="160" width="140" height="20"/>
+              <AbsoluteConstraints x="10" y="76" width="140" height="20"/>
             </Constraint>
           </Constraints>
         </Component>
@@ -109,7 +109,7 @@
           </Events>
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
-              <AbsoluteConstraints x="350" y="190" width="160" height="30"/>
+              <AbsoluteConstraints x="10" y="190" width="200" height="30"/>
             </Constraint>
           </Constraints>
         </Component>
@@ -175,37 +175,6 @@
           </Properties>
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_CreateCodePost" type="java.lang.String" value="try {&#xd;&#xa;    Class.forName(&quot;org.sqlite.JDBC&quot;);&#xd;&#xa;    Connection con = DriverManager.getConnection(&quot;jdbc:sqlite:inven.db&quot;);&#xd;&#xa;    Statement st = con.createStatement();&#xd;&#xa;    ResultSet rs = st.executeQuery(&quot;Select * from part_items&quot;);&#xd;&#xa;&#xd;&#xa;    Set&lt;String&gt; partNames = new HashSet&lt;&gt;();&#xd;&#xa;    while (rs.next()) {&#xd;&#xa;        String s = rs.getString(&quot;partName&quot;);&#xd;&#xa;        partNames.add(s);&#xd;&#xa;    }&#xd;&#xa;    con.close();&#xd;&#xa;&#xd;&#xa;    for (String partName : partNames) {&#xd;&#xa;        jcombopartname.addItem(partName);&#xd;&#xa;    }&#xd;&#xa;} catch (ClassNotFoundException | SQLException e) {&#xd;&#xa;    System.out.println(&quot;Error is &quot; + e.getMessage());&#xd;&#xa;}&#xd;&#xa;&#xd;&#xa;AutoCompleteDecorator.decorate(jcombopartname);&#xd;&#xa;"/>
-            <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
-          </AuxValues>
-          <Constraints>
-            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
-              <AbsoluteConstraints x="10" y="190" width="200" height="30"/>
-            </Constraint>
-          </Constraints>
-        </Component>
-        <Component class="javax.swing.JLabel" name="jLabel5">
-          <Properties>
-            <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
-              <Font name="Segoe UI" size="14" style="1"/>
-            </Property>
-            <Property name="text" type="java.lang.String" value="Worker Name"/>
-          </Properties>
-          <Constraints>
-            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
-              <AbsoluteConstraints x="11" y="76" width="140" height="20"/>
-            </Constraint>
-          </Constraints>
-        </Component>
-        <Component class="javax.swing.JComboBox" name="empName">
-          <Properties>
-            <Property name="editable" type="boolean" value="true"/>
-            <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
-              <StringArray count="0"/>
-            </Property>
-            <Property name="toolTipText" type="java.lang.String" value=""/>
-          </Properties>
-          <AuxValues>
-            <AuxValue name="JavaCodeGenerator_CreateCodePost" type="java.lang.String" value="try{&#xd;&#xa;    Class.forName(&quot;org.sqlite.JDBC&quot;);&#xd;&#xa;    Connection con = DriverManager.getConnection(&quot;jdbc:sqlite:inven.db&quot;);&#xd;&#xa;    Statement st = con.createStatement();&#xd;&#xa;    ResultSet rs = st.executeQuery(&quot;Select * from emp&quot;);&#xd;&#xa;    while(rs.next()){&#xd;&#xa;        String s = rs.getString(&quot;empName&quot;)+&quot; &quot;+rs.getString(&quot;empID&quot;);&#xd;&#xa;        empName.addItem(s);&#xd;&#xa;    }&#xd;&#xa;    con.close();&#xd;&#xa;}&#xd;&#xa;catch(ClassNotFoundException | SQLException e){&#xd;&#xa;    System.out.println(&quot;Error is &quot;+e.getMessage());&#xd;&#xa;}&#xd;&#xa;AutoCompleteDecorator.decorate(empName);"/>
             <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
           </AuxValues>
           <Constraints>
