@@ -15,12 +15,19 @@ public class InventoryManagement {
     public static void main(String[] args) {
         System.out.println("Hello World!");
         try{
-            Class.forName("org.sqlite.JDBC");
-            Connection con = DriverManager.getConnection("jdbc:sqlite:inven.db");
+             // Load PostgreSQL JDBC driver
+            Class.forName("org.postgresql.Driver");
+            
+            // Connect to PostgreSQL database
+            String url = "jdbc:postgresql://localhost:5432/inven";
+            String user = "your_username"; // Replace with your PostgreSQL username
+            String password = "1234"; // Replace with your PostgreSQL password
+            
+            Connection con = DriverManager.getConnection(url, user, password);
             Statement st = con.createStatement();
-            ResultSet rs = st.executeQuery("Select * from emp");
-            while(rs.next()){
-                System.out.println(rs.getString("empID")+" "+rs.getString("empName"));
+            ResultSet rs = st.executeQuery("SELECT * FROM emp");
+            while (rs.next()) {
+                System.out.println(rs.getString("empID") + " " + rs.getString("empName"));
             }
             con.close();
         }
