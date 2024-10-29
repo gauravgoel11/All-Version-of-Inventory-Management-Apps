@@ -36,6 +36,9 @@ import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
 import java.text.SimpleDateFormat;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 
 /**
  *
@@ -76,10 +79,10 @@ public class EditEntry extends javax.swing.JFrame {
         new AdminMenu().setVisible(true);
         this.dispose();
     }
-    public void viewEntryOfThirtyDays(){
-    try {
+    public void viewEntryOfThirtyDays() {
+    try (Connection conn = DatabaseConnection.getConnection()){
     // Connect to the database
-    Connection conn = DriverManager.getConnection("jdbc:sqlite:inven.db");
+   
 
     // Calculate the date one month ago from today
     java.util.Calendar cal = java.util.Calendar.getInstance();
@@ -117,7 +120,7 @@ public class EditEntry extends javax.swing.JFrame {
     rs.close();
     pstmt.close();
     conn.close();
-} catch (SQLException e) {
+} catch (SQLException | ClassNotFoundException e) {
     JOptionPane.showMessageDialog(null, e.getMessage());
 }
     }
@@ -384,9 +387,9 @@ public class EditEntry extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-try {
+try(Connection conn = DatabaseConnection.getConnection()) {
             // Connect to the database
-            Connection conn = DriverManager.getConnection("jdbc:sqlite:inven.db");
+           
             String sql = "SELECT * FROM entry";
             PreparedStatement pstmt = conn.prepareStatement(sql);
             ResultSet rs = pstmt.executeQuery();
@@ -413,7 +416,7 @@ try {
             rs.close();
             pstmt.close();
             conn.close();
-        } catch (SQLException e) {
+        } catch (SQLException | ClassNotFoundException e) {
             JOptionPane.showMessageDialog(null, e.getMessage());
         }
     }//GEN-LAST:event_jButton1ActionPerformed
@@ -433,72 +436,71 @@ try {
     }//GEN-LAST:event_jButtonPrintActionPerformed
 private JFrame frame;
     private void jButtonCusotmEntryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonCusotmEntryActionPerformed
-try {
+
+        try (Connection conn = DatabaseConnection.getConnection()) {
     // Get selected employee name and ID
     String selectedEmployee = (empName.getSelectedIndex() != -1) ? empName.getSelectedItem().toString() : "";
-    
+
     String empName = "";
     String empID = "";
-    
+
     // Check if an employee is selected
     if (!selectedEmployee.isEmpty()) {
         String[] employeeData = selectedEmployee.split(" ");
         empName = employeeData[0];
         empID = employeeData[1];
     }
-    
+
     // Get selected dates
     java.util.Date fromDate = jDateChooserFrom.getDate();
     java.util.Date toDate = jDateChooserTo.getDate();
-    
-    // Format the date to "yyyy-MM-dd"
-    SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-    String formattedFromDate = (fromDate != null) ? formatter.format(fromDate) : null;
-    String formattedToDate = (toDate != null) ? formatter.format(toDate) : null;
-    
+
+    // Convert java.util.Date to java.sql.Date
+    java.sql.Date sqlFromDate = (fromDate != null) ? new java.sql.Date(fromDate.getTime()) : null;
+    java.sql.Date sqlToDate = (toDate != null) ? new java.sql.Date(toDate.getTime()) : null;
+
     // Prepare SQL query dynamically
     StringBuilder query = new StringBuilder("SELECT * FROM entry WHERE 1=1");
-    
+
     if (!empName.isEmpty()) {
         query.append(" AND empName = ? AND empID = ?");
     }
-    if (formattedFromDate != null) {
+    if (sqlFromDate != null) {
         query.append(" AND entryDate >= ?");
     }
-    if (formattedToDate != null) {
+    if (sqlToDate != null) {
         query.append(" AND entryDate <= ?");
     }
-    
-    // Connect to the database
-    Connection conn = DriverManager.getConnection("jdbc:sqlite:inven.db");
+
+    // Prepare statement
     PreparedStatement pstmt = conn.prepareStatement(query.toString());
-    
+
     // Set parameters dynamically
     int paramIndex = 1;
-    
+
     if (!empName.isEmpty()) {
         pstmt.setString(paramIndex++, empName);
-        pstmt.setString(paramIndex++, empID);
+        pstmt.setInt(paramIndex++, Integer.parseInt(empID));
     }
-    if (formattedFromDate != null) {
-        pstmt.setString(paramIndex++, formattedFromDate);
+    if (sqlFromDate != null) {
+        pstmt.setDate(paramIndex++, sqlFromDate);
     }
-    if (formattedToDate != null) {
-        pstmt.setString(paramIndex++, formattedToDate);
+    if (sqlToDate != null) {
+        pstmt.setDate(paramIndex++, sqlToDate);
     }
-    
+
     // Execute query
     ResultSet rs = pstmt.executeQuery();
-    
+
     // Get table model
     DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
     // Clear existing data
     model.setRowCount(0);
-    
+
     // Get column names dynamically
     ResultSetMetaData metaData = rs.getMetaData();
     int columnCount = metaData.getColumnCount();
-    
+
     // Add rows to the model
     while (rs.next()) {
         Object[] row = new Object[columnCount];
@@ -507,12 +509,12 @@ try {
         }
         model.addRow(row);
     }
-    
+
     // Close connections
     rs.close();
     pstmt.close();
     conn.close();
-} catch (SQLException e) {
+} catch (SQLException | ClassNotFoundException e) {
     JOptionPane.showMessageDialog(null, e.getMessage());
 }
 
@@ -572,7 +574,7 @@ if (row >= 0) {
     
     if (response == JOptionPane.YES_OPTION) {
         String sql = "DELETE FROM entry WHERE empName = ? AND itemName = ? AND entryDate = ?";
-        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:inven.db");
+        try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, empNameValue);
             pstmt.setString(2, itemNameValue);
@@ -582,7 +584,7 @@ if (row >= 0) {
             // Remove row from the table
             model.removeRow(row);
             JOptionPane.showMessageDialog(null, "Entry deleted successfully.");
-        } catch (SQLException e) {
+        } catch (SQLException | ClassNotFoundException e) {
             JOptionPane.showMessageDialog(null, e.getMessage());
         }
     }
@@ -612,8 +614,8 @@ if (row >= 0) {
             JOptionPane.QUESTION_MESSAGE);
 
     if (response == JOptionPane.YES_OPTION) {
-        try {
-            Connection conn = DriverManager.getConnection("jdbc:sqlite:inven.db");
+        try ( Connection conn = DatabaseConnection.getConnection()){
+           
             String sql = "UPDATE entry SET quantity = ? WHERE empName = ? AND itemName = ? AND entryDate = ?";
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, newQuantity);
@@ -625,9 +627,10 @@ if (row >= 0) {
             // Update table display
             model.setValueAt(newQuantity, row, 3);
             JOptionPane.showMessageDialog(null, "Quantity updated successfully.");
-        } catch (SQLException e) {
+        } catch (SQLException | ClassNotFoundException e) {
             JOptionPane.showMessageDialog(null, e.getMessage());
-        }
+             Logger.getLogger(EditEntry.class.getName()).log(Level.SEVERE, null, e);
+        } 
     } 
 } else {
     JOptionPane.showMessageDialog(null, "Please select an entry to update.");
@@ -638,90 +641,90 @@ viewEntryOfThirtyDays();
     }//GEN-LAST:event_jButtonChangeQuantityActionPerformed
 
     private void jBtnTotalWorkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnTotalWorkActionPerformed
+                                          
+    try (Connection conn = DatabaseConnection.getConnection()) {
+        // Get selected employee name and ID
+        String selectedEmployee = (empName.getSelectedIndex() != -1) ? empName.getSelectedItem().toString() : "";
 
-        try {
-            // Get selected employee name and ID
-            String selectedEmployee = (empName.getSelectedIndex() != -1) ? empName.getSelectedItem().toString() : "";
+        String empName = "";
+        String empID = "";
 
-            String empName = "";
-            String empID = "";
-
-            // Check if an employee is selected
-            if (!selectedEmployee.isEmpty()) {
-                String[] employeeData = selectedEmployee.split(" ");
-                empName = employeeData[0];
-                empID = employeeData[1];
-            }
-
-            // Get selected dates
-            java.util.Date fromDate = jDateChooserFrom.getDate();
-            java.util.Date toDate = jDateChooserTo.getDate();
-
-            // Format the date to "yyyy-MM-dd"
-            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-            String formattedFromDate = (fromDate != null) ? formatter.format(fromDate) : null;
-            String formattedToDate = (toDate != null) ? formatter.format(toDate) : null;
-
-            // Prepare SQL query dynamically
-            StringBuilder query = new StringBuilder("SELECT empName, empID, itemName, SUM(quantity) as totalQuantity FROM entry WHERE 1=1");
-
-            if (!empName.isEmpty()) {
-                query.append(" AND empName = ? AND empID = ?");
-            }
-            if (formattedFromDate != null) {
-                query.append(" AND entryDate >= ?");
-            }
-            if (formattedToDate != null) {
-                query.append(" AND entryDate <= ?");
-            }
-            query.append(" GROUP BY empName, empID, itemName");
-
-            // Connect to the database
-            Connection conn = DriverManager.getConnection("jdbc:sqlite:inven.db");
-            PreparedStatement pstmt = conn.prepareStatement(query.toString());
-
-            // Set parameters dynamically
-            int paramIndex = 1;
-
-            if (!empName.isEmpty()) {
-                pstmt.setString(paramIndex++, empName);
-                pstmt.setString(paramIndex++, empID);
-            }
-            if (formattedFromDate != null) {
-                pstmt.setString(paramIndex++, formattedFromDate);
-            }
-            if (formattedToDate != null) {
-                pstmt.setString(paramIndex++, formattedToDate);
-            }
-
-            // Execute query
-            ResultSet rs = pstmt.executeQuery();
-
-            // Get the table model from your JTable
-            DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
-
-            // Clear the existing rows in the table
-            model.setRowCount(0);
-
-            // Populate the table with the query result
-            while (rs.next()) {
-                String resultEmpName = rs.getString("empName");
-                String resultEmpID = rs.getString("empID");
-                String itemName = rs.getString("itemName");
-                int totalQuantity = rs.getInt("totalQuantity");
-
-                // Add a new row to the table model
-                model.addRow(new Object[]{resultEmpName, resultEmpID, itemName, totalQuantity});
-            }
-
-            // Close connections
-            rs.close();
-            pstmt.close();
-            conn.close();
-
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, e.getMessage());
+        // Check if an employee is selected
+        if (!selectedEmployee.isEmpty()) {
+            String[] employeeData = selectedEmployee.split(" ");
+            empName = employeeData[0];
+            empID = employeeData[1];
         }
+
+        // Get selected dates
+        java.util.Date fromDate = jDateChooserFrom.getDate();
+        java.util.Date toDate = jDateChooserTo.getDate();
+
+        // Convert java.util.Date to java.sql.Date
+        java.sql.Date sqlFromDate = (fromDate != null) ? new java.sql.Date(fromDate.getTime()) : null;
+        java.sql.Date sqlToDate = (toDate != null) ? new java.sql.Date(toDate.getTime()) : null;
+
+        // Prepare SQL query dynamically
+        StringBuilder query = new StringBuilder("SELECT empName, empID, itemName, SUM(quantity) as totalQuantity FROM entry WHERE 1=1");
+
+        if (!empName.isEmpty()) {
+            query.append(" AND empName = ? AND empID = ?");
+        }
+        if (sqlFromDate != null) {
+            query.append(" AND entryDate >= ?");
+        }
+        if (sqlToDate != null) {
+            query.append(" AND entryDate <= ?");
+        }
+        query.append(" GROUP BY empName, empID, itemName");
+
+        // Prepare statement
+        PreparedStatement pstmt = conn.prepareStatement(query.toString());
+
+        // Set parameters dynamically
+        int paramIndex = 1;
+
+        if (!empName.isEmpty()) {
+            pstmt.setString(paramIndex++, empName);
+            pstmt.setInt(paramIndex++, Integer.parseInt(empID));
+        }
+        if (sqlFromDate != null) {
+            pstmt.setDate(paramIndex++, sqlFromDate);
+        }
+        if (sqlToDate != null) {
+            pstmt.setDate(paramIndex++, sqlToDate);
+        }
+
+        // Execute query
+        ResultSet rs = pstmt.executeQuery();
+
+        // Get the table model from your JTable
+        DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+
+        // Clear the existing rows in the table
+        model.setRowCount(0);
+
+        // Populate the table with the query result
+        while (rs.next()) {
+            String resultEmpName = rs.getString("empName");
+            String resultEmpID = rs.getString("empID");
+            String itemName = rs.getString("itemName");
+            int totalQuantity = rs.getInt("totalQuantity");
+
+            // Add a new row to the table model
+            model.addRow(new Object[]{resultEmpName, resultEmpID, itemName, totalQuantity});
+        }
+
+        // Close connections
+        rs.close();
+        pstmt.close();
+        conn.close();
+
+    } catch (SQLException | ClassNotFoundException e) {
+        JOptionPane.showMessageDialog(null, e.getMessage());
+    }
+
+
 
     }//GEN-LAST:event_jBtnTotalWorkActionPerformed
 
