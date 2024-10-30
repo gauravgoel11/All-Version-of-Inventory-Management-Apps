@@ -79,51 +79,47 @@ public class EditEntry extends javax.swing.JFrame {
         new AdminMenu().setVisible(true);
         this.dispose();
     }
-    public void viewEntryOfThirtyDays() {
-    try (Connection conn = DatabaseConnection.getConnection()){
-    // Connect to the database
-   
 
-    // Calculate the date one month ago from today
-    java.util.Calendar cal = java.util.Calendar.getInstance();
-    cal.add(java.util.Calendar.MONTH, -1);
-    java.util.Date oneMonthAgo = cal.getTime();
-    SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-    String formattedDate = formatter.format(oneMonthAgo);
+public void viewEntryOfThirtyDays() {
+    try (Connection conn = DatabaseConnection.getConnection()) {
+        // Calculate the date one month ago from today
+        java.util.Calendar cal = java.util.Calendar.getInstance();
+        cal.add(java.util.Calendar.MONTH, -1);
+        java.util.Date oneMonthAgo = cal.getTime();
+        java.sql.Date sqlDate = new java.sql.Date(oneMonthAgo.getTime());
 
-    // Prepare SQL query to select entries from the last month
-    String sql = "SELECT * FROM entry WHERE entryDate >= ?";
-    PreparedStatement pstmt = conn.prepareStatement(sql);
-    pstmt.setString(1, formattedDate);
+        // Prepare SQL query to select entries from the last month
+        String sql = "SELECT * FROM entry WHERE entryDate >= ?";
+        PreparedStatement pstmt = conn.prepareStatement(sql);
+        pstmt.setDate(1, sqlDate);
 
-    ResultSet rs = pstmt.executeQuery();
+        ResultSet rs = pstmt.executeQuery();
 
-    // Get table model
-    DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
-    // Clear existing data
-    model.setRowCount(0);
+        // Get table model
+        DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+        // Clear existing data
+        model.setRowCount(0);
 
-    // Get column names dynamically
-    ResultSetMetaData metaData = rs.getMetaData();
-    int columnCount = metaData.getColumnCount();
+        // Get column names dynamically
+        ResultSetMetaData metaData = rs.getMetaData();
+        int columnCount = metaData.getColumnCount();
 
-    // Add rows to the model
-    while (rs.next()) {
-        Object[] row = new Object[columnCount];
-        for (int i = 1; i <= columnCount; i++) {
-            row[i - 1] = rs.getObject(i);
+        // Add rows to the model
+        while (rs.next()) {
+            Object[] row = new Object[columnCount];
+            for (int i = 1; i <= columnCount; i++) {
+                row[i - 1] = rs.getObject(i);
+            }
+            model.addRow(row);
         }
-        model.addRow(row);
-    }
 
-    // Close connections
-    rs.close();
-    pstmt.close();
-    conn.close();
-} catch (SQLException | ClassNotFoundException e) {
-    JOptionPane.showMessageDialog(null, e.getMessage());
-}
-    }
+        // Close connections
+        rs.close();
+        pstmt.close();
+        conn.close();
+    } catch (SQLException | ClassNotFoundException e) {
+        JOptionPane.showMessageDialog(null, e.getMessage());
+    }}
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -387,38 +383,45 @@ public class EditEntry extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-try(Connection conn = DatabaseConnection.getConnection()) {
-            // Connect to the database
-           
-            String sql = "SELECT * FROM entry";
-            PreparedStatement pstmt = conn.prepareStatement(sql);
-            ResultSet rs = pstmt.executeQuery();
+  try (Connection conn = DatabaseConnection.getConnection()) {
+        // Calculate the date one month ago from today
+        java.util.Calendar cal = java.util.Calendar.getInstance();
+        cal.add(java.util.Calendar.MONTH, -1);
+        java.util.Date oneMonthAgo = cal.getTime();
+        java.sql.Date sqlDate = new java.sql.Date(oneMonthAgo.getTime());
 
-            // Get table model
-            DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
-            // Clear existing data
-            model.setRowCount(0);
+        // Prepare SQL query to select entries from the last month
+        String sql = "SELECT * FROM entry WHERE entryDate >= ?";
+        PreparedStatement pstmt = conn.prepareStatement(sql);
+        pstmt.setDate(1, sqlDate);
 
-            // Get column names dynamically
-            ResultSetMetaData metaData = rs.getMetaData();
-            int columnCount = metaData.getColumnCount();
+        ResultSet rs = pstmt.executeQuery();
 
-            // Add rows to the model
-            while (rs.next()) {
-                Object[] row = new Object[columnCount];
-                for (int i = 1; i <= columnCount; i++) {
-                    row[i - 1] = rs.getObject(i);
-                }
-                model.addRow(row);
+        // Get table model
+        DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+        // Clear existing data
+        model.setRowCount(0);
+
+        // Get column names dynamically
+        ResultSetMetaData metaData = rs.getMetaData();
+        int columnCount = metaData.getColumnCount();
+
+        // Add rows to the model
+        while (rs.next()) {
+            Object[] row = new Object[columnCount];
+            for (int i = 1; i <= columnCount; i++) {
+                row[i - 1] = rs.getObject(i);
             }
-
-            // Close connections
-            rs.close();
-            pstmt.close();
-            conn.close();
-        } catch (SQLException | ClassNotFoundException e) {
-            JOptionPane.showMessageDialog(null, e.getMessage());
+            model.addRow(row);
         }
+
+        // Close connections
+        rs.close();
+        pstmt.close();
+        conn.close();
+    } catch (SQLException | ClassNotFoundException e) {
+        JOptionPane.showMessageDialog(null, e.getMessage());
+    }
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButtonPrintActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonPrintActionPerformed
@@ -556,7 +559,7 @@ private JFrame frame;
     }//GEN-LAST:event_jTable1MouseClicked
 
     private void jButtonDeleteEntryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonDeleteEntryActionPerformed
-        // TODO add your handling code here:
+ // TODO add your handling code here:
 int row = jTable1.getSelectedRow();
 if (row >= 0) {
     DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
@@ -578,12 +581,15 @@ if (row >= 0) {
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, empNameValue);
             pstmt.setString(2, itemNameValue);
-            pstmt.setString(3, entryDate);
+            pstmt.setDate(3, java.sql.Date.valueOf(entryDate)); // Convert string to java.sql.Date
             pstmt.executeUpdate();
             
             // Remove row from the table
             model.removeRow(row);
             JOptionPane.showMessageDialog(null, "Entry deleted successfully.");
+            
+            // Refresh the table to show updated data
+            viewEntryOfThirtyDays();
         } catch (SQLException | ClassNotFoundException e) {
             JOptionPane.showMessageDialog(null, e.getMessage());
         }
@@ -591,12 +597,11 @@ if (row >= 0) {
 } else {
     JOptionPane.showMessageDialog(null, "Please select an entry to delete.");
 }
-viewEntryOfThirtyDays();
 
     }//GEN-LAST:event_jButtonDeleteEntryActionPerformed
 
     private void jButtonChangeQuantityActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonChangeQuantityActionPerformed
-        int row = jTable1.getSelectedRow();
+ int row = jTable1.getSelectedRow();
 if (row >= 0) {
     DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
     String empNameValue = model.getValueAt(row, 0).toString();
@@ -614,14 +619,13 @@ if (row >= 0) {
             JOptionPane.QUESTION_MESSAGE);
 
     if (response == JOptionPane.YES_OPTION) {
-        try ( Connection conn = DatabaseConnection.getConnection()){
-           
+        try (Connection conn = DatabaseConnection.getConnection()) {
             String sql = "UPDATE entry SET quantity = ? WHERE empName = ? AND itemName = ? AND entryDate = ?";
             PreparedStatement pstmt = conn.prepareStatement(sql);
-            pstmt.setString(1, newQuantity);
+            pstmt.setInt(1, Integer.parseInt(newQuantity)); // Assuming quantity is an integer
             pstmt.setString(2, empNameValue);
             pstmt.setString(3, itemNameValue);
-            pstmt.setString(4, entryDate);
+            pstmt.setDate(4, java.sql.Date.valueOf(entryDate)); // Convert string to java.sql.Date
             pstmt.executeUpdate();
             
             // Update table display
@@ -629,7 +633,7 @@ if (row >= 0) {
             JOptionPane.showMessageDialog(null, "Quantity updated successfully.");
         } catch (SQLException | ClassNotFoundException e) {
             JOptionPane.showMessageDialog(null, e.getMessage());
-             Logger.getLogger(EditEntry.class.getName()).log(Level.SEVERE, null, e);
+            Logger.getLogger(EditEntry.class.getName()).log(Level.SEVERE, null, e);
         } 
     } 
 } else {
