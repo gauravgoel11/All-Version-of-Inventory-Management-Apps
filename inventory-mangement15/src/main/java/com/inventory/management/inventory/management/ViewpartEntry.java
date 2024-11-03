@@ -385,8 +385,8 @@ public class ViewpartEntry extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
- try {
-        Connection conn = DriverManager.getConnection("jdbc:sqlite:inven.db");
+                                         
+    try (Connection conn = DatabaseConnection.getConnection()) {
         String sql = "SELECT partName, quantity, entryDate FROM partentry";
         PreparedStatement pstmt = conn.prepareStatement(sql);
         ResultSet rs = pstmt.executeQuery();
@@ -397,16 +397,20 @@ public class ViewpartEntry extends javax.swing.JFrame {
         while (rs.next()) {
             String partName = rs.getString("partName");
             int quantity = rs.getInt("quantity");
-            String entryDate = rs.getString("entryDate");
-            model.addRow(new Object[]{partName, quantity, entryDate});
+            java.sql.Date entryDate = rs.getDate("entryDate");  // Assuming entryDate is stored as a Date in the database
+
+            // Convert java.sql.Date to String if necessary
+            String displayDate = (entryDate != null) ? entryDate.toString() : "No Date";
+            model.addRow(new Object[]{partName, quantity, displayDate});
         }
 
         rs.close();
         pstmt.close();
-        conn.close();
-    } catch (SQLException e) {
+    } catch (ClassNotFoundException | SQLException e) {
         JOptionPane.showMessageDialog(null, e.getMessage());
     }
+
+
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButtonPrintActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonPrintActionPerformed
@@ -435,38 +439,37 @@ private JFrame frame;
     }//GEN-LAST:event_jButtonExitActionPerformed
 
     private void jButtonCusotmEntryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonCusotmEntryActionPerformed
-try {
+                                                   
+    try (Connection conn = DatabaseConnection.getConnection()) {
         String selectedPart = (jcombopartname.getSelectedIndex() != -1) ? jcombopartname.getSelectedItem().toString() : "";
         java.util.Date fromDate = jDateChooserFrom.getDate();
         java.util.Date toDate = jDateChooserTo.getDate();
 
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-        String formattedFromDate = (fromDate != null) ? formatter.format(fromDate) : null;
-        String formattedToDate = (toDate != null) ? formatter.format(toDate) : null;
+        // Convert java.util.Date to java.sql.Date
+        java.sql.Date sqlFromDate = (fromDate != null) ? new java.sql.Date(fromDate.getTime()) : null;
+        java.sql.Date sqlToDate = (toDate != null) ? new java.sql.Date(toDate.getTime()) : null;
 
         StringBuilder query = new StringBuilder("SELECT partName, quantity, entryDate FROM partentry WHERE 1=1");
         if (!selectedPart.isEmpty()) {
             query.append(" AND partName = ?");
         }
-        if (formattedFromDate != null) {
+        if (sqlFromDate != null) {
             query.append(" AND entryDate >= ?");
         }
-        if (formattedToDate != null) {
+        if (sqlToDate != null) {
             query.append(" AND entryDate <= ?");
         }
 
-        Connection conn = DriverManager.getConnection("jdbc:sqlite:inven.db");
         PreparedStatement pstmt = conn.prepareStatement(query.toString());
-
         int paramIndex = 1;
         if (!selectedPart.isEmpty()) {
             pstmt.setString(paramIndex++, selectedPart);
         }
-        if (formattedFromDate != null) {
-            pstmt.setString(paramIndex++, formattedFromDate);
+        if (sqlFromDate != null) {
+            pstmt.setDate(paramIndex++, sqlFromDate);
         }
-        if (formattedToDate != null) {
-            pstmt.setString(paramIndex++, formattedToDate);
+        if (sqlToDate != null) {
+            pstmt.setDate(paramIndex++, sqlToDate);
         }
 
         ResultSet rs = pstmt.executeQuery();
@@ -476,18 +479,17 @@ try {
         while (rs.next()) {
             String partName = rs.getString("partName");
             int quantity = rs.getInt("quantity");
-            String entryDate = rs.getString("entryDate");
+            java.sql.Date entryDate = rs.getDate("entryDate");
             model.addRow(new Object[]{partName, quantity, entryDate});
         }
 
         rs.close();
         pstmt.close();
-        conn.close();
-    } catch (SQLException e) {
+    } catch (ClassNotFoundException | SQLException e) {
         JOptionPane.showMessageDialog(null, e.getMessage());
     }
 
-      // TODO add your handling code here:
+
     }//GEN-LAST:event_jButtonCusotmEntryActionPerformed
 
     private void jButtonResetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonResetActionPerformed
@@ -499,40 +501,38 @@ try {
     }//GEN-LAST:event_jButtonResetActionPerformed
 
     private void jBtnTotalWorkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnTotalWorkActionPerformed
-                                               
-   try {
+                                              
+    try (Connection conn = DatabaseConnection.getConnection()) {
         String selectedPart = (jcombopartname.getSelectedIndex() != -1) ? jcombopartname.getSelectedItem().toString() : "";
         java.util.Date fromDate = jDateChooserFrom.getDate();
         java.util.Date toDate = jDateChooserTo.getDate();
 
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-        String formattedFromDate = (fromDate != null) ? formatter.format(fromDate) : null;
-        String formattedToDate = (toDate != null) ? formatter.format(toDate) : null;
+        // Convert java.util.Date to java.sql.Date
+        java.sql.Date sqlFromDate = (fromDate != null) ? new java.sql.Date(fromDate.getTime()) : null;
+        java.sql.Date sqlToDate = (toDate != null) ? new java.sql.Date(toDate.getTime()) : null;
 
         StringBuilder query = new StringBuilder("SELECT partName, SUM(quantity) as totalQuantity FROM partentry WHERE 1=1");
         if (!selectedPart.isEmpty()) {
             query.append(" AND partName = ?");
         }
-        if (formattedFromDate != null) {
+        if (sqlFromDate != null) {
             query.append(" AND entryDate >= ?");
         }
-        if (formattedToDate != null) {
+        if (sqlToDate != null) {
             query.append(" AND entryDate <= ?");
         }
         query.append(" GROUP BY partName");
 
-        Connection conn = DriverManager.getConnection("jdbc:sqlite:inven.db");
         PreparedStatement pstmt = conn.prepareStatement(query.toString());
-
         int paramIndex = 1;
         if (!selectedPart.isEmpty()) {
             pstmt.setString(paramIndex++, selectedPart);
         }
-        if (formattedFromDate != null) {
-            pstmt.setString(paramIndex++, formattedFromDate);
+        if (sqlFromDate != null) {
+            pstmt.setDate(paramIndex++, sqlFromDate);
         }
-        if (formattedToDate != null) {
-            pstmt.setString(paramIndex++, formattedToDate);
+        if (sqlToDate != null) {
+            pstmt.setDate(paramIndex++, sqlToDate);
         }
 
         ResultSet rs = pstmt.executeQuery();
@@ -547,10 +547,12 @@ try {
 
         rs.close();
         pstmt.close();
-        conn.close();
-    } catch (SQLException e) {
+    } catch (ClassNotFoundException | SQLException e) {
         JOptionPane.showMessageDialog(null, e.getMessage());
     }
+
+                                         
+   
 
 
     }//GEN-LAST:event_jBtnTotalWorkActionPerformed
@@ -561,82 +563,89 @@ try {
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButtonDeleteEntryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonDeleteEntryActionPerformed
-int row = jTable1.getSelectedRow();
-if (row >= 0) {
-    DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
-    String partNameValue = model.getValueAt(row, 0).toString();
-    String quantityValue = model.getValueAt(row, 1).toString(); // Assuming quantity is in column 1
-    String entryDate = model.getValueAt(row, 2).toString(); // Assuming entryDate is in column 2
+                                                   
+    int row = jTable1.getSelectedRow();
+    if (row >= 0) {
+        DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+        String partNameValue = model.getValueAt(row, 0).toString();
+        String quantityValue = model.getValueAt(row, 1).toString(); // Assuming quantity is in column 1
+        String entryDate = model.getValueAt(row, 2).toString(); // Assuming entryDate is in column 2
 
-    int response = JOptionPane.showConfirmDialog(null,
-        "Do you want to delete the entry for part: " + partNameValue +
-        " with quantity: " + quantityValue + " on " + entryDate + "?",
-        "Confirm Deletion",
-        JOptionPane.YES_NO_OPTION,
-        JOptionPane.WARNING_MESSAGE);
+        int response = JOptionPane.showConfirmDialog(null,
+            "Do you want to delete the entry for part: " + partNameValue +
+            " with quantity: " + quantityValue + " on " + entryDate + "?",
+            "Confirm Deletion",
+            JOptionPane.YES_NO_OPTION,
+            JOptionPane.WARNING_MESSAGE);
 
-    if (response == JOptionPane.YES_OPTION) {
-        String sql = "DELETE FROM partentry WHERE partName = ? AND quantity = ? AND entryDate = ?";
-        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:inven.db");
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, partNameValue);
-            pstmt.setString(2, quantityValue);
-            pstmt.setString(3, entryDate);
-            pstmt.executeUpdate();
+        if (response == JOptionPane.YES_OPTION) {
+            String sql = "DELETE FROM partentry WHERE partName = ? AND quantity = ? AND entryDate = ?";
+            try (Connection conn = DatabaseConnection.getConnection();
+                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                pstmt.setString(1, partNameValue);
+                pstmt.setInt(2, Integer.parseInt(quantityValue)); // Assuming quantity is an integer
+                pstmt.setDate(3, java.sql.Date.valueOf(entryDate)); // Convert string to java.sql.Date
+                pstmt.executeUpdate();
 
-            model.removeRow(row);
-            JOptionPane.showMessageDialog(null, "Entry deleted successfully.");
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, e.getMessage());
+                model.removeRow(row);
+                JOptionPane.showMessageDialog(null, "Entry deleted successfully.");
+            } catch (ClassNotFoundException | SQLException e) {
+                JOptionPane.showMessageDialog(null, e.getMessage());
+            }
         }
+    } else {
+        JOptionPane.showMessageDialog(null, "Please select an entry to delete.");
     }
-} else {
-    JOptionPane.showMessageDialog(null, "Please select an entry to delete.");
-}
-oneMonthEntryView();
+    oneMonthEntryView(); // Assuming this method refreshes the view
+
+
 
     }//GEN-LAST:event_jButtonDeleteEntryActionPerformed
 
     private void jButtonChangeQuantityActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonChangeQuantityActionPerformed
-int row = jTable1.getSelectedRow();
-if (row >= 0) {
-    DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
-    String partNameValue = model.getValueAt(row, 0).toString();
-    String entryDate = model.getValueAt(row, 2).toString();
-    String oldQuantity = model.getValueAt(row, 1).toString();
-    String newQuantity = jTextFieldQuantity.getText();
+                                                  
+    int row = jTable1.getSelectedRow();
+    if (row >= 0) {
+        DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+        String partNameValue = model.getValueAt(row, 0).toString();
+        java.util.Date entryDateUtil = (java.util.Date) model.getValueAt(row, 2);
+        java.sql.Date entryDate = new java.sql.Date(entryDateUtil.getTime());
+        String oldQuantity = model.getValueAt(row, 1).toString();
+        String newQuantity = jTextFieldQuantity.getText();
 
-    int response = JOptionPane.showConfirmDialog(null,
-        "Do you want to change the quantity for part " + partNameValue +
-        " from " + oldQuantity + " to " + newQuantity + "?",
-        "Confirm Quantity Update",
-        JOptionPane.YES_NO_OPTION,
-        JOptionPane.QUESTION_MESSAGE);
+        int response = JOptionPane.showConfirmDialog(null,
+            "Do you want to change the quantity for part " + partNameValue +
+            " from " + oldQuantity + " to " + newQuantity + "?",
+            "Confirm Quantity Update",
+            JOptionPane.YES_NO_OPTION,
+            JOptionPane.QUESTION_MESSAGE);
 
-    if (response == JOptionPane.YES_OPTION) {
-        try {
-            Connection conn = DriverManager.getConnection("jdbc:sqlite:inven.db");
-            String sql = "UPDATE partentry SET quantity = ? WHERE partName = ? AND entryDate = ? AND quantity = ?";
-            PreparedStatement pstmt = conn.prepareStatement(sql);
-            pstmt.setString(1, newQuantity);
-            pstmt.setString(2, partNameValue);
-            pstmt.setString(3, entryDate);
-            pstmt.setString(4, oldQuantity);
-            pstmt.executeUpdate();
+        if (response == JOptionPane.YES_OPTION) {
+            try (Connection conn = DatabaseConnection.getConnection()) {
+                String sql = "UPDATE partentry SET quantity = ? WHERE partName = ? AND entryDate = ? AND quantity = ?";
+                PreparedStatement pstmt = conn.prepareStatement(sql);
+                pstmt.setInt(1, Integer.parseInt(newQuantity)); // Assuming quantity is an integer
+                pstmt.setString(2, partNameValue);
+                pstmt.setDate(3, entryDate);
+                pstmt.setInt(4, Integer.parseInt(oldQuantity)); // Assuming old quantity is an integer
 
-            model.setValueAt(newQuantity, row, 1);
-            JOptionPane.showMessageDialog(null, "Quantity updated successfully.");
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, e.getMessage());
+                int updatedRows = pstmt.executeUpdate();
+                if (updatedRows > 0) {
+                    model.setValueAt(newQuantity, row, 1);
+                    JOptionPane.showMessageDialog(null, "Quantity updated successfully.");
+                } else {
+                    JOptionPane.showMessageDialog(null, "No rows updated, check your data.");
+                }
+            } catch (ClassNotFoundException | SQLException e) {
+                JOptionPane.showMessageDialog(null, e.getMessage());
+            }
         }
+    } else {
+        JOptionPane.showMessageDialog(null, "Please select an entry to update.");
     }
-} else {
-    JOptionPane.showMessageDialog(null, "Please select an entry to update.");
-}
-oneMonthEntryView();
+    oneMonthEntryView(); // Assuming this method refreshes the view
 
 
-        // TODO add your handling code here:
     }//GEN-LAST:event_jButtonChangeQuantityActionPerformed
 
     private void jTable1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable1MouseClicked
