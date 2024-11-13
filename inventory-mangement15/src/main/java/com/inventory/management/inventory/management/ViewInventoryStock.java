@@ -77,14 +77,15 @@ public class ViewInventoryStock extends javax.swing.JFrame {
         new AdminMenu().setVisible(true);
         this.dispose();
     }
-        private void totalStockLeft(){
-     try {
-        String selecteditem = (itemName.getSelectedIndex() != -1) ? itemName.getSelectedItem().toString() : "";
+ private void totalStockLeft() {
+    try (Connection conn = DatabaseConnection.getConnection()) {
+        String selectedItem = (itemName.getSelectedIndex() != -1) ? itemName.getSelectedItem().toString() : "";
         java.util.Date fromDate = jDateChooserFrom.getDate();
         java.util.Date toDate = jDateChooserTo.getDate();
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-        String formattedFromDate = (fromDate != null) ? formatter.format(fromDate) : null;
-        String formattedToDate = (toDate != null) ? formatter.format(toDate) : null;
+
+        // Convert java.util.Date to java.sql.Date
+        java.sql.Date sqlFromDate = (fromDate != null) ? new java.sql.Date(fromDate.getTime()) : null;
+        java.sql.Date sqlToDate = (toDate != null) ? new java.sql.Date(toDate.getTime()) : null;
 
         StringBuilder query = new StringBuilder(
             "SELECT itemName, SUM(creditQuantity) - SUM(debitQuantity) as totalStock " +
@@ -95,13 +96,13 @@ public class ViewInventoryStock extends javax.swing.JFrame {
         );
 
         // Applying filters to the 'adminentry' table
-        if (!selecteditem.isEmpty()) {
+        if (!selectedItem.isEmpty()) {
             query.append(" AND itemName = ?");
         }
-        if (formattedFromDate != null) {
+        if (sqlFromDate != null) {
             query.append(" AND entryDate >= ?");
         }
-        if (formattedToDate != null) {
+        if (sqlToDate != null) {
             query.append(" AND entryDate <= ?");
         }
 
@@ -112,42 +113,41 @@ public class ViewInventoryStock extends javax.swing.JFrame {
         query.append(" WHERE 1=1 ");
 
         // Applying filters to the 'entry' table
-        if (!selecteditem.isEmpty()) {
+        if (!selectedItem.isEmpty()) {
             query.append(" AND itemName = ?");
         }
-        if (formattedFromDate != null) {
+        if (sqlFromDate != null) {
             query.append(" AND entryDate >= ?");
         }
-        if (formattedToDate != null) {
+        if (sqlToDate != null) {
             query.append(" AND entryDate <= ?");
         }
 
         query.append(" GROUP BY itemName ");
         query.append(") GROUP BY itemName");
 
-        Connection conn = DriverManager.getConnection("jdbc:sqlite:inven.db");
         PreparedStatement pstmt = conn.prepareStatement(query.toString());
 
         int paramIndex = 1;
         // Setting parameters for 'adminentry' table filters
-        if (!selecteditem.isEmpty()) {
-            pstmt.setString(paramIndex++, selecteditem);
+        if (!selectedItem.isEmpty()) {
+            pstmt.setString(paramIndex++, selectedItem);
         }
-        if (formattedFromDate != null) {
-            pstmt.setString(paramIndex++, formattedFromDate);
+        if (sqlFromDate != null) {
+            pstmt.setDate(paramIndex++, sqlFromDate);
         }
-        if (formattedToDate != null) {
-            pstmt.setString(paramIndex++, formattedToDate);
+        if (sqlToDate != null) {
+            pstmt.setDate(paramIndex++, sqlToDate);
         }
         // Setting parameters for 'entry' table filters
-        if (!selecteditem.isEmpty()) {
-            pstmt.setString(paramIndex++, selecteditem);
+        if (!selectedItem.isEmpty()) {
+            pstmt.setString(paramIndex++, selectedItem);
         }
-        if (formattedFromDate != null) {
-            pstmt.setString(paramIndex++, formattedFromDate);
+        if (sqlFromDate != null) {
+            pstmt.setDate(paramIndex++, sqlFromDate);
         }
-        if (formattedToDate != null) {
-            pstmt.setString(paramIndex++, formattedToDate);
+        if (sqlToDate != null) {
+            pstmt.setDate(paramIndex++, sqlToDate);
         }
 
         ResultSet rs = pstmt.executeQuery();
@@ -163,11 +163,11 @@ public class ViewInventoryStock extends javax.swing.JFrame {
 
         rs.close();
         pstmt.close();
-        conn.close();
-    } catch (SQLException e) {
+    } catch (ClassNotFoundException | SQLException e) {
         JOptionPane.showMessageDialog(null, e.getMessage());
     }
-    }
+}
+
 
 
     /**
@@ -390,36 +390,40 @@ public class ViewInventoryStock extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jBtnCreditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnCreditActionPerformed
-   try {
-        String selecteditem = (itemName.getSelectedIndex() != -1) ? itemName.getSelectedItem().toString() : "";
+                                           
+    try (Connection conn = DatabaseConnection.getConnection()) {
+        String selectedItem = (itemName.getSelectedIndex() != -1) ? itemName.getSelectedItem().toString() : "";
         java.util.Date fromDate = jDateChooserFrom.getDate();
         java.util.Date toDate = jDateChooserTo.getDate();
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-        String formattedFromDate = (fromDate != null) ? formatter.format(fromDate) : null;
-        String formattedToDate = (toDate != null) ? formatter.format(toDate) : null;
+
+        // Convert java.util.Date to java.sql.Date
+        java.sql.Date sqlFromDate = (fromDate != null) ? new java.sql.Date(fromDate.getTime()) : null;
+        java.sql.Date sqlToDate = (toDate != null) ? new java.sql.Date(toDate.getTime()) : null;
+
         StringBuilder query = new StringBuilder("SELECT itemName, SUM(quantity) as totalQuantity FROM adminentry WHERE 1=1");
-        if (!selecteditem.isEmpty()) {
+        if (!selectedItem.isEmpty()) {
             query.append(" AND itemName = ?");
         }
-        if (formattedFromDate != null) {
+        if (sqlFromDate != null) {
             query.append(" AND entryDate >= ?");
         }
-        if (formattedToDate != null) {
+        if (sqlToDate != null) {
             query.append(" AND entryDate <= ?");
         }
         query.append(" GROUP BY itemName");
-        Connection conn = DriverManager.getConnection("jdbc:sqlite:inven.db");
+
         PreparedStatement pstmt = conn.prepareStatement(query.toString());
         int paramIndex = 1;
-        if (!selecteditem.isEmpty()) {
-            pstmt.setString(paramIndex++, selecteditem);
+        if (!selectedItem.isEmpty()) {
+            pstmt.setString(paramIndex++, selectedItem);
         }
-        if (formattedFromDate != null) {
-            pstmt.setString(paramIndex++, formattedFromDate);
+        if (sqlFromDate != null) {
+            pstmt.setDate(paramIndex++, sqlFromDate);
         }
-        if (formattedToDate != null) {
-            pstmt.setString(paramIndex++, formattedToDate);
+        if (sqlToDate != null) {
+            pstmt.setDate(paramIndex++, sqlToDate);
         }
+
         ResultSet rs = pstmt.executeQuery();
         DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
         model.setRowCount(0);
@@ -428,12 +432,14 @@ public class ViewInventoryStock extends javax.swing.JFrame {
             int totalQuantity = rs.getInt("totalQuantity");
             model.addRow(new Object[]{itemName, totalQuantity});
         }
+
         rs.close();
         pstmt.close();
-        conn.close();
-    } catch (SQLException e) {
+    } catch (ClassNotFoundException | SQLException e) {
         JOptionPane.showMessageDialog(null, e.getMessage());
-}
+    }
+
+
 
 
     }//GEN-LAST:event_jBtnCreditActionPerformed
@@ -464,55 +470,57 @@ private JFrame frame;
     }//GEN-LAST:event_jButtonExitActionPerformed
 
     private void jBtnDebitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnDebitActionPerformed
-
-     try {
-        String selecteditem = (itemName.getSelectedIndex() != -1) ? itemName.getSelectedItem().toString() : "";
+                                         
+    try (Connection conn = DatabaseConnection.getConnection()) {
+        String selectedItem = (itemName.getSelectedIndex() != -1) ? itemName.getSelectedItem().toString() : "";
         java.util.Date fromDate = jDateChooserFrom.getDate();
         java.util.Date toDate = jDateChooserTo.getDate();
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-        String formattedFromDate = (fromDate != null) ? formatter.format(fromDate) : null;
-        String formattedToDate = (toDate != null) ? formatter.format(toDate) : null;
+
+        // Convert java.util.Date to java.sql.Date
+        java.sql.Date sqlFromDate = (fromDate != null) ? new java.sql.Date(fromDate.getTime()) : null;
+        java.sql.Date sqlToDate = (toDate != null) ? new java.sql.Date(toDate.getTime()) : null;
+
         StringBuilder query = new StringBuilder("SELECT itemName, SUM(quantity) as totalQuantity FROM entry WHERE 1=1");
-        if (!selecteditem.isEmpty()) {
+        if (!selectedItem.isEmpty()) {
             query.append(" AND itemName = ?");
         }
-        if (formattedFromDate != null) {
+        if (sqlFromDate != null) {
             query.append(" AND entryDate >= ?");
         }
-        if (formattedToDate != null) {
+        if (sqlToDate != null) {
             query.append(" AND entryDate <= ?");
         }
         query.append(" GROUP BY itemName");
-        Connection conn = DriverManager.getConnection("jdbc:sqlite:inven.db");
+
         PreparedStatement pstmt = conn.prepareStatement(query.toString());
         int paramIndex = 1;
-        if (!selecteditem.isEmpty()) {
-            pstmt.setString(paramIndex++, selecteditem);
+        if (!selectedItem.isEmpty()) {
+            pstmt.setString(paramIndex++, selectedItem);
         }
-        if (formattedFromDate != null) {
-            pstmt.setString(paramIndex++, formattedFromDate);
+        if (sqlFromDate != null) {
+            pstmt.setDate(paramIndex++, sqlFromDate);
         }
-        if (formattedToDate != null) {
-            pstmt.setString(paramIndex++, formattedToDate);
+        if (sqlToDate != null) {
+            pstmt.setDate(paramIndex++, sqlToDate);
         }
+
         ResultSet rs = pstmt.executeQuery();
         DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
         model.setRowCount(0);
+
         while (rs.next()) {
             String itemName = rs.getString("itemName");
             int totalQuantity = rs.getInt("totalQuantity");
             model.addRow(new Object[]{itemName, totalQuantity});
         }
+
         rs.close();
         pstmt.close();
-        conn.close();
-    } catch (SQLException e) {
+    } catch (ClassNotFoundException | SQLException e) {
         JOptionPane.showMessageDialog(null, e.getMessage());
     }
 
 
-
-      // TODO add your handling code here:
     }//GEN-LAST:event_jBtnDebitActionPerformed
 
     private void jButtonResetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonResetActionPerformed
@@ -523,14 +531,15 @@ private JFrame frame;
     }//GEN-LAST:event_jButtonResetActionPerformed
 
     private void jBtnTotalStockActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnTotalStockActionPerformed
-                                              
-      try {
-        String selecteditem = (itemName.getSelectedIndex() != -1) ? itemName.getSelectedItem().toString() : "";
+                                                  
+    try (Connection conn = DatabaseConnection.getConnection()) {
+        String selectedItem = (itemName.getSelectedIndex() != -1) ? itemName.getSelectedItem().toString() : "";
         java.util.Date fromDate = jDateChooserFrom.getDate();
         java.util.Date toDate = jDateChooserTo.getDate();
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-        String formattedFromDate = (fromDate != null) ? formatter.format(fromDate) : null;
-        String formattedToDate = (toDate != null) ? formatter.format(toDate) : null;
+
+        // Convert java.util.Date to java.sql.Date
+        java.sql.Date sqlFromDate = (fromDate != null) ? new java.sql.Date(fromDate.getTime()) : null;
+        java.sql.Date sqlToDate = (toDate != null) ? new java.sql.Date(toDate.getTime()) : null;
 
         StringBuilder query = new StringBuilder(
             "SELECT itemName, SUM(creditQuantity) - SUM(debitQuantity) as totalStock " +
@@ -541,13 +550,13 @@ private JFrame frame;
         );
 
         // Applying filters to the 'adminentry' table
-        if (!selecteditem.isEmpty()) {
+        if (!selectedItem.isEmpty()) {
             query.append(" AND itemName = ?");
         }
-        if (formattedFromDate != null) {
+        if (sqlFromDate != null) {
             query.append(" AND entryDate >= ?");
         }
-        if (formattedToDate != null) {
+        if (sqlToDate != null) {
             query.append(" AND entryDate <= ?");
         }
 
@@ -558,42 +567,41 @@ private JFrame frame;
         query.append(" WHERE 1=1 ");
 
         // Applying filters to the 'entry' table
-        if (!selecteditem.isEmpty()) {
+        if (!selectedItem.isEmpty()) {
             query.append(" AND itemName = ?");
         }
-        if (formattedFromDate != null) {
+        if (sqlFromDate != null) {
             query.append(" AND entryDate >= ?");
         }
-        if (formattedToDate != null) {
+        if (sqlToDate != null) {
             query.append(" AND entryDate <= ?");
         }
 
         query.append(" GROUP BY itemName ");
         query.append(") GROUP BY itemName");
 
-        Connection conn = DriverManager.getConnection("jdbc:sqlite:inven.db");
         PreparedStatement pstmt = conn.prepareStatement(query.toString());
 
         int paramIndex = 1;
         // Setting parameters for 'adminentry' table filters
-        if (!selecteditem.isEmpty()) {
-            pstmt.setString(paramIndex++, selecteditem);
+        if (!selectedItem.isEmpty()) {
+            pstmt.setString(paramIndex++, selectedItem);
         }
-        if (formattedFromDate != null) {
-            pstmt.setString(paramIndex++, formattedFromDate);
+        if (sqlFromDate != null) {
+            pstmt.setDate(paramIndex++, sqlFromDate);
         }
-        if (formattedToDate != null) {
-            pstmt.setString(paramIndex++, formattedToDate);
+        if (sqlToDate != null) {
+            pstmt.setDate(paramIndex++, sqlToDate);
         }
         // Setting parameters for 'entry' table filters
-        if (!selecteditem.isEmpty()) {
-            pstmt.setString(paramIndex++, selecteditem);
+        if (!selectedItem.isEmpty()) {
+            pstmt.setString(paramIndex++, selectedItem);
         }
-        if (formattedFromDate != null) {
-            pstmt.setString(paramIndex++, formattedFromDate);
+        if (sqlFromDate != null) {
+            pstmt.setDate(paramIndex++, sqlFromDate);
         }
-        if (formattedToDate != null) {
-            pstmt.setString(paramIndex++, formattedToDate);
+        if (sqlToDate != null) {
+            pstmt.setDate(paramIndex++, sqlToDate);
         }
 
         ResultSet rs = pstmt.executeQuery();
@@ -609,10 +617,10 @@ private JFrame frame;
 
         rs.close();
         pstmt.close();
-        conn.close();
-    } catch (SQLException e) {
+    } catch (ClassNotFoundException | SQLException e) {
         JOptionPane.showMessageDialog(null, e.getMessage());
     }
+
 
                         
     }//GEN-LAST:event_jBtnTotalStockActionPerformed

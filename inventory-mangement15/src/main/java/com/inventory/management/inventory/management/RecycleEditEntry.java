@@ -76,50 +76,47 @@ public class RecycleEditEntry extends javax.swing.JFrame {
         new RecycleMenu().setVisible(true);
         this.dispose();
     }
-    private void oneMonthEntry(){
-    try {
-    // Connect to the database
-    Connection conn = DriverManager.getConnection("jdbc:sqlite:inven.db");
+ private void oneMonthEntry() {
+    try (Connection conn = DatabaseConnection.getConnection()) {
+        // Calculate the date one month ago from today
+        java.util.Calendar cal = java.util.Calendar.getInstance();
+        cal.add(java.util.Calendar.MONTH, -1);
+        java.util.Date oneMonthAgo = cal.getTime();
+        java.sql.Date sqlDate = new java.sql.Date(oneMonthAgo.getTime());
 
-    // Calculate the date one month ago from today
-    java.util.Calendar cal = java.util.Calendar.getInstance();
-    cal.add(java.util.Calendar.MONTH, -1);
-    java.util.Date oneMonthAgo = cal.getTime();
-    SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-    String formattedDate = formatter.format(oneMonthAgo);
+        // Prepare SQL query to select entries from the last month
+        String sql = "SELECT * FROM temp_entry WHERE entryDate >= ?";
+        PreparedStatement pstmt = conn.prepareStatement(sql);
+        pstmt.setDate(1, sqlDate);
 
-    // Prepare SQL query to select entries from the last month
-    String sql = "SELECT * FROM temp_entry WHERE entryDate >= ?";
-    PreparedStatement pstmt = conn.prepareStatement(sql);
-    pstmt.setString(1, formattedDate);
+        ResultSet rs = pstmt.executeQuery();
 
-    ResultSet rs = pstmt.executeQuery();
+        // Get table model
+        DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+        // Clear existing data
+        model.setRowCount(0);
 
-    // Get table model
-    DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
-    // Clear existing data
-    model.setRowCount(0);
+        // Get column names dynamically
+        ResultSetMetaData metaData = rs.getMetaData();
+        int columnCount = metaData.getColumnCount();
 
-    // Get column names dynamically
-    ResultSetMetaData metaData = rs.getMetaData();
-    int columnCount = metaData.getColumnCount();
-
-    // Add rows to the model
-    while (rs.next()) {
-        Object[] row = new Object[columnCount];
-        for (int i = 1; i <= columnCount; i++) {
-            row[i - 1] = rs.getObject(i);
+        // Add rows to the model
+        while (rs.next()) {
+            Object[] row = new Object[columnCount];
+            for (int i = 1; i <= columnCount; i++) {
+                row[i - 1] = rs.getObject(i);
+            }
+            model.addRow(row);
         }
-        model.addRow(row);
-    }
 
-    // Close connections
-    rs.close();
-    pstmt.close();
-    conn.close();
-} catch (SQLException e) {
-    JOptionPane.showMessageDialog(null, e.getMessage());
-}}
+        // Close connections
+        rs.close();
+        pstmt.close();
+    } catch (ClassNotFoundException | SQLException e) {
+        JOptionPane.showMessageDialog(null, e.getMessage());
+    }
+}
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -141,19 +138,15 @@ public class RecycleEditEntry extends javax.swing.JFrame {
         jLabel5 = new javax.swing.JLabel();
         empEnt = new javax.swing.JLabel();
         empName = new javax.swing.JComboBox<>();
-        try{
-            Class.forName("org.sqlite.JDBC");
-            Connection con = DriverManager.getConnection("jdbc:sqlite:inven.db");
-            Statement st = con.createStatement();
-            ResultSet rs = st.executeQuery("Select * from emp");
-            while(rs.next()){
-                String s = rs.getString("empName")+" "+rs.getString("empID");
+        try (Connection conn = DatabaseConnection.getConnection()) {
+            Statement st = conn.createStatement();
+            ResultSet rs = st.executeQuery("SELECT * FROM emp");
+            while (rs.next()) {
+                String s = rs.getString("empName") + " " + rs.getString("empID");
                 empName.addItem(s);
             }
-            con.close();
-        }
-        catch(ClassNotFoundException | SQLException e){
-            System.out.println("Error is "+e.getMessage());
+        } catch (ClassNotFoundException | SQLException e) {
+            System.out.println("Error: " + e.getMessage());
         }
         AutoCompleteDecorator.decorate(empName);
         jButtonRestoreEntry = new javax.swing.JButton();
@@ -311,49 +304,46 @@ public class RecycleEditEntry extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-try {
-    // Connect to the database
-    Connection conn = DriverManager.getConnection("jdbc:sqlite:inven.db");
+                                       
+    try (Connection conn = DatabaseConnection.getConnection()) {
+        // Calculate the date one month ago from today
+        java.util.Calendar cal = java.util.Calendar.getInstance();
+        cal.add(java.util.Calendar.MONTH, -1);
+        java.util.Date oneMonthAgo = cal.getTime();
+        java.sql.Date sqlDate = new java.sql.Date(oneMonthAgo.getTime());
 
-    // Calculate the date one month ago from today
-    java.util.Calendar cal = java.util.Calendar.getInstance();
-    cal.add(java.util.Calendar.MONTH, -1);
-    java.util.Date oneMonthAgo = cal.getTime();
-    SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-    String formattedDate = formatter.format(oneMonthAgo);
+        // Prepare SQL query to select entries from the last month
+        String sql = "SELECT * FROM temp_entry WHERE entryDate >= ?";
+        PreparedStatement pstmt = conn.prepareStatement(sql);
+        pstmt.setDate(1, sqlDate);
 
-    // Prepare SQL query to select entries from the last month
-    String sql = "SELECT * FROM temp_entry WHERE entryDate >= ?";
-    PreparedStatement pstmt = conn.prepareStatement(sql);
-    pstmt.setString(1, formattedDate);
+        ResultSet rs = pstmt.executeQuery();
 
-    ResultSet rs = pstmt.executeQuery();
+        // Get table model
+        DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+        // Clear existing data
+        model.setRowCount(0);
 
-    // Get table model
-    DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
-    // Clear existing data
-    model.setRowCount(0);
+        // Get column names dynamically
+        ResultSetMetaData metaData = rs.getMetaData();
+        int columnCount = metaData.getColumnCount();
 
-    // Get column names dynamically
-    ResultSetMetaData metaData = rs.getMetaData();
-    int columnCount = metaData.getColumnCount();
-
-    // Add rows to the model
-    while (rs.next()) {
-        Object[] row = new Object[columnCount];
-        for (int i = 1; i <= columnCount; i++) {
-            row[i - 1] = rs.getObject(i);
+        // Add rows to the model
+        while (rs.next()) {
+            Object[] row = new Object[columnCount];
+            for (int i = 1; i <= columnCount; i++) {
+                row[i - 1] = rs.getObject(i);
+            }
+            model.addRow(row);
         }
-        model.addRow(row);
+
+        // Close connections
+        rs.close();
+        pstmt.close();
+    } catch (ClassNotFoundException | SQLException e) {
+        JOptionPane.showMessageDialog(null, e.getMessage());
     }
 
-    // Close connections
-    rs.close();
-    pstmt.close();
-    conn.close();
-} catch (SQLException e) {
-    JOptionPane.showMessageDialog(null, e.getMessage());
-}
 
     }//GEN-LAST:event_jButton1ActionPerformed
 private JFrame frame;
@@ -383,46 +373,40 @@ private JFrame frame;
     }//GEN-LAST:event_jTextFieldQuantityActionPerformed
 
     private void jButtonRestoreEntryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonRestoreEntryActionPerformed
-
+                                                    
     int selectedRow = jTable1.getSelectedRow();
     if (selectedRow != -1) {
         DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
 
         // Assuming your table has columns: empName, empID, itemName, quantity, entryDate
         String empName = model.getValueAt(selectedRow, 0).toString();
-        String empID = model.getValueAt(selectedRow, 1).toString();
+        int empID = Integer.parseInt(model.getValueAt(selectedRow, 1).toString()); // Assuming empID is an integer
         String itemName = model.getValueAt(selectedRow, 2).toString();
-        String quantity = model.getValueAt(selectedRow, 3).toString();
-        String entryDate = model.getValueAt(selectedRow, 4).toString();
+        int quantity = Integer.parseInt(model.getValueAt(selectedRow, 3).toString()); // Assuming quantity is an integer
+        java.sql.Date entryDate = java.sql.Date.valueOf(model.getValueAt(selectedRow, 4).toString()); // Convert string to java.sql.Date
 
-        try {
-            // Connect to the database
-            Connection conn = DriverManager.getConnection("jdbc:sqlite:inven.db");
+        try (Connection conn = DatabaseConnection.getConnection()) { // Using DatabaseConnection class for PostgreSQL connection
             String sql = "INSERT INTO entry (empName, empID, itemName, quantity, entryDate) VALUES (?, ?, ?, ?, ?)";
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, empName);
-            pstmt.setString(2, empID);
+            pstmt.setInt(2, empID);
             pstmt.setString(3, itemName);
-            pstmt.setString(4, quantity);
-            pstmt.setString(5, entryDate);
+            pstmt.setInt(4, quantity);
+            pstmt.setDate(5, entryDate);
 
             // Execute the insert
             pstmt.executeUpdate();
 
-            // Close the connection
+            // Close the statement
             pstmt.close();
-            conn.close();
 
             JOptionPane.showMessageDialog(null, "Row copied to entry table successfully.");
-        } catch (SQLException e) {
+        } catch (ClassNotFoundException | SQLException e) {
             JOptionPane.showMessageDialog(null, "Error: " + e.getMessage());
         }
     } else {
         JOptionPane.showMessageDialog(null, "Please select a row to copy.");
     }
-
-
-
 
 
     }//GEN-LAST:event_jButtonRestoreEntryActionPerformed

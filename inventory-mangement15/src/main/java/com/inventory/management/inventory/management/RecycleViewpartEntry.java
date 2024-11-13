@@ -92,46 +92,48 @@ public class RecycleViewpartEntry extends javax.swing.JFrame {
         new RecycleMenu().setVisible(true);
         this.dispose();
     }
-    private void oneMonthEntry(){
+private void oneMonthEntry() {
     try {
-    // Connect to the database
-    Connection conn = DriverManager.getConnection("jdbc:sqlite:inven.db");
+        // Connect to the database using PostgreSQL
+        Connection conn = DatabaseConnection.getConnection();
 
-    // Calculate the date one month ago from today
-    java.util.Calendar cal = java.util.Calendar.getInstance();
-    cal.add(java.util.Calendar.MONTH, -1);
-    java.util.Date oneMonthAgo = cal.getTime();
-    SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-    String formattedDate = formatter.format(oneMonthAgo);
+        // Calculate the date one month ago from today
+        java.util.Calendar cal = java.util.Calendar.getInstance();
+        cal.add(java.util.Calendar.MONTH, -1);
+        java.util.Date oneMonthAgo = cal.getTime();
 
-    // Prepare SQL query to select entries from the last month
-    String sql = "SELECT partName, quantity, entryDate FROM temp_partentry WHERE entryDate >= ?";
-    PreparedStatement pstmt = conn.prepareStatement(sql);
-    pstmt.setString(1, formattedDate);
+        // Convert java.util.Date to java.sql.Date for use in the prepared statement
+        java.sql.Date sqlDate = new java.sql.Date(oneMonthAgo.getTime());
 
-    ResultSet rs = pstmt.executeQuery();
+        // Prepare SQL query to select entries from the last month
+        String sql = "SELECT partName, quantity, entryDate FROM temp_partentry WHERE entryDate >= ?";
+        PreparedStatement pstmt = conn.prepareStatement(sql);
+        pstmt.setDate(1, sqlDate);  // Use setDate instead of setString
 
-    // Get table model
-    DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
-    // Clear existing data
-    model.setRowCount(0);
+        ResultSet rs = pstmt.executeQuery();
 
-    // Add rows to the model
-    while (rs.next()) {
-        String partName = rs.getString("partName");
-        int quantity = rs.getInt("quantity");
-        String entryDate = rs.getString("entryDate");
-        model.addRow(new Object[]{partName, quantity, entryDate});
+        // Get table model
+        DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+        // Clear existing data
+        model.setRowCount(0);
+
+        // Add rows to the model
+        while (rs.next()) {
+            String partName = rs.getString("partName");
+            int quantity = rs.getInt("quantity");
+            java.sql.Date entryDate = rs.getDate("entryDate");
+            model.addRow(new Object[]{partName, quantity, entryDate.toString()});
+        }
+
+        // Close connections
+        rs.close();
+        pstmt.close();
+        conn.close();
+    } catch (ClassNotFoundException | SQLException e) {
+        JOptionPane.showMessageDialog(null, e.getMessage());
     }
+}
 
-    // Close connections
-    rs.close();
-    pstmt.close();
-    conn.close();
-} catch (SQLException e) {
-    JOptionPane.showMessageDialog(null, e.getMessage());
-}
-}
     
 
     /**
@@ -155,10 +157,10 @@ public class RecycleViewpartEntry extends javax.swing.JFrame {
         empEnt = new javax.swing.JLabel();
         jcombopartname = new javax.swing.JComboBox<>();
         try {
-            Class.forName("org.sqlite.JDBC");
-            Connection con = DriverManager.getConnection("jdbc:sqlite:inven.db");
+            // Assuming DatabaseConnection is your utility class to get a connection
+            Connection con = DatabaseConnection.getConnection();
             Statement st = con.createStatement();
-            ResultSet rs = st.executeQuery("Select * from part_items");
+            ResultSet rs = st.executeQuery("SELECT * FROM part_items");
 
             Set<String> partNames = new HashSet<>();
             while (rs.next()) {
@@ -315,80 +317,83 @@ public class RecycleViewpartEntry extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-try {
-    // Connect to the database
-    Connection conn = DriverManager.getConnection("jdbc:sqlite:inven.db");
+                                         
+    try {
+        // Connect to the database using PostgreSQL
+        Connection conn = DatabaseConnection.getConnection(); // Ensure this method is set up for PostgreSQL
 
-    // Calculate the date one month ago from today
-    java.util.Calendar cal = java.util.Calendar.getInstance();
-    cal.add(java.util.Calendar.MONTH, -1);
-    java.util.Date oneMonthAgo = cal.getTime();
-    SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-    String formattedDate = formatter.format(oneMonthAgo);
+        // Calculate the date one month ago from today
+        java.util.Calendar cal = java.util.Calendar.getInstance();
+        cal.add(java.util.Calendar.MONTH, -1);
+        java.util.Date oneMonthAgo = cal.getTime();
 
-    // Prepare SQL query to select entries from the last month
-    String sql = "SELECT partName, quantity, entryDate FROM temp_partentry WHERE entryDate >= ?";
-    PreparedStatement pstmt = conn.prepareStatement(sql);
-    pstmt.setString(1, formattedDate);
+        // Convert java.util.Date to java.sql.Date for use in the prepared statement
+        java.sql.Date sqlDate = new java.sql.Date(oneMonthAgo.getTime());
 
-    ResultSet rs = pstmt.executeQuery();
+        // Prepare SQL query to select entries from the last month
+        String sql = "SELECT partName, quantity, entryDate FROM temp_partentry WHERE entryDate >= ?";
+        PreparedStatement pstmt = conn.prepareStatement(sql);
+        pstmt.setDate(1, sqlDate); // Use setDate instead of setString
 
-    // Get table model
-    DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
-    // Clear existing data
-    model.setRowCount(0);
+        ResultSet rs = pstmt.executeQuery();
 
-    // Add rows to the model
-    while (rs.next()) {
-        String partName = rs.getString("partName");
-        int quantity = rs.getInt("quantity");
-        String entryDate = rs.getString("entryDate");
-        model.addRow(new Object[]{partName, quantity, entryDate});
+        // Get table model
+        DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+        // Clear existing data
+        model.setRowCount(0);
+
+        // Add rows to the model
+        while (rs.next()) {
+            String partName = rs.getString("partName");
+            int quantity = rs.getInt("quantity");
+            java.sql.Date entryDate = rs.getDate("entryDate");
+            // Format the SQL Date to display as a string if necessary
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+            String formattedDate = formatter.format(entryDate);
+            model.addRow(new Object[]{partName, quantity, formattedDate});
+        }
+
+        // Close connections
+        rs.close();
+        pstmt.close();
+        conn.close();
+    } catch (ClassNotFoundException | SQLException e) {
+        JOptionPane.showMessageDialog(null, e.getMessage());
     }
 
-    // Close connections
-    rs.close();
-    pstmt.close();
-    conn.close();
-} catch (SQLException e) {
-    JOptionPane.showMessageDialog(null, e.getMessage());
-}
 
     }//GEN-LAST:event_jButton1ActionPerformed
 private JFrame frame;
     private void jButtonRestoreEntryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonRestoreEntryActionPerformed
-
+                                                    
     int selectedRow = jTable1.getSelectedRow();
     if (selectedRow != -1) {
         DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
 
-        // Adjust the column indices to match the new table structure
+        // Adjust the column indices to match your table structure
         String partName = model.getValueAt(selectedRow, 0).toString(); // Assuming partName is in column 0
-        String quantity = model.getValueAt(selectedRow, 1).toString(); // Assuming quantity is in column 1
+        int quantity = Integer.parseInt(model.getValueAt(selectedRow, 1).toString()); // Assuming quantity is in column 1
         String entryDate = model.getValueAt(selectedRow, 2).toString(); // Assuming entryDate is in column 2
 
-        try {
-            // Connect to the database
-            Connection conn = DriverManager.getConnection("jdbc:sqlite:inven.db");
+        // Convert the entryDate from String to java.sql.Date
+        java.sql.Date sqlEntryDate = java.sql.Date.valueOf(entryDate);
+
+        try (Connection conn = DatabaseConnection.getConnection()) {
             String sql = "INSERT INTO partentry (partName, quantity, entryDate) VALUES (?, ?, ?)";
-            PreparedStatement pstmt = conn.prepareStatement(sql);
-            pstmt.setString(1, partName);
-            pstmt.setString(2, quantity);
-            pstmt.setString(3, entryDate);
+            try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                pstmt.setString(1, partName);
+                pstmt.setInt(2, quantity);
+                pstmt.setDate(3, sqlEntryDate);
 
-            // Execute the insert
-            pstmt.executeUpdate();
+                // Execute the insert
+                pstmt.executeUpdate();
 
-            // Optionally, remove the row from temp_partentry if needed
-            
+                // Optionally, remove the row from temp_partentry if needed
+                // This would require another SQL statement here
 
-            // Close the connections
-            pstmt.close();
-            
-            conn.close();
-
-            JOptionPane.showMessageDialog(null, "Row recovered to partentry table successfully.");
-        } catch (SQLException e) {
+                JOptionPane.showMessageDialog(null, "Row recovered to partentry table successfully.");
+            }
+        } catch (ClassNotFoundException | SQLException e) {
             JOptionPane.showMessageDialog(null, "Error: " + e.getMessage());
         }
     } else {

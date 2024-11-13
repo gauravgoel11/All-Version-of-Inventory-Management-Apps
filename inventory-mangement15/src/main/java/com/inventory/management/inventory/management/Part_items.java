@@ -102,12 +102,11 @@ public class Part_items extends javax.swing.JFrame {
         new AdminMenu().setVisible(true);
         this.dispose();
     }
-    private void viewAllPartItems(){
-      try {
-        Connection con = DriverManager.getConnection("jdbc:sqlite:inven.db");
+private void viewAllPartItems() {
+    try (Connection con = DatabaseConnection.getConnection()) { // Use DatabaseConnection class to handle PostgreSQL connection
         String query = "SELECT * FROM part_items";
-        Statement st = con.createStatement();
-        ResultSet rs = st.executeQuery(query);
+        PreparedStatement st = con.prepareStatement(query); // Use PreparedStatement instead of Statement
+        ResultSet rs = st.executeQuery();
         
         DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
         model.setRowCount(0);  // Clear existing rows
@@ -118,30 +117,30 @@ public class Part_items extends javax.swing.JFrame {
             int quantity = rs.getInt("quantity");
             model.addRow(new Object[]{partName, itemName, quantity});
         }
-        
-        con.close();
-    } catch (SQLException e) {
+    } catch (ClassNotFoundException | SQLException e) {
         System.out.println("Error: " + e.getMessage());
     } 
-    }
-    private void loadItems() {
-        try {
-            Class.forName("org.sqlite.JDBC");
-            Connection con = DriverManager.getConnection("jdbc:sqlite:inven.db");
-            Statement st = con.createStatement();
-            ResultSet rs = st.executeQuery("Select * from items");
-            while (rs.next()) {
-                String name = rs.getString("itemName");
-                String code = rs.getString("itemCode");
-                itemName.addItem(name);
-                itemCode.addItem(code);
-                itemMap.put(name, code); // Store the relationship in the map
-            }
-            con.close();
-        } catch (ClassNotFoundException | SQLException e) {
-            System.out.println("Error is " + e.getMessage());
+}
+
+private void loadItems() {
+    try {
+        // Use DatabaseConnection class to handle PostgreSQL connection
+        Connection con = DatabaseConnection.getConnection();
+        Statement st = con.createStatement();
+        ResultSet rs = st.executeQuery("SELECT * FROM items");
+        while (rs.next()) {
+            String name = rs.getString("itemName");
+            String code = rs.getString("itemCode");
+            itemName.addItem(name);
+            itemCode.addItem(code);
+            itemMap.put(name, code); // Store the relationship in the map
         }
+        con.close();
+    } catch (ClassNotFoundException | SQLException e) {
+        System.out.println("Error is " + e.getMessage());
     }
+}
+
      private void setupComboBoxListeners() {
         itemName.addActionListener(new ActionListener() {
             @Override
@@ -363,44 +362,43 @@ public class Part_items extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButtonDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonDeleteActionPerformed
-int row = jTable1.getSelectedRow();
-if (row >= 0) {
-    DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
-    String partNameValue = model.getValueAt(row, 0).toString();
-    String itemNameValue = model.getValueAt(row, 1).toString(); // Assuming itemName is in column 2
-    
-    
-    // Show confirmation dialog before deletion
-    int response = JOptionPane.showConfirmDialog(null, 
-            "Do you want to delete the entry for part: " + partNameValue + 
-             " for item " + itemNameValue + "?", 
-            "Confirm Deletion", 
-            JOptionPane.YES_NO_OPTION, 
-            JOptionPane.WARNING_MESSAGE);
-    
-    if (response == JOptionPane.YES_OPTION) {
-        String sql = "DELETE FROM part_items WHERE partName = ? AND itemName = ?";
-        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:inven.db");
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, partNameValue);
-            pstmt.setString(2, itemNameValue);
-           
-            pstmt.executeUpdate();
-            
-            // Remove row from the table
-            model.removeRow(row);
-            JOptionPane.showMessageDialog(null, "Entry deleted successfully.");
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, e.getMessage());
-        }
-    }
-} else {
-    JOptionPane.showMessageDialog(null, "Please select an entry to delete.");
-}     
-viewAllPartItems();
+                                              
+    int row = jTable1.getSelectedRow();
+    if (row >= 0) {
+        DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+        String partNameValue = model.getValueAt(row, 0).toString();
+        String itemNameValue = model.getValueAt(row, 1).toString(); // Assuming itemName is in column 2
 
-        
-        
+        // Show confirmation dialog before deletion
+        int response = JOptionPane.showConfirmDialog(null, 
+                "Do you want to delete the entry for part: " + partNameValue + 
+                " for item " + itemNameValue + "?", 
+                "Confirm Deletion", 
+                JOptionPane.YES_NO_OPTION, 
+                JOptionPane.WARNING_MESSAGE);
+
+        if (response == JOptionPane.YES_OPTION) {
+            String sql = "DELETE FROM part_items WHERE partName = ? AND itemName = ?";
+            try (Connection conn = DatabaseConnection.getConnection(); // Use centralized connection method
+                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                pstmt.setString(1, partNameValue);
+                pstmt.setString(2, itemNameValue);
+
+                pstmt.executeUpdate();
+
+                // Remove row from the table
+                model.removeRow(row);
+                JOptionPane.showMessageDialog(null, "Entry deleted successfully.");
+            } catch (ClassNotFoundException | SQLException e) {
+                JOptionPane.showMessageDialog(null, e.getMessage());
+            }
+        }
+    } else {
+        JOptionPane.showMessageDialog(null, "Please select an entry to delete.");
+    }     
+    viewAllPartItems(); // Ensure this method is adapted to use PostgreSQL if it interacts with the database
+
+    
     }//GEN-LAST:event_jButtonDeleteActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
@@ -409,13 +407,13 @@ viewAllPartItems();
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButtonAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonAddActionPerformed
-
+                                          
     String newPartName = jTextFieldNewPartName.getText().trim().toUpperCase();
     String selectedItem = (String) itemName.getSelectedItem();
     String quantity = jTextFieldQuantity.getText().trim();
 
     if (!newPartName.isEmpty() && !selectedItem.isEmpty() && !quantity.isEmpty()) {
-        try (Connection con = DriverManager.getConnection("jdbc:sqlite:inven.db")) {
+        try (Connection con = DatabaseConnection.getConnection()) { // Use centralized connection method
             // Check if the item already exists for the part
             String checkQuery = "SELECT COUNT(*) FROM part_items WHERE partName = ? AND itemName = ?";
             PreparedStatement checkStmt = con.prepareStatement(checkQuery);
@@ -438,64 +436,61 @@ viewAllPartItems();
                 insertStmt.executeUpdate();
                 JOptionPane.showMessageDialog(null, "Item Added Successfully");
             }
-        } catch (SQLException e) {
+        } catch (ClassNotFoundException | SQLException e) {
             JOptionPane.showMessageDialog(null, "Error: " + e.getMessage());
         }
     } else {
         JOptionPane.showMessageDialog(null, "Please fill in all fields");
     }
-    viewAllPartItems();
+    viewAllPartItems(); // Ensure this method is adapted to use PostgreSQL if it interacts with the database
 
 
-
-        // TODO add your handling code here:
     }//GEN-LAST:event_jButtonAddActionPerformed
 
     private void jButtonEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonEditActionPerformed
-        int row = jTable1.getSelectedRow();
-if (row >= 0) {
-    DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
-    String partNameValue = model.getValueAt(row, 0).toString();
-    String itemNameValue = model.getValueAt(row, 1).toString(); // Assuming itemName is in column 2
-    String oldQuantity = model.getValueAt(row, 2).toString();
-    String newQuantity = jTextFieldQuantity.getText();
+                                            
+    int row = jTable1.getSelectedRow();
+    if (row >= 0) {
+        DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+        String partNameValue = model.getValueAt(row, 0).toString();
+        String itemNameValue = model.getValueAt(row, 1).toString(); // Assuming itemName is in column 2
+        String oldQuantity = model.getValueAt(row, 2).toString();
+        String newQuantity = jTextFieldQuantity.getText();
 
-    // Show confirmation dialog before updating quantity
-    int response = JOptionPane.showConfirmDialog(null, 
-            "Do you want to change the quantity for item " + itemNameValue + 
-            " from " + oldQuantity + " to " + newQuantity + "?", 
-            "Confirm Quantity Update", 
-            JOptionPane.YES_NO_OPTION, 
-            JOptionPane.QUESTION_MESSAGE);
+        // Show confirmation dialog before updating quantity
+        int response = JOptionPane.showConfirmDialog(null, 
+                "Do you want to change the quantity for item " + itemNameValue + 
+                " from " + oldQuantity + " to " + newQuantity + "?", 
+                "Confirm Quantity Update", 
+                JOptionPane.YES_NO_OPTION, 
+                JOptionPane.QUESTION_MESSAGE);
 
-    if (response == JOptionPane.YES_OPTION) {
-        try {
-            Connection conn = DriverManager.getConnection("jdbc:sqlite:inven.db");
-            String sql = "UPDATE part_items SET quantity = ? WHERE partName = ? AND itemName = ?";
-            PreparedStatement pstmt = conn.prepareStatement(sql);
-            pstmt.setString(1, newQuantity);
-            pstmt.setString(2, partNameValue);
-            pstmt.setString(3, itemNameValue);
-            pstmt.executeUpdate();
-            
-            // Update table display
-            model.setValueAt(newQuantity, row, 2);
-            JOptionPane.showMessageDialog(null, "Quantity updated successfully.");
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, e.getMessage());
-        }
-    } 
-} else {
-    JOptionPane.showMessageDialog(null, "Please select an entry to update.");
-}
+        if (response == JOptionPane.YES_OPTION) {
+            try (Connection conn = DatabaseConnection.getConnection()) {
+                String sql = "UPDATE part_items SET quantity = ? WHERE partName = ? AND itemName = ?";
+                PreparedStatement pstmt = conn.prepareStatement(sql);
+                pstmt.setInt(1, Integer.parseInt(newQuantity)); // Assuming quantity is an integer
+                pstmt.setString(2, partNameValue);
+                pstmt.setString(3, itemNameValue);
+                pstmt.executeUpdate();
+                
+                // Update table display
+                model.setValueAt(newQuantity, row, 2);
+                JOptionPane.showMessageDialog(null, "Quantity updated successfully.");
+            } catch (ClassNotFoundException | SQLException e) {
+                JOptionPane.showMessageDialog(null, e.getMessage());
+            }
+        } 
+    } else {
+        JOptionPane.showMessageDialog(null, "Please select an entry to update.");
+    }
 
 
-        // TODO add your handling code here:
     }//GEN-LAST:event_jButtonEditActionPerformed
 
     private void jButtonViewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonViewActionPerformed
-  try {
-        Connection con = DriverManager.getConnection("jdbc:sqlite:inven.db");
+                                           
+    try (Connection con = DatabaseConnection.getConnection()) {
         String query = "SELECT * FROM part_items";
         Statement st = con.createStatement();
         ResultSet rs = st.executeQuery(query);
@@ -509,11 +504,12 @@ if (row >= 0) {
             int quantity = rs.getInt("quantity");
             model.addRow(new Object[]{partName, itemName, quantity});
         }
-        
-        con.close();
-    } catch (SQLException e) {
+    } catch (ClassNotFoundException | SQLException e) {
         System.out.println("Error: " + e.getMessage());
-    }        // TODO add your handling code here:
+        JOptionPane.showMessageDialog(null, e.getMessage());
+    }
+
+       // TODO add your handling code here:
     }//GEN-LAST:event_jButtonViewActionPerformed
 
     private void jTable1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable1MouseClicked

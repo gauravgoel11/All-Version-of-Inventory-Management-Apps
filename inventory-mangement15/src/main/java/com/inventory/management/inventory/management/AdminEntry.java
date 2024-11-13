@@ -50,24 +50,25 @@ public class AdminEntry extends javax.swing.JFrame {
          /**new code*/
  
     }
-         private void loadItems() {
-        try {
-            Class.forName("org.sqlite.JDBC");
-            Connection con = DriverManager.getConnection("jdbc:sqlite:inven.db");
-            Statement st = con.createStatement();
-            ResultSet rs = st.executeQuery("Select * from items");
-            while (rs.next()) {
-                String name = rs.getString("itemName");
-                String code = rs.getString("itemCode");
-                itemName.addItem(name);
-                itemCode.addItem(code);
-                itemMap.put(name, code); // Store the relationship in the map
-            }
-            con.close();
-        } catch (ClassNotFoundException | SQLException e) {
-            System.out.println("Error is " + e.getMessage());
+   private void loadItems() {
+    try {
+        // Use the DatabaseConnection class to handle the PostgreSQL connection
+        Connection con = DatabaseConnection.getConnection();
+        Statement st = con.createStatement();
+        ResultSet rs = st.executeQuery("SELECT * FROM items");
+        while (rs.next()) {
+            String name = rs.getString("itemName");
+            String code = rs.getString("itemCode");
+            itemName.addItem(name);
+            itemCode.addItem(code);
+            itemMap.put(name, code); // Store the relationship in the map
         }
+        con.close();
+    } catch (ClassNotFoundException | SQLException e) {
+        System.out.println("Error is " + e.getMessage());
     }
+}
+
 
     private void setupComboBoxListeners() {
         itemName.addActionListener(new ActionListener() {
@@ -105,7 +106,7 @@ public class AdminEntry extends javax.swing.JFrame {
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "ESCAPE");
         actionMap.put("ESCAPE", new AbstractAction() {
             @Override
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(ActionEvent e) { 
                 // Action to perform when ESC is pressed
                 goBack();
             }
@@ -145,23 +146,20 @@ public class AdminEntry extends javax.swing.JFrame {
         totalTA = new javax.swing.JTextArea();
         jButton2 = new javax.swing.JButton();
         empName = new javax.swing.JComboBox<>();
-        try {
-            Class.forName("org.sqlite.JDBC");
-            Connection con = DriverManager.getConnection("jdbc:sqlite:inven.db");
-            Statement st = con.createStatement();
-            ResultSet rs = st.executeQuery("Select DISTINCT adminName from adminentry");
+        try (Connection conn = DatabaseConnection.getConnection()) {
+            Statement st = conn.createStatement();
+            ResultSet rs = st.executeQuery("SELECT DISTINCT adminName FROM adminentry");
 
             Set<String> adminNames = new HashSet<>();
             while (rs.next()) {
                 String s = rs.getString("adminName");
                 adminNames.add(s);
             }
-            con.close();
 
             for (String adminName : adminNames) {
                 empName.addItem(adminName);
             }
-        } catch (ClassNotFoundException | SQLException e) {
+        } catch ( ClassNotFoundException | SQLException e) {
             System.out.println("Error is " + e.getMessage());
         }
 

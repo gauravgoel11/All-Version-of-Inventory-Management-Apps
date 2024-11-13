@@ -77,10 +77,10 @@ public class EditItems extends javax.swing.JFrame {
         this.dispose();
     }
     private void viewItems(){
- DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+        DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
     model.setRowCount(0); // Clear the table before populating it
 
-    try (Connection conn = DriverManager.getConnection("jdbc:sqlite:inven.db")) {
+    try (Connection conn = DatabaseConnection.getConnection()) {
         String query = "SELECT itemName, itemCode FROM items";
         Statement stmt = conn.createStatement();
         ResultSet rs = stmt.executeQuery(query);
@@ -90,9 +90,9 @@ public class EditItems extends javax.swing.JFrame {
             String itemCode = rs.getString("itemCode");
             model.addRow(new Object[]{itemName, itemCode});
         }
-    } catch (SQLException e) {
+    } catch (ClassNotFoundException | SQLException e) {
         JOptionPane.showMessageDialog(null, e.getMessage());
-    } 
+    }
     }
 
     /**
@@ -253,72 +253,75 @@ int selectedRow = jTable1.getSelectedRow();
     }//GEN-LAST:event_jTable1MouseClicked
 
     private void jBtnAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnAddActionPerformed
-String itemName = jTFItemName.getText().trim();
-String itemCode = jTFItemCode.getText().trim();
-String upperCaseItemName = itemName.toUpperCase();
-String upperCaseItemCode = itemCode.toUpperCase();
+                                      
+    String itemName = jTFItemName.getText().trim();
+    String itemCode = jTFItemCode.getText().trim();
+    String upperCaseItemName = itemName.toUpperCase();
+    String upperCaseItemCode = itemCode.toUpperCase();
 
-if (!upperCaseItemName.isEmpty() && !upperCaseItemCode.isEmpty()) {
-    try (Connection conn = DriverManager.getConnection("jdbc:sqlite:inven.db")) {
-        // Check if the item name or item code already exists
-        String checkQuery = "SELECT COUNT(*) FROM items WHERE itemName = ? OR itemCode = ?";
-        PreparedStatement checkStmt = conn.prepareStatement(checkQuery);
-        checkStmt.setString(1, upperCaseItemName);
-        checkStmt.setString(2, upperCaseItemCode);
-        ResultSet rs = checkStmt.executeQuery();
-        rs.next();
-        int count = rs.getInt(1);
+    if (!upperCaseItemName.isEmpty() && !upperCaseItemCode.isEmpty()) {
+        try (Connection conn = DatabaseConnection.getConnection()) { // Use centralized connection method
+            // Check if the item name or item code already exists
+            String checkQuery = "SELECT COUNT(*) FROM items WHERE itemName = ? OR itemCode = ?";
+            PreparedStatement checkStmt = conn.prepareStatement(checkQuery);
+            checkStmt.setString(1, upperCaseItemName);
+            checkStmt.setString(2, upperCaseItemCode);
+            ResultSet rs = checkStmt.executeQuery();
+            rs.next();
+            int count = rs.getInt(1);
 
-        if (count > 0) {
-            JOptionPane.showMessageDialog(null, "Item name or code already exists.");
-        } else {
-            // Insert the new item
-            String query = "INSERT INTO items (itemName, itemCode) VALUES (?, ?)";
-            PreparedStatement pstmt = conn.prepareStatement(query);
-            pstmt.setString(1, upperCaseItemName);
-            pstmt.setString(2, upperCaseItemCode);
+            if (count > 0) {
+                JOptionPane.showMessageDialog(null, "Item name or code already exists.");
+            } else {
+                // Insert the new item
+                String query = "INSERT INTO items (itemName, itemCode) VALUES (?, ?)";
+                PreparedStatement pstmt = conn.prepareStatement(query);
+                pstmt.setString(1, upperCaseItemName);
+                pstmt.setString(2, upperCaseItemCode);
 
-            int rowsInserted = pstmt.executeUpdate();
-            if (rowsInserted > 0) {
-                JOptionPane.showMessageDialog(null, "Item added successfully.");
-                jTFItemName.setText(""); // Clear the item name text field after adding
-                jTFItemCode.setText(""); // Clear the item code text field after adding
-                jBtnViewActionPerformed(null); // Refresh the table
+                int rowsInserted = pstmt.executeUpdate();
+                if (rowsInserted > 0) {
+                    JOptionPane.showMessageDialog(null, "Item added successfully.");
+                    jTFItemName.setText(""); // Clear the item name text field after adding
+                    jTFItemCode.setText(""); // Clear the item code text field after adding
+                    jBtnViewActionPerformed(null); // Refresh the table
+                }
             }
+        } catch (ClassNotFoundException | SQLException e) {
+            JOptionPane.showMessageDialog(null, e.getMessage());
         }
-    } catch (SQLException e) {
-        JOptionPane.showMessageDialog(null, e.getMessage());
+    } else {
+        JOptionPane.showMessageDialog(null, "Item name and code cannot be empty.");
     }
-} else {
-    JOptionPane.showMessageDialog(null, "Item name and code cannot be empty.");
-}
-     // TODO add your handling code here:
+    // TODO add your handling code here:
+
+
     }//GEN-LAST:event_jBtnAddActionPerformed
 
     private void jBtnViewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnViewActionPerformed
-                                        
+                                       
     DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
     model.setRowCount(0); // Clear the table before populating it
 
-    try (Connection conn = DriverManager.getConnection("jdbc:sqlite:inven.db")) {
+    try (Connection conn = DatabaseConnection.getConnection()) {
         String query = "SELECT itemName, itemCode FROM items";
-        Statement stmt = conn.createStatement();
-        ResultSet rs = stmt.executeQuery(query);
+        PreparedStatement pstmt = conn.prepareStatement(query);
+        ResultSet rs = pstmt.executeQuery();
 
         while (rs.next()) {
             String itemName = rs.getString("itemName");
             String itemCode = rs.getString("itemCode");
             model.addRow(new Object[]{itemName, itemCode});
         }
-    } catch (SQLException e) {
+    } catch (ClassNotFoundException | SQLException e) {
         JOptionPane.showMessageDialog(null, e.getMessage());
     }
 
-       // TODO add your handling code here:
+
     }//GEN-LAST:event_jBtnViewActionPerformed
 
     private void jBtnDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnDeleteActionPerformed
-                                          
+                                         
     int selectedRow = jTable1.getSelectedRow();
     if (selectedRow != -1) {
         String itemName = jTable1.getValueAt(selectedRow, 0).toString();
@@ -331,7 +334,7 @@ if (!upperCaseItemName.isEmpty() && !upperCaseItemCode.isEmpty()) {
             JOptionPane.WARNING_MESSAGE);
 
         if (response == JOptionPane.YES_OPTION) {
-            try (Connection conn = DriverManager.getConnection("jdbc:sqlite:inven.db")) {
+            try (Connection conn = DatabaseConnection.getConnection()) { // Use centralized DatabaseConnection class
                 String query = "DELETE FROM items WHERE itemName = ? AND itemCode = ?";
                 PreparedStatement pstmt = conn.prepareStatement(query);
                 pstmt.setString(1, itemName);
@@ -342,7 +345,7 @@ if (!upperCaseItemName.isEmpty() && !upperCaseItemCode.isEmpty()) {
                     JOptionPane.showMessageDialog(null, "Item deleted successfully.");
                     jBtnViewActionPerformed(null); // Refresh the table
                 }
-            } catch (SQLException e) {
+            } catch (ClassNotFoundException | SQLException e) {
                 JOptionPane.showMessageDialog(null, e.getMessage());
             }
         }
@@ -351,7 +354,6 @@ if (!upperCaseItemName.isEmpty() && !upperCaseItemCode.isEmpty()) {
     }
 
 
-       // TODO add your handling code here:
     }//GEN-LAST:event_jBtnDeleteActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
@@ -360,56 +362,74 @@ if (!upperCaseItemName.isEmpty() && !upperCaseItemCode.isEmpty()) {
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jBtnChangeNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnChangeNameActionPerformed
-                                              
- int selectedRow = jTable1.getSelectedRow();
-if (selectedRow != -1) {
-    String oldItemName = jTable1.getValueAt(selectedRow, 0).toString();
+                                                 
+                                                   
+    int selectedRow = jTable1.getSelectedRow();
+    if (selectedRow != -1) {
+        String oldItemName = jTable1.getValueAt(selectedRow, 0).toString();
+        String newItemName = JOptionPane.showInputDialog(this, "Enter new name for the item:", oldItemName);
 
-    // Prompt the user to enter a new name
-    String newItemName = JOptionPane.showInputDialog(this, "Enter new name for the item:", oldItemName);
+        if (newItemName != null && !newItemName.trim().isEmpty()) {
+            String upperNewItemName = newItemName.toUpperCase(); // Convert to uppercase
+            int response = JOptionPane.showConfirmDialog(this, 
+                "Do you want to change the item name from " + oldItemName + " to " + upperNewItemName + "?",
+                "Confirm Name Change", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
 
-    if (newItemName != null && !newItemName.trim().isEmpty()) {
-        String upperNewItemName = newItemName.toUpperCase(); // Convert to uppercase
+            if (response == JOptionPane.YES_OPTION) {
+                Connection conn = null;
+                try {
+                    conn = DatabaseConnection.getConnection();
+                    conn.setAutoCommit(false); // Start transaction
 
-        // Confirm the change
-        int response = JOptionPane.showConfirmDialog(this, 
-            "Do you want to change the item name from " + oldItemName + " to " + upperNewItemName + "?",
-            "Confirm Name Change", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+                    String[] tables = {"items", "adminentry", "entry", "part_items", "temp_adminentry", "temp_entry"};
+                    for (String table : tables) {
+                        String query = "UPDATE " + table + " SET itemName = ? WHERE itemName = ?";
+                        try (PreparedStatement pstmt = conn.prepareStatement(query)) {
+                            pstmt.setString(1, upperNewItemName);
+                            pstmt.setString(2, oldItemName);
+                            pstmt.executeUpdate();
+                        }
+                    }
 
-        if (response == JOptionPane.YES_OPTION) {
-            try (Connection conn = DriverManager.getConnection("jdbc:sqlite:inven.db")) {
-                conn.setAutoCommit(false); // Start transaction
-
-                String[] tables = {"items", "adminentry", "entry", "part_items", "temp_adminentry", "temp_entry"};
-                for (String table : tables) {
-                    String query = "UPDATE " + table + " SET itemName = ? WHERE itemName = ?";
-                    try (PreparedStatement pstmt = conn.prepareStatement(query)) {
-                        pstmt.setString(1, upperNewItemName); // Use the uppercase name
-                        pstmt.setString(2, oldItemName);
-                        pstmt.executeUpdate();
+                    conn.commit(); // Commit transaction
+                    JOptionPane.showMessageDialog(this, "Item name updated successfully in all tables.");
+                    jBtnViewActionPerformed(null); // Refresh the table
+                } catch (ClassNotFoundException | SQLException e) {
+                    JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
+                    if (conn != null) {
+                        try {
+                            conn.rollback(); // Rollback transaction on error
+                        } catch (SQLException ex) {
+                            JOptionPane.showMessageDialog(this, "Error on rollback: " + ex.getMessage());
+                        }
+                    }
+                } finally {
+                    if (conn != null) {
+                        try {
+                            conn.close();
+                        } catch (SQLException ex) {
+                            JOptionPane.showMessageDialog(this, "Error on closing connection: " + ex.getMessage());
+                        }
                     }
                 }
-
-                conn.commit(); // Commit transaction
-                JOptionPane.showMessageDialog(this, "Item name updated successfully in all tables.");
-                jBtnViewActionPerformed(null); // Refresh the table
-            } catch (SQLException e) {
-                JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
             }
+        } else {
+            JOptionPane.showMessageDialog(this, "New item name cannot be empty.");
         }
     } else {
-        JOptionPane.showMessageDialog(this, "New item name cannot be empty.");
+        JOptionPane.showMessageDialog(this, "Please select an item to change its name.");
     }
-} else {
-    JOptionPane.showMessageDialog(this, "Please select an item to change its name.");
-}
 
 
-       // TODO add your handling code here:
+
+                                           
+
     }//GEN-LAST:event_jBtnChangeNameActionPerformed
 
     private void jBtnDelete1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnDelete1ActionPerformed
- int selectedRow = jTable1.getSelectedRow();
+      // TODO add your handling code here:
+                                                 
+    int selectedRow = jTable1.getSelectedRow();
     if (selectedRow != -1) {
         String oldItemName = jTable1.getValueAt(selectedRow, 0).toString();
         String oldItemCode = jTable1.getValueAt(selectedRow, 1).toString();
@@ -424,7 +444,7 @@ if (selectedRow != -1) {
                 "Confirm Code Change", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
 
             if (response == JOptionPane.YES_OPTION) {
-                try (Connection conn = DriverManager.getConnection("jdbc:sqlite:inven.db")) {
+                try (Connection conn = DatabaseConnection.getConnection()) { // Use centralized DatabaseConnection class
                     String query = "UPDATE items SET itemCode = ? WHERE itemName = ? AND itemCode = ?";
                     PreparedStatement pstmt = conn.prepareStatement(query);
                     pstmt.setString(1, newItemCode);
@@ -438,7 +458,7 @@ if (selectedRow != -1) {
                     } else {
                         JOptionPane.showMessageDialog(this, "No matching item found to update.");
                     }
-                } catch (SQLException e) {
+                } catch (ClassNotFoundException | SQLException e) {
                     JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
                 }
             }
@@ -447,7 +467,9 @@ if (selectedRow != -1) {
         }
     } else {
         JOptionPane.showMessageDialog(this, "Please select an item to change its code.");
-    }        // TODO add your handling code here:
+    }
+
+
     }//GEN-LAST:event_jBtnDelete1ActionPerformed
 
     /**

@@ -90,34 +90,36 @@ public class Employee extends javax.swing.JFrame {
         new AdminMenu().setVisible(true);
         this.dispose();
     }
-     private void loadDataIntoTable() {
-        try {
-            Connection conn = DriverManager.getConnection("jdbc:sqlite:inven.db");
-            String sql = "SELECT * FROM emp";
-            PreparedStatement pstmt = conn.prepareStatement(sql);
-            ResultSet rs = pstmt.executeQuery();
+private void loadDataIntoTable() {
+    try {
+        // Use the centralized DatabaseConnection class to handle PostgreSQL connection
+        Connection conn = DatabaseConnection.getConnection();
+        String sql = "SELECT * FROM emp";
+        PreparedStatement pstmt = conn.prepareStatement(sql);
+        ResultSet rs = pstmt.executeQuery();
 
-            DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
-            model.setRowCount(0);
+        DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+        model.setRowCount(0);
 
-            ResultSetMetaData metaData = rs.getMetaData();
-            int columnCount = metaData.getColumnCount();
+        ResultSetMetaData metaData = rs.getMetaData();
+        int columnCount = metaData.getColumnCount();
 
-            while (rs.next()) {
-                Object[] row = new Object[columnCount];
-                for (int i = 1; i <= columnCount; i++) {
-                    row[i - 1] = rs.getObject(i);
-                }
-                model.addRow(row);
+        while (rs.next()) {
+            Object[] row = new Object[columnCount];
+            for (int i = 1; i <= columnCount; i++) {
+                row[i - 1] = rs.getObject(i);
             }
-
-            rs.close();
-            pstmt.close();
-            conn.close();
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, e.getMessage());
+            model.addRow(row);
         }
+
+        rs.close();
+        pstmt.close();
+        conn.close();
+    } catch (ClassNotFoundException | SQLException e) {
+        JOptionPane.showMessageDialog(null, e.getMessage());
     }
+}
+
     
     
     
@@ -311,46 +313,47 @@ public class Employee extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButtonAddDataActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonAddDataActionPerformed
-        // TODO add your handling code here:
-     String name = jTxtName.getText().trim();
-     String nameUpperCase = name.toUpperCase();
-        java.util.Date dateOfBirth = jDateChooserDateOfBirth.getDate();
-        String employeeId = jTxtEmployeeId.getText();
-        String mobile = jTxtMobile.getText();
-        String aadharNumber = jTxtAadharNumber.getText();
+                                              
+    // Retrieve data from form fields
+    String name = jTxtName.getText().trim();
+    String nameUpperCase = name.toUpperCase();
+    java.util.Date dateOfBirth = jDateChooserDateOfBirth.getDate();
+    String employeeId = jTxtEmployeeId.getText().trim();
+    String mobile = jTxtMobile.getText().trim();
+    String aadharNumber = jTxtAadharNumber.getText().trim();
 
-        // Validate that name and employeeId are not empty
-        if (nameUpperCase == null || nameUpperCase.trim().isEmpty() || employeeId == null || employeeId.trim().isEmpty()) {
-            JOptionPane.showMessageDialog(null, "Name and Employee ID cannot be empty");
-            return;
-        }
+    // Validate that name and employeeId are not empty
+    if (nameUpperCase.isEmpty() || employeeId.isEmpty()) {
+        JOptionPane.showMessageDialog(null, "Name and Employee ID cannot be empty");
+        return;
+    }
 
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-        String formattedDateOfBirth = (dateOfBirth != null) ? formatter.format(dateOfBirth) : null;
+    // Convert java.util.Date to java.sql.Date
+    java.sql.Date sqlDateOfBirth = (dateOfBirth != null) ? new java.sql.Date(dateOfBirth.getTime()) : null;
 
-        try {
-            Connection conn = DriverManager.getConnection("jdbc:sqlite:inven.db");
-            String sql = "INSERT INTO emp (empName, dateOfBirth, empId, mobile, aadharNumber) VALUES (?, ?, ?, ?, ?)";
-            PreparedStatement pstmt = conn.prepareStatement(sql);
-            pstmt.setString(1, nameUpperCase);
-            pstmt.setString(2, formattedDateOfBirth);
-            pstmt.setString(3, employeeId);
-            pstmt.setString(4, mobile);
-            pstmt.setString(5, aadharNumber);
+    try (Connection conn = DatabaseConnection.getConnection()) {
+        String sql = "INSERT INTO emp (empName, dateOfBirth, empId, mobile, aadharNumber) VALUES (?, ?, ?, ?, ?)";
+        PreparedStatement pstmt = conn.prepareStatement(sql);
+        pstmt.setString(1, nameUpperCase);
+        pstmt.setDate(2, sqlDateOfBirth);
+        pstmt.setString(3, employeeId);
+        pstmt.setString(4, mobile);
+        pstmt.setString(5, aadharNumber);
 
-            pstmt.executeUpdate();
-            conn.close();
+        pstmt.executeUpdate();
 
-            JOptionPane.showMessageDialog(null, "Data Added Successfully");
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, e.getMessage());
-        }
-            jTxtName.setText("");
+        JOptionPane.showMessageDialog(null, "Data Added Successfully");
+    } catch (ClassNotFoundException | SQLException e) {
+        JOptionPane.showMessageDialog(null, e.getMessage());
+    }
+
+    // Clear form fields
+    jTxtName.setText("");
     jDateChooserDateOfBirth.setDate(null);
     jTxtEmployeeId.setText("");
     jTxtMobile.setText("");
     jTxtAadharNumber.setText("");
-    loadDataIntoTable();
+    loadDataIntoTable(); // Assuming this method refreshes the table view
 
 
     }//GEN-LAST:event_jButtonAddDataActionPerformed
@@ -372,20 +375,18 @@ public class Employee extends javax.swing.JFrame {
     }//GEN-LAST:event_jButtonResetActionPerformed
 
     private void jButtonUpdateDataActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonUpdateDataActionPerformed
-                                                
-    String name = jTxtName.getText();
+                                                  
+    String name = jTxtName.getText().trim();
     java.util.Date dateOfBirth = jDateChooserDateOfBirth.getDate();
-    String employeeId = jTxtEmployeeId.getText();
-    String mobile = jTxtMobile.getText();
-    String aadharNumber = jTxtAadharNumber.getText();
+    String employeeId = jTxtEmployeeId.getText().trim();
+    String mobile = jTxtMobile.getText().trim();
+    String aadharNumber = jTxtAadharNumber.getText().trim();
 
-    SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-    String formattedDateOfBirth = (dateOfBirth != null) ? formatter.format(dateOfBirth) : null;
+    // Convert java.util.Date to java.sql.Date
+    java.sql.Date sqlDateOfBirth = (dateOfBirth != null) ? new java.sql.Date(dateOfBirth.getTime()) : null;
 
     if (!employeeId.isEmpty() && !name.isEmpty()) {
-        try {
-            Connection conn = DriverManager.getConnection("jdbc:sqlite:inven.db");
-            
+        try (Connection conn = DatabaseConnection.getConnection()) {
             // Fetch the current data from the database
             String fetchSql = "SELECT * FROM emp WHERE empId = ? AND empName = ?";
             PreparedStatement fetchPstmt = conn.prepareStatement(fetchSql);
@@ -395,7 +396,7 @@ public class Employee extends javax.swing.JFrame {
             
             if (rs.next()) {
                 String currentName = rs.getString("empName");
-                String currentDateOfBirth = rs.getString("dateOfBirth");
+                java.sql.Date currentDateOfBirth = rs.getDate("dateOfBirth");
                 String currentMobile = rs.getString("mobile");
                 String currentAadharNumber = rs.getString("aadharNumber");
 
@@ -407,7 +408,7 @@ public class Employee extends javax.swing.JFrame {
                     sql.append("empName = ?");
                     firstField = false;
                 }
-                if (formattedDateOfBirth != null && !formattedDateOfBirth.equals(currentDateOfBirth)) {
+                if (sqlDateOfBirth != null && !sqlDateOfBirth.equals(currentDateOfBirth)) {
                     if (!firstField) sql.append(", ");
                     sql.append("dateOfBirth = ?");
                     firstField = false;
@@ -430,8 +431,8 @@ public class Employee extends javax.swing.JFrame {
                 if (!name.equals(currentName)) {
                     pstmt.setString(paramIndex++, name);
                 }
-                if (formattedDateOfBirth != null && !formattedDateOfBirth.equals(currentDateOfBirth)) {
-                    pstmt.setString(paramIndex++, formattedDateOfBirth);
+                if (sqlDateOfBirth != null && !sqlDateOfBirth.equals(currentDateOfBirth)) {
+                    pstmt.setDate(paramIndex++, sqlDateOfBirth);
                 }
                 if (!mobile.equals(currentMobile)) {
                     pstmt.setString(paramIndex++, mobile);
@@ -449,25 +450,23 @@ public class Employee extends javax.swing.JFrame {
                 } else {
                     JOptionPane.showMessageDialog(null, "No matching record found.");
                 }
-                conn.close();
             } else {
                 JOptionPane.showMessageDialog(null, "No matching record found.");
             }
-        } catch (SQLException e) {
+        } catch (ClassNotFoundException | SQLException e) {
             JOptionPane.showMessageDialog(null, e.getMessage());
         }
     } else {
         JOptionPane.showMessageDialog(null, "Please enter both Employee ID and Name to update.");
     }
-        jTxtName.setText("");
+    jTxtName.setText("");
     jDateChooserDateOfBirth.setDate(null);
     jTxtEmployeeId.setText("");
     jTxtMobile.setText("");
     jTxtAadharNumber.setText("");
     loadDataIntoTable();
 
-        // TODO add your handling code here:
-  
+
     }//GEN-LAST:event_jButtonUpdateDataActionPerformed
 
     private void jButtonPrintActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonPrintActionPerformed
@@ -485,13 +484,12 @@ public class Employee extends javax.swing.JFrame {
     }//GEN-LAST:event_jButtonPrintActionPerformed
 
     private void jButtonDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonDeleteActionPerformed
-                                            
+                                             
     String employeeId = jTxtEmployeeId.getText();
     String name = jTxtName.getText();
 
     if (!employeeId.isEmpty() && !name.isEmpty()) {
-        try {
-            Connection conn = DriverManager.getConnection("jdbc:sqlite:inven.db");
+        try (Connection conn = DatabaseConnection.getConnection()) {  // Use centralized connection method
             String sql = "DELETE FROM emp WHERE empId = ? AND empName = ?";
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, employeeId);
@@ -503,37 +501,31 @@ public class Employee extends javax.swing.JFrame {
             } else {
                 JOptionPane.showMessageDialog(null, "No matching record found.");
             }
-            conn.close();
-        } catch (SQLException e) {
+        } catch (ClassNotFoundException | SQLException e) {
             JOptionPane.showMessageDialog(null, e.getMessage());
         }
     } else {
         JOptionPane.showMessageDialog(null, "Please enter both Employee ID and Name to delete.");
     }
-    loadDataIntoTable();
+    loadDataIntoTable();  // Ensure this method is defined to refresh the table view
 
-        // TODO add your handling code here:
+
 
     }//GEN-LAST:event_jButtonDeleteActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-            try {
-        // Connect to the database
-        Connection conn = DriverManager.getConnection("jdbc:sqlite:inven.db");
+                                       
+    try (Connection conn = DatabaseConnection.getConnection()) {
         String sql = "SELECT * FROM emp";
         PreparedStatement pstmt = conn.prepareStatement(sql);
         ResultSet rs = pstmt.executeQuery();
-        
-        // Get table model
+
         DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
-        // Clear existing data
         model.setRowCount(0);
 
-        // Get column names dynamically
         ResultSetMetaData metaData = rs.getMetaData();
         int columnCount = metaData.getColumnCount();
-        
-        // Add rows to the model
+
         while (rs.next()) {
             Object[] row = new Object[columnCount];
             for (int i = 1; i <= columnCount; i++) {
@@ -541,14 +533,14 @@ public class Employee extends javax.swing.JFrame {
             }
             model.addRow(row);
         }
-        
-        // Close connections
+
         rs.close();
         pstmt.close();
-        conn.close();
-    } catch (SQLException e) {
+    } catch (ClassNotFoundException | SQLException e) {
         JOptionPane.showMessageDialog(null, e.getMessage());
     }
+
+
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jTable1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable1MouseClicked
