@@ -77,51 +77,47 @@ public class ViewAdminEntry extends javax.swing.JFrame {
         new AdminMenu().setVisible(true);
         this.dispose();
     }
-    private void oneMonthAdminEntry(){
-    try {
-    // Connect to the database
-    Connection conn = DriverManager.getConnection("jdbc:sqlite:inven.db");
+private void oneMonthAdminEntry() {
+    try (Connection conn = DatabaseConnection.getConnection()) {
+        // Calculate the date one month ago from today
+        java.util.Calendar cal = java.util.Calendar.getInstance();
+        cal.add(java.util.Calendar.MONTH, -1);
+        java.util.Date oneMonthAgo = cal.getTime();
+        java.sql.Date sqlDate = new java.sql.Date(oneMonthAgo.getTime());
 
-    // Calculate the date one month ago from today
-    java.util.Calendar cal = java.util.Calendar.getInstance();
-    cal.add(java.util.Calendar.MONTH, -1);
-    java.util.Date oneMonthAgo = cal.getTime();
-    SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-    String formattedDate = formatter.format(oneMonthAgo);
+        // Prepare SQL query to select entries from the last month
+        String sql = "SELECT * FROM adminentry WHERE entryDate >= ?";
+        PreparedStatement pstmt = conn.prepareStatement(sql);
+        pstmt.setDate(1, sqlDate);
 
-    // Prepare SQL query to select entries from the last month
-    String sql = "SELECT * FROM adminentry WHERE entryDate >= ?";
-    PreparedStatement pstmt = conn.prepareStatement(sql);
-    pstmt.setString(1, formattedDate);
+        ResultSet rs = pstmt.executeQuery();
 
-    ResultSet rs = pstmt.executeQuery();
+        // Get table model
+        DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+        // Clear existing data
+        model.setRowCount(0);
 
-    // Get table model
-    DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
-    // Clear existing data
-    model.setRowCount(0);
+        // Get column names dynamically
+        ResultSetMetaData metaData = rs.getMetaData();
+        int columnCount = metaData.getColumnCount();
 
-    // Get column names dynamically
-    ResultSetMetaData metaData = rs.getMetaData();
-    int columnCount = metaData.getColumnCount();
-
-    // Add rows to the model
-    while (rs.next()) {
-        Object[] row = new Object[columnCount];
-        for (int i = 1; i <= columnCount; i++) {
-            row[i - 1] = rs.getObject(i);
+        // Add rows to the model
+        while (rs.next()) {
+            Object[] row = new Object[columnCount];
+            for (int i = 1; i <= columnCount; i++) {
+                row[i - 1] = rs.getObject(i);
+            }
+            model.addRow(row);
         }
-        model.addRow(row);
-    }
 
-    // Close connections
-    rs.close();
-    pstmt.close();
-    conn.close();
-} catch (SQLException e) {
-    JOptionPane.showMessageDialog(null, e.getMessage());
-}
+        // Close connections
+        rs.close();
+        pstmt.close();
+    } catch (ClassNotFoundException | SQLException e) {
+        JOptionPane.showMessageDialog(null, e.getMessage());
     }
+}
+
 
     /**
      * This method is called from within the constructor to initialize the form.
