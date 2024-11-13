@@ -69,6 +69,7 @@ public class AdminMenu extends javax.swing.JFrame {
         jButton11 = new javax.swing.JButton();
         jButton13 = new javax.swing.JButton();
         jButton14 = new javax.swing.JButton();
+        jButton4 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         addKeyListener(new java.awt.event.KeyAdapter() {
@@ -184,6 +185,14 @@ public class AdminMenu extends javax.swing.JFrame {
         });
         jPanel1.add(jButton14, new org.netbeans.lib.awtextra.AbsoluteConstraints(550, 390, 390, 60));
 
+        jButton4.setText("jButton4");
+        jButton4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton4ActionPerformed(evt);
+            }
+        });
+        jPanel1.add(jButton4, new org.netbeans.lib.awtextra.AbsoluteConstraints(560, 470, -1, -1));
+
         getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 150, 1120, 720));
 
         pack();
@@ -261,6 +270,20 @@ new EditEntry().setVisible(true);
             this.dispose();         // TODO add your handling code here:
     }//GEN-LAST:event_jButton14ActionPerformed
 
+    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+        // TODO add your handling code here:
+                      String sourceUrl = "jdbc:postgresql://192.168.1.2:5432/inven";
+                String targetUrl = "jdbc:postgresql://192.168.1.3:5432/inven2";
+                String user = "postgres";
+                String password = "1234";
+                try {
+                    EnhancedDataSynchronizer.synchronizeAllTables(sourceUrl, targetUrl, user, password);
+                    JOptionPane.showMessageDialog(null, "Synchronization Complete");
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(null, "Synchronization Failed: " + ex.getMessage());
+                }
+    }//GEN-LAST:event_jButton4ActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -306,6 +329,7 @@ new EditEntry().setVisible(true);
     private javax.swing.JButton jButton14;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
+    private javax.swing.JButton jButton4;
     private javax.swing.JButton jButton5;
     private javax.swing.JButton jButton6;
     private javax.swing.JButton jButton7;
