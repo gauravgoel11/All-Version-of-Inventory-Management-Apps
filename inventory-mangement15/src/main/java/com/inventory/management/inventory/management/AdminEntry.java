@@ -35,7 +35,7 @@ public class AdminEntry extends javax.swing.JFrame {
     private Map<String, String> itemMap = new HashMap<>();
 
     /**
-     * Creates new form AdminEntry
+     * Creates new form AdminEntry and adding new
      */
     public AdminEntry() {
         initComponents();
