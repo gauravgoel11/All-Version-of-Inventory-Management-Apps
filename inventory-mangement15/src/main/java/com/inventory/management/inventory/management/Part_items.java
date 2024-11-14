@@ -67,6 +67,8 @@ import java.awt.event.KeyEvent;
 
 public class Part_items extends javax.swing.JFrame {
     private Map<String, String> itemMap = new HashMap<>();
+    private Map<String, String> partMap = new HashMap<>();
+
 
     /**
      * Creates new form entry
@@ -135,13 +137,31 @@ private void loadItems() {
             itemCode.addItem(code);
             itemMap.put(name, code); // Store the relationship in the map
         }
+        rs = st.executeQuery("SELECT * FROM part_items");
+        while (rs.next()) {
+            String partName = rs.getString("partName");
+            empName.addItem(partName);
+            partMap.put(partName, partName); // Assuming partName is unique and used as a key
+        }
         con.close();
     } catch (ClassNotFoundException | SQLException e) {
         System.out.println("Error is " + e.getMessage());
     }
 }
 
+
      private void setupComboBoxListeners() {
+         empName.addActionListener(new ActionListener() {
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        String selectedEmpName = (String) empName.getSelectedItem();
+        if (selectedEmpName != null && partMap.containsKey(selectedEmpName)) {
+            empName.setSelectedItem(partMap.get(selectedEmpName));
+            
+        }
+    }
+});
+
         itemName.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -181,26 +201,6 @@ private void loadItems() {
         empEnt = new javax.swing.JLabel();
         jSeparator1 = new javax.swing.JSeparator();
         empName = new javax.swing.JComboBox<>();
-        try {
-            Class.forName("org.sqlite.JDBC");
-            Connection con = DriverManager.getConnection("jdbc:sqlite:inven.db");
-            Statement st = con.createStatement();
-            ResultSet rs = st.executeQuery("Select * from part_items");
-
-            Set<String> partNames = new HashSet<>();
-            while (rs.next()) {
-                String s = rs.getString("partName");
-                partNames.add(s);
-            }
-            con.close();
-
-            for (String partName : partNames) {
-                empName.addItem(partName);
-            }
-        } catch (ClassNotFoundException | SQLException e) {
-            System.out.println("Error is " + e.getMessage());
-        }
-
         AutoCompleteDecorator.decorate(empName);
         itemName = new javax.swing.JComboBox<>();
         AutoCompleteDecorator.decorate(itemName);
