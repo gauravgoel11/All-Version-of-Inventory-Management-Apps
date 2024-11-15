@@ -205,7 +205,7 @@
             <Property name="toolTipText" type="java.lang.String" value=""/>
           </Properties>
           <AuxValues>
-            <AuxValue name="JavaCodeGenerator_CreateCodePost" type="java.lang.String" value="try{&#xa;    Class.forName(&quot;org.sqlite.JDBC&quot;);&#xa;    Connection con = DriverManager.getConnection(&quot;jdbc:sqlite:inven.db&quot;);&#xa;    Statement st = con.createStatement();&#xa;    ResultSet rs = st.executeQuery(&quot;Select * from emp&quot;);&#xa;    while(rs.next()){&#xa;        String s = rs.getString(&quot;empName&quot;)+&quot; &quot;+rs.getString(&quot;empID&quot;);&#xa;        empName.addItem(s);&#xa;    }&#xa;    con.close();&#xa;}&#xa;catch(ClassNotFoundException | SQLException e){&#xa;    System.out.println(&quot;Error is &quot;+e.getMessage());&#xa;}&#xa;AutoCompleteDecorator.decorate(empName);"/>
+            <AuxValue name="JavaCodeGenerator_CreateCodePost" type="java.lang.String" value="AutoCompleteDecorator.decorate(empName);"/>
             <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
           </AuxValues>
           <Constraints>

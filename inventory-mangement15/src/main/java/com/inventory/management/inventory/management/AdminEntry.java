@@ -33,6 +33,7 @@ import java.util.Map;
  */
 public class AdminEntry extends javax.swing.JFrame {
     private Map<String, String> itemMap = new HashMap<>();
+    private Map<String, String> adminMap = new HashMap<>();
 
     /**
      * Creates new form AdminEntry and adding new
@@ -63,6 +64,13 @@ public class AdminEntry extends javax.swing.JFrame {
             itemCode.addItem(code);
             itemMap.put(name, code); // Store the relationship in the map
         }
+        rs = st.executeQuery("SELECT DISTINCT adminName FROM adminentry");
+        
+        while (rs.next()) {
+            String adminName = rs.getString("adminName");
+            empName.addItem(adminName);
+            adminMap.put(adminName, adminName); // Assuming adminName is unique and used as a key
+        }
         con.close();
     } catch (ClassNotFoundException | SQLException e) {
         System.out.println("Error is " + e.getMessage());
@@ -71,6 +79,17 @@ public class AdminEntry extends javax.swing.JFrame {
 
 
     private void setupComboBoxListeners() {
+        empName.addActionListener(new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            String selectedAdminName = (String) empName.getSelectedItem();
+            if (selectedAdminName != null && adminMap.containsKey(selectedAdminName)) {
+                jTextFieldAdminName.setText(selectedAdminName);
+//                empName.setSelectedItem(adminMap.get(selectedAdminName));
+                // Optionally, perform other actions based on the selected admin name
+            }
+        }
+    });
         itemName.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -146,23 +165,6 @@ public class AdminEntry extends javax.swing.JFrame {
         totalTA = new javax.swing.JTextArea();
         jButton2 = new javax.swing.JButton();
         empName = new javax.swing.JComboBox<>();
-        try (Connection conn = DatabaseConnection.getConnection()) {
-            Statement st = conn.createStatement();
-            ResultSet rs = st.executeQuery("SELECT DISTINCT adminName FROM adminentry");
-
-            Set<String> adminNames = new HashSet<>();
-            while (rs.next()) {
-                String s = rs.getString("adminName");
-                adminNames.add(s);
-            }
-
-            for (String adminName : adminNames) {
-                empName.addItem(adminName);
-            }
-        } catch ( ClassNotFoundException | SQLException e) {
-            System.out.println("Error is " + e.getMessage());
-        }
-
         AutoCompleteDecorator.decorate(empName);
         jLabel5 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();

@@ -36,6 +36,7 @@ import java.util.Map;
  */
 public class entry1 extends javax.swing.JFrame {
     private Map<String, String> itemMap = new HashMap<>();
+    private Map<String, String> empMap = new HashMap<>();
 
     /**
      * Creates new form AdminEntry
@@ -54,25 +55,49 @@ public class entry1 extends javax.swing.JFrame {
  
     }
      private void loadItems() {
-        try {
-            Class.forName("org.sqlite.JDBC");
-            Connection con = DriverManager.getConnection("jdbc:sqlite:inven.db");
-            Statement st = con.createStatement();
-            ResultSet rs = st.executeQuery("Select * from items");
-            while (rs.next()) {
-                String name = rs.getString("itemName");
-                String code = rs.getString("itemCode");
-                itemName.addItem(name);
-                itemCode.addItem(code);
-                itemMap.put(name, code); // Store the relationship in the map
-            }
-            con.close();
-        } catch (ClassNotFoundException | SQLException e) {
-            System.out.println("Error is " + e.getMessage());
+ try (Connection con = DatabaseConnection.getConnection()) {
+        Statement st = con.createStatement();
+        
+        // Load items
+        ResultSet rs = st.executeQuery("SELECT * FROM items");
+        while (rs.next()) {
+            String name = rs.getString("itemName");
+            String code = rs.getString("itemCode");
+            itemName.addItem(name);
+            itemCode.addItem(code);
+            itemMap.put(name, code); // Store the relationship in the map
         }
+
+        // Load employee names with IDs
+        rs = st.executeQuery("SELECT * FROM emp");
+        while (rs.next()) {
+            String empNameWithID = rs.getString("empName") + " " + rs.getString("empID");
+            empName.addItem(empNameWithID);
+            empMap.put(empNameWithID, empNameWithID); // Assuming empNameWithID is unique and used as a key
+        }
+    } catch (ClassNotFoundException | SQLException e) {
+        System.out.println("Error is " + e.getMessage());
+    }
     }
 
     private void setupComboBoxListeners() {
+        empName.addActionListener(new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            String selectedEmpNameWithID = (String) empName.getSelectedItem();
+            if (selectedEmpNameWithID != null && empMap.containsKey(selectedEmpNameWithID)) {
+                // Split the selected employee name and ID
+                String[] empDetails = selectedEmpNameWithID.split(" ");
+                if (empDetails.length == 2) {
+                    String empName = empDetails[0];
+                    String empID = empDetails[1];
+                    // Perform actions based on the selected employee name and ID
+                    // For example, update a text field or display additional information
+                    System.out.println("Selected Employee: " + empName + ", ID: " + empID);
+                }
+            }
+        }
+    });
         itemName.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -147,20 +172,6 @@ public class entry1 extends javax.swing.JFrame {
         totalTA = new javax.swing.JTextArea();
         jButton2 = new javax.swing.JButton();
         empName = new javax.swing.JComboBox<>();
-        try{
-            Class.forName("org.sqlite.JDBC");
-            Connection con = DriverManager.getConnection("jdbc:sqlite:inven.db");
-            Statement st = con.createStatement();
-            ResultSet rs = st.executeQuery("Select * from emp");
-            while(rs.next()){
-                String s = rs.getString("empName")+" "+rs.getString("empID");
-                empName.addItem(s);
-            }
-            con.close();
-        }
-        catch(ClassNotFoundException | SQLException e){
-            System.out.println("Error is "+e.getMessage());
-        }
         AutoCompleteDecorator.decorate(empName);
         jLabel5 = new javax.swing.JLabel();
         itemCode = new javax.swing.JComboBox<>();
