@@ -184,20 +184,6 @@ public void viewEntryOfThirtyDays() {
         jLabel5 = new javax.swing.JLabel();
         empEnt = new javax.swing.JLabel();
         empName = new javax.swing.JComboBox<>();
-        try{
-            Class.forName("org.sqlite.JDBC");
-            Connection con = DriverManager.getConnection("jdbc:sqlite:inven.db");
-            Statement st = con.createStatement();
-            ResultSet rs = st.executeQuery("Select * from emp");
-            while(rs.next()){
-                String s = rs.getString("empName")+" "+rs.getString("empID");
-                empName.addItem(s);
-            }
-            con.close();
-        }
-        catch(ClassNotFoundException | SQLException e){
-            System.out.println("Error is "+e.getMessage());
-        }
         AutoCompleteDecorator.decorate(empName);
         jButtonCusotmEntry = new javax.swing.JButton();
         jButtonReset = new javax.swing.JButton();
