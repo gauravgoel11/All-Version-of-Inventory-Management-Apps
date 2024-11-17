@@ -148,7 +148,7 @@ try (Connection con = DatabaseConnection.getConnection()) {
                     itemName.setSelectedItem(itemMap.get(selectedName));
                 }
             }
-        });;
+        });
             }
 
 
