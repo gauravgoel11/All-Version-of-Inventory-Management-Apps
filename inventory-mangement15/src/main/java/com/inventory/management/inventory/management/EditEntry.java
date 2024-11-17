@@ -58,6 +58,7 @@ public class EditEntry extends javax.swing.JFrame {
          setExtendedState(this.MAXIMIZED_BOTH);
          setupKeyBindings();
          viewEntryOfThirtyDays();
+         loadItems();
     }
      private void setupKeyBindings() {
         // Get the input map for the root pane
@@ -72,7 +73,7 @@ public class EditEntry extends javax.swing.JFrame {
             public void actionPerformed(ActionEvent e) {
                 // Action to perform when ESC is pressed
                 goBack();
-                loadItems();
+                
             }
         });
     }
