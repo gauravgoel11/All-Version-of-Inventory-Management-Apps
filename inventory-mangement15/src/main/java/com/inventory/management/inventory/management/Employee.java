@@ -46,6 +46,8 @@ import java.text.SimpleDateFormat;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.math.BigDecimal;
+
 
 
 
@@ -156,6 +158,8 @@ private void loadDataIntoTable() {
         jTxtEmployeeId = new javax.swing.JTextField();
         jLabel6 = new javax.swing.JLabel();
         jTxtAadharNumber = new javax.swing.JTextField();
+        jLabel7 = new javax.swing.JLabel();
+        jTxtBaseSalary = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -170,7 +174,7 @@ private void loadDataIntoTable() {
             }
         });
         jPanel1.add(jButtonAddData);
-        jButtonAddData.setBounds(470, 130, 110, 27);
+        jButtonAddData.setBounds(30, 250, 110, 27);
 
         jButtonUpdateData.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jButtonUpdateData.setText("UpdateData");
@@ -180,7 +184,7 @@ private void loadDataIntoTable() {
             }
         });
         jPanel1.add(jButtonUpdateData);
-        jButtonUpdateData.setBounds(470, 170, 120, 27);
+        jButtonUpdateData.setBounds(160, 250, 120, 27);
 
         jButtonPrint.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jButtonPrint.setText("Print");
@@ -190,7 +194,7 @@ private void loadDataIntoTable() {
             }
         });
         jPanel1.add(jButtonPrint);
-        jButtonPrint.setBounds(590, 130, 110, 27);
+        jButtonPrint.setBounds(650, 250, 110, 27);
 
         jButtonReset.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jButtonReset.setText("Erase");
@@ -200,7 +204,7 @@ private void loadDataIntoTable() {
             }
         });
         jPanel1.add(jButtonReset);
-        jButtonReset.setBounds(590, 90, 110, 27);
+        jButtonReset.setBounds(400, 250, 110, 27);
 
         jButtonDelete.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jButtonDelete.setText("Delete");
@@ -210,7 +214,7 @@ private void loadDataIntoTable() {
             }
         });
         jPanel1.add(jButtonDelete);
-        jButtonDelete.setBounds(710, 130, 90, 27);
+        jButtonDelete.setBounds(300, 250, 90, 27);
 
         jButton1.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jButton1.setText("All entry");
@@ -220,7 +224,7 @@ private void loadDataIntoTable() {
             }
         });
         jPanel1.add(jButton1);
-        jButton1.setBounds(470, 90, 110, 27);
+        jButton1.setBounds(520, 250, 110, 27);
 
         jButton5.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jButton5.setText("Back");
@@ -230,17 +234,17 @@ private void loadDataIntoTable() {
             }
         });
         jPanel1.add(jButton5);
-        jButton5.setBounds(710, 90, 92, 27);
+        jButton5.setBounds(770, 250, 92, 27);
 
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null}
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null}
             },
             new String [] {
-                "EmployeeID", "Name", "D.O.B", "Mobile Number", "Aadhar Number"
+                "EmployeeID", "Name", "D.O.B", "Mobile Number", "Aadhar Number", "Base Salary"
             }
         ));
         jTable1.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -251,12 +255,12 @@ private void loadDataIntoTable() {
         jScrollPane1.setViewportView(jTable1);
 
         jPanel1.add(jScrollPane1);
-        jScrollPane1.setBounds(10, 350, 790, 300);
+        jScrollPane1.setBounds(10, 300, 870, 350);
 
         jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 36)); // NOI18N
         jLabel1.setText("                      EMPLOYEE DATA");
         jPanel1.add(jLabel1);
-        jLabel1.setBounds(7, 20, 610, 45);
+        jLabel1.setBounds(120, 20, 590, 45);
 
         jLabel3.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         jLabel3.setText("DOB");
@@ -281,12 +285,12 @@ private void loadDataIntoTable() {
 
         jTxtMobile.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         jPanel1.add(jTxtMobile);
-        jTxtMobile.setBounds(180, 240, 257, 38);
+        jTxtMobile.setBounds(610, 90, 257, 38);
 
         jLabel5.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         jLabel5.setText("Mobile");
         jPanel1.add(jLabel5);
-        jLabel5.setBounds(20, 240, 152, 38);
+        jLabel5.setBounds(490, 90, 152, 38);
 
         jTxtEmployeeId.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         jTxtEmployeeId.addActionListener(new java.awt.event.ActionListener() {
@@ -298,15 +302,24 @@ private void loadDataIntoTable() {
         jTxtEmployeeId.setBounds(180, 190, 257, 38);
 
         jLabel6.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
-        jLabel6.setText("Aadhar No.");
+        jLabel6.setText("Base Salary");
         jPanel1.add(jLabel6);
-        jLabel6.setBounds(20, 290, 128, 38);
+        jLabel6.setBounds(470, 190, 128, 38);
 
         jTxtAadharNumber.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         jPanel1.add(jTxtAadharNumber);
-        jTxtAadharNumber.setBounds(180, 290, 257, 38);
+        jTxtAadharNumber.setBounds(610, 140, 257, 38);
 
-        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 150, 807, 660));
+        jLabel7.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
+        jLabel7.setText("Aadhar No.");
+        jPanel1.add(jLabel7);
+        jLabel7.setBounds(470, 140, 130, 38);
+
+        jTxtBaseSalary.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
+        jPanel1.add(jTxtBaseSalary);
+        jTxtBaseSalary.setBounds(610, 190, 257, 38);
+
+        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 150, 900, 660));
 
         pack();
         setLocationRelativeTo(null);
@@ -321,6 +334,7 @@ private void loadDataIntoTable() {
     String employeeId = jTxtEmployeeId.getText().trim();
     String mobile = jTxtMobile.getText().trim();
     String aadharNumber = jTxtAadharNumber.getText().trim();
+    String baseSalary = jTxtBaseSalary.getText().trim();
 
     // Validate that name and employeeId are not empty
     if (nameUpperCase.isEmpty() || employeeId.isEmpty()) {
@@ -332,13 +346,14 @@ private void loadDataIntoTable() {
     java.sql.Date sqlDateOfBirth = (dateOfBirth != null) ? new java.sql.Date(dateOfBirth.getTime()) : null;
 
     try (Connection conn = DatabaseConnection.getConnection()) {
-        String sql = "INSERT INTO emp (empName, dateOfBirth, empId, mobile, aadharNumber) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO emp (empName, dateOfBirth, empId, mobile, aadharNumber, baseSalary) VALUES (?, ?, ?, ?, ?, ?)";
         PreparedStatement pstmt = conn.prepareStatement(sql);
         pstmt.setString(1, nameUpperCase);
         pstmt.setDate(2, sqlDateOfBirth);
         pstmt.setString(3, employeeId);
         pstmt.setString(4, mobile);
         pstmt.setString(5, aadharNumber);
+        pstmt.setBigDecimal(6, new BigDecimal(baseSalary));
 
         pstmt.executeUpdate();
 
@@ -353,6 +368,7 @@ private void loadDataIntoTable() {
     jTxtEmployeeId.setText("");
     jTxtMobile.setText("");
     jTxtAadharNumber.setText("");
+    jTxtBaseSalary.setText("");
     loadDataIntoTable(); // Assuming this method refreshes the table view
 
 
@@ -370,24 +386,25 @@ private void loadDataIntoTable() {
     jTxtEmployeeId.setText("");
     jTxtMobile.setText("");
     jTxtAadharNumber.setText("");
+    jTxtBaseSalary.setText("");
 
 
     }//GEN-LAST:event_jButtonResetActionPerformed
 
     private void jButtonUpdateDataActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonUpdateDataActionPerformed
-                                                  
+  
     String name = jTxtName.getText().trim();
     java.util.Date dateOfBirth = jDateChooserDateOfBirth.getDate();
     String employeeId = jTxtEmployeeId.getText().trim();
     String mobile = jTxtMobile.getText().trim();
     String aadharNumber = jTxtAadharNumber.getText().trim();
+    String baseSalary = jTxtBaseSalary.getText().trim();
 
     // Convert java.util.Date to java.sql.Date
     java.sql.Date sqlDateOfBirth = (dateOfBirth != null) ? new java.sql.Date(dateOfBirth.getTime()) : null;
 
     if (!employeeId.isEmpty() && !name.isEmpty()) {
         try (Connection conn = DatabaseConnection.getConnection()) {
-            // Fetch the current data from the database
             String fetchSql = "SELECT * FROM emp WHERE empId = ? AND empName = ?";
             PreparedStatement fetchPstmt = conn.prepareStatement(fetchSql);
             fetchPstmt.setString(1, employeeId);
@@ -399,8 +416,8 @@ private void loadDataIntoTable() {
                 java.sql.Date currentDateOfBirth = rs.getDate("dateOfBirth");
                 String currentMobile = rs.getString("mobile");
                 String currentAadharNumber = rs.getString("aadharNumber");
+                BigDecimal currentBaseSalary = rs.getBigDecimal("baseSalary");
 
-                // Build the update query dynamically based on changed fields
                 StringBuilder sql = new StringBuilder("UPDATE emp SET ");
                 boolean firstField = true;
 
@@ -421,6 +438,11 @@ private void loadDataIntoTable() {
                 if (!aadharNumber.equals(currentAadharNumber)) {
                     if (!firstField) sql.append(", ");
                     sql.append("aadharNumber = ?");
+                    firstField = false;
+                }
+                if (!baseSalary.equals(currentBaseSalary.toString())) {
+                    if (!firstField) sql.append(", ");
+                    sql.append("baseSalary = ?");
                 }
 
                 sql.append(" WHERE empId = ? AND empName = ?");
@@ -439,6 +461,9 @@ private void loadDataIntoTable() {
                 }
                 if (!aadharNumber.equals(currentAadharNumber)) {
                     pstmt.setString(paramIndex++, aadharNumber);
+                }
+                if (!baseSalary.equals(currentBaseSalary.toString())) {
+                    pstmt.setBigDecimal(paramIndex++, new BigDecimal(baseSalary));
                 }
 
                 pstmt.setString(paramIndex++, employeeId);
@@ -464,7 +489,9 @@ private void loadDataIntoTable() {
     jTxtEmployeeId.setText("");
     jTxtMobile.setText("");
     jTxtAadharNumber.setText("");
+    jTxtBaseSalary.setText("");
     loadDataIntoTable();
+
 
 
     }//GEN-LAST:event_jButtonUpdateDataActionPerformed
@@ -544,17 +571,9 @@ private void loadDataIntoTable() {
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jTable1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable1MouseClicked
-        // TODO add your handling code here:
-                                     
-    // Get the selected row index
-    jTxtName.setText("");
-    jDateChooserDateOfBirth.setDate(null);
-    jTxtEmployeeId.setText("");
-    jTxtMobile.setText("");
-    jTxtAadharNumber.setText("");
+   
     int selectedRow = jTable1.getSelectedRow();
     
-    // Retrieve data from the selected row and set them to the corresponding text fields
     jTxtEmployeeId.setText(jTable1.getValueAt(selectedRow, 0) != null ? jTable1.getValueAt(selectedRow, 0).toString() : "");
     jTxtName.setText(jTable1.getValueAt(selectedRow, 1) != null ? jTable1.getValueAt(selectedRow, 1).toString() : "");
     
@@ -572,7 +591,7 @@ private void loadDataIntoTable() {
     
     jTxtMobile.setText(jTable1.getValueAt(selectedRow, 3) != null ? jTable1.getValueAt(selectedRow, 3).toString() : "");
     jTxtAadharNumber.setText(jTable1.getValueAt(selectedRow, 4) != null ? jTable1.getValueAt(selectedRow, 4).toString() : "");
-
+    jTxtBaseSalary.setText(jTable1.getValueAt(selectedRow, 5) != null ? jTable1.getValueAt(selectedRow, 5).toString() : "");
 
 
     }//GEN-LAST:event_jTable1MouseClicked
@@ -640,10 +659,12 @@ new AdminMenu().setVisible(true);
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable jTable1;
     private javax.swing.JTextField jTxtAadharNumber;
+    private javax.swing.JTextField jTxtBaseSalary;
     private javax.swing.JTextField jTxtEmployeeId;
     private javax.swing.JTextField jTxtMobile;
     private javax.swing.JTextField jTxtName;

@@ -54,7 +54,7 @@ public class entry1 extends javax.swing.JFrame {
          /**new code*/
  
     }
-     private void loadItems() {
+     private void loadItems() { 
  try (Connection con = DatabaseConnection.getConnection()) {
         Statement st = con.createStatement();
         
@@ -93,7 +93,7 @@ public class entry1 extends javax.swing.JFrame {
                     String empID = empDetails[1];
                     // Perform actions based on the selected employee name and ID
                     // For example, update a text field or display additional information
-                    System.out.println("Selected Employee: " + empName + ", ID: " + empID);
+//                    System.out.println("Selected Employee: " + empName + ", ID: " + empID);
                 }
             }
         }
