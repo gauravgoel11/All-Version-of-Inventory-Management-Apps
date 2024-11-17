@@ -47,6 +47,7 @@ public class Part_entry1 extends javax.swing.JFrame {
         jDateChooser.setDate(new Date());
          setExtendedState(this.MAXIMIZED_BOTH);
           setupKeyBindings();
+          loadItems();
          
          /**new code*/
  

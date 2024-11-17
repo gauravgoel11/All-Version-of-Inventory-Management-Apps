@@ -355,6 +355,20 @@ private void loadDataIntoTable() {
     java.sql.Date sqlDateOfBirth = (dateOfBirth != null) ? new java.sql.Date(dateOfBirth.getTime()) : null;
 
     try (Connection conn = DatabaseConnection.getConnection()) {
+        // Check if the employee ID already exists
+        String checkSql = "SELECT COUNT(*) FROM emp WHERE empId = ?";
+        PreparedStatement checkPstmt = conn.prepareStatement(checkSql);
+        checkPstmt.setInt(1, employeeId);
+        ResultSet rs = checkPstmt.executeQuery();
+        rs.next();
+        int count = rs.getInt(1);
+
+        if (count > 0) {
+            JOptionPane.showMessageDialog(null, "Employee ID already exists. Data cannot be added.");
+            return;
+        }
+
+        // Proceed with insertion if the employee ID does not exist
         String sql = "INSERT INTO emp (empName, dateOfBirth, empId, mobile, aadharNumber, baseSalary) VALUES (?, ?, ?, ?, ?, ?)";
         PreparedStatement pstmt = conn.prepareStatement(sql);
         pstmt.setString(1, nameUpperCase);
@@ -379,7 +393,6 @@ private void loadDataIntoTable() {
     jTxtAadharNumber.setText("");
     jTxtBaseSalary.setText("");
     loadDataIntoTable(); // Assuming this method refreshes the table view
-
 
 
     }//GEN-LAST:event_jButtonAddDataActionPerformed
