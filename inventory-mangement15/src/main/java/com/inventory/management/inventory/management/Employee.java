@@ -326,19 +326,28 @@ private void loadDataIntoTable() {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButtonAddDataActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonAddDataActionPerformed
-                                              
+
     // Retrieve data from form fields
     String name = jTxtName.getText().trim();
     String nameUpperCase = name.toUpperCase();
     java.util.Date dateOfBirth = jDateChooserDateOfBirth.getDate();
-    String employeeId = jTxtEmployeeId.getText().trim();
+    String empId = jTxtEmployeeId.getText().trim();
     String mobile = jTxtMobile.getText().trim();
     String aadharNumber = jTxtAadharNumber.getText().trim();
     String baseSalary = jTxtBaseSalary.getText().trim();
 
     // Validate that name and employeeId are not empty
-    if (nameUpperCase.isEmpty() || employeeId.isEmpty()) {
+    if (nameUpperCase.isEmpty() || empId.isEmpty()) {
         JOptionPane.showMessageDialog(null, "Name and Employee ID cannot be empty");
+        return;
+    }
+
+    // Parse employeeId as an integer
+    int employeeId;
+    try {
+        employeeId = Integer.parseInt(empId);
+    } catch (NumberFormatException e) {
+        JOptionPane.showMessageDialog(null, "Employee ID must be a valid integer.");
         return;
     }
 
@@ -350,7 +359,7 @@ private void loadDataIntoTable() {
         PreparedStatement pstmt = conn.prepareStatement(sql);
         pstmt.setString(1, nameUpperCase);
         pstmt.setDate(2, sqlDateOfBirth);
-        pstmt.setString(3, employeeId);
+        pstmt.setInt(3, employeeId); // Use the parsed integer
         pstmt.setString(4, mobile);
         pstmt.setString(5, aadharNumber);
         pstmt.setBigDecimal(6, new BigDecimal(baseSalary));
@@ -370,6 +379,7 @@ private void loadDataIntoTable() {
     jTxtAadharNumber.setText("");
     jTxtBaseSalary.setText("");
     loadDataIntoTable(); // Assuming this method refreshes the table view
+
 
 
     }//GEN-LAST:event_jButtonAddDataActionPerformed
@@ -392,22 +402,37 @@ private void loadDataIntoTable() {
     }//GEN-LAST:event_jButtonResetActionPerformed
 
     private void jButtonUpdateDataActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonUpdateDataActionPerformed
-  
+ 
     String name = jTxtName.getText().trim();
     java.util.Date dateOfBirth = jDateChooserDateOfBirth.getDate();
-    String employeeId = jTxtEmployeeId.getText().trim();
+    String empId = jTxtEmployeeId.getText().trim();
     String mobile = jTxtMobile.getText().trim();
     String aadharNumber = jTxtAadharNumber.getText().trim();
     String baseSalary = jTxtBaseSalary.getText().trim();
 
+    // Validate that name and employeeId are not empty
+    if (name.isEmpty() || empId.isEmpty()) {
+        JOptionPane.showMessageDialog(null, "Name and Employee ID cannot be empty");
+        return;
+    }
+
+    // Parse employeeId as an integer
+    int employeeId;
+    try {
+        employeeId = Integer.parseInt(empId);
+    } catch (NumberFormatException e) {
+        JOptionPane.showMessageDialog(null, "Employee ID must be a valid integer.");
+        return;
+    }
+
     // Convert java.util.Date to java.sql.Date
     java.sql.Date sqlDateOfBirth = (dateOfBirth != null) ? new java.sql.Date(dateOfBirth.getTime()) : null;
 
-    if (!employeeId.isEmpty() && !name.isEmpty()) {
+    if (!name.isEmpty()) {
         try (Connection conn = DatabaseConnection.getConnection()) {
             String fetchSql = "SELECT * FROM emp WHERE empId = ? AND empName = ?";
             PreparedStatement fetchPstmt = conn.prepareStatement(fetchSql);
-            fetchPstmt.setString(1, employeeId);
+            fetchPstmt.setInt(1, employeeId);
             fetchPstmt.setString(2, name);
             ResultSet rs = fetchPstmt.executeQuery();
             
@@ -466,7 +491,7 @@ private void loadDataIntoTable() {
                     pstmt.setBigDecimal(paramIndex++, new BigDecimal(baseSalary));
                 }
 
-                pstmt.setString(paramIndex++, employeeId);
+                pstmt.setInt(paramIndex++, employeeId);
                 pstmt.setString(paramIndex++, currentName);
 
                 int rowsUpdated = pstmt.executeUpdate();
@@ -493,7 +518,6 @@ private void loadDataIntoTable() {
     loadDataIntoTable();
 
 
-
     }//GEN-LAST:event_jButtonUpdateDataActionPerformed
 
     private void jButtonPrintActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonPrintActionPerformed
@@ -511,15 +535,17 @@ private void loadDataIntoTable() {
     }//GEN-LAST:event_jButtonPrintActionPerformed
 
     private void jButtonDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonDeleteActionPerformed
-                                             
-    String employeeId = jTxtEmployeeId.getText();
-    String name = jTxtName.getText();
+try {
+    String employeeIdString = jTxtEmployeeId.getText().trim();
+    int employeeId = Integer.parseInt(employeeIdString);
+    String name = jTxtName.getText().trim();
 
-    if (!employeeId.isEmpty() && !name.isEmpty()) {
+    // Validate that employeeId and name are not empty
+    if (!employeeIdString.isEmpty() && !name.isEmpty()) {
         try (Connection conn = DatabaseConnection.getConnection()) {  // Use centralized connection method
             String sql = "DELETE FROM emp WHERE empId = ? AND empName = ?";
             PreparedStatement pstmt = conn.prepareStatement(sql);
-            pstmt.setString(1, employeeId);
+            pstmt.setInt(1, employeeId);  // Use setInt for integer
             pstmt.setString(2, name);
 
             int rowsDeleted = pstmt.executeUpdate();
@@ -534,9 +560,10 @@ private void loadDataIntoTable() {
     } else {
         JOptionPane.showMessageDialog(null, "Please enter both Employee ID and Name to delete.");
     }
-    loadDataIntoTable();  // Ensure this method is defined to refresh the table view
-
-
+    loadDataIntoTable();  // Refresh the table view to reflect changes
+} catch (NumberFormatException e) {
+    JOptionPane.showMessageDialog(null, "Please enter a valid integer for Employee ID.");
+}
 
     }//GEN-LAST:event_jButtonDeleteActionPerformed
 
