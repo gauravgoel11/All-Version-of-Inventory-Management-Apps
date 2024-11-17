@@ -56,6 +56,7 @@ public class ViewAdminEntry extends javax.swing.JFrame {
         setExtendedState(this.MAXIMIZED_BOTH);
          setupKeyBindings();
          oneMonthAdminEntry();
+         loadItems();
     }
          private void setupKeyBindings() {
         // Get the input map for the root pane
