@@ -225,7 +225,7 @@
             <Property name="toolTipText" type="java.lang.String" value=""/>
           </Properties>
           <AuxValues>
-            <AuxValue name="JavaCodeGenerator_CreateCodePost" type="java.lang.String" value="try {&#xa;    // Assuming DatabaseConnection is your utility class to get a connection&#xa;    Connection con = DatabaseConnection.getConnection();&#xa;    Statement st = con.createStatement();&#xa;    ResultSet rs = st.executeQuery(&quot;SELECT * FROM part_items&quot;);&#xa;&#xa;    Set&lt;String&gt; partNames = new HashSet&lt;&gt;();&#xa;    while (rs.next()) {&#xa;        String s = rs.getString(&quot;partName&quot;);&#xa;        partNames.add(s);&#xa;    }&#xa;    con.close();&#xa;&#xa;    for (String partName : partNames) {&#xa;        jcombopartname.addItem(partName);&#xa;    }&#xa;} catch (ClassNotFoundException | SQLException e) {&#xa;    System.out.println(&quot;Error is &quot; + e.getMessage());&#xa;}&#xa;&#xa;AutoCompleteDecorator.decorate(jcombopartname);&#xa;"/>
+            <AuxValue name="JavaCodeGenerator_CreateCodePost" type="java.lang.String" value="AutoCompleteDecorator.decorate(jcombopartname);&#xa;"/>
             <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
           </AuxValues>
         </Component>

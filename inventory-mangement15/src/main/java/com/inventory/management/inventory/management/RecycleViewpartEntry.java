@@ -58,6 +58,7 @@ import java.awt.event.KeyEvent;
  * @author gaura
  */
 public class RecycleViewpartEntry extends javax.swing.JFrame {
+    private Map<String, String> partMap = new HashMap<>();
 
     /**
      * Creates new form ViewEntry
@@ -68,6 +69,7 @@ public class RecycleViewpartEntry extends javax.swing.JFrame {
          setExtendedState(this.MAXIMIZED_BOTH);
           setupKeyBindings();
           oneMonthEntry();
+          loadItems();
     }
          private void setupKeyBindings() {
         // Get the input map for the root pane
@@ -133,6 +135,35 @@ private void oneMonthEntry() {
         JOptionPane.showMessageDialog(null, e.getMessage());
     }
 }
+ private void loadItems() { 
+ try (Connection con = DatabaseConnection.getConnection()) {
+        Statement st = con.createStatement();
+        
+        // Load items
+        ResultSet rs = st.executeQuery("SELECT DISTINCT partName FROM part_items");
+        while (rs.next()) {
+            String partName = rs.getString("partName");
+            jcombopartname.addItem(partName);
+            partMap.put(partName, partName);        
+        }
+
+        // Load employee names with IDs
+        
+    } catch (ClassNotFoundException | SQLException e) {
+        System.out.println("Error is " + e.getMessage());
+    }
+    }
+         private void setupComboBoxListeners() {
+        jcombopartname.addActionListener(new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            String selectedPartName = (String) jcombopartname.getSelectedItem();
+            if (selectedPartName != null && partMap.containsKey(selectedPartName)) {
+                jcombopartname.setSelectedItem(partMap.get(selectedPartName));
+                }
+            }
+        });
+            }
 
     
 
@@ -156,26 +187,6 @@ private void oneMonthEntry() {
         jLabel5 = new javax.swing.JLabel();
         empEnt = new javax.swing.JLabel();
         jcombopartname = new javax.swing.JComboBox<>();
-        try {
-            // Assuming DatabaseConnection is your utility class to get a connection
-            Connection con = DatabaseConnection.getConnection();
-            Statement st = con.createStatement();
-            ResultSet rs = st.executeQuery("SELECT * FROM part_items");
-
-            Set<String> partNames = new HashSet<>();
-            while (rs.next()) {
-                String s = rs.getString("partName");
-                partNames.add(s);
-            }
-            con.close();
-
-            for (String partName : partNames) {
-                jcombopartname.addItem(partName);
-            }
-        } catch (ClassNotFoundException | SQLException e) {
-            System.out.println("Error is " + e.getMessage());
-        }
-
         AutoCompleteDecorator.decorate(jcombopartname);
         jLabel1 = new javax.swing.JLabel();
         jTextFieldQuantity = new javax.swing.JTextField();

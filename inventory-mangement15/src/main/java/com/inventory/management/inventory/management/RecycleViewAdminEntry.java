@@ -37,12 +37,15 @@ import java.text.SimpleDateFormat;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  *
  * @author gaura
  */
 public class RecycleViewAdminEntry extends javax.swing.JFrame {
+    private Map<String, String> itemMap = new HashMap<>();
 
     /**
      * Creates new form ViewEntry
@@ -53,6 +56,7 @@ public class RecycleViewAdminEntry extends javax.swing.JFrame {
         setExtendedState(this.MAXIMIZED_BOTH);
          setupKeyBindings();
          oneMonthEntry();
+         loadItems();
     }
          private void setupKeyBindings() {
         // Get the input map for the root pane
@@ -121,6 +125,35 @@ private void oneMonthEntry() {
         JOptionPane.showMessageDialog(null, e.getMessage());
     }
 }
+private void loadItems() { 
+try (Connection con = DatabaseConnection.getConnection()) {
+        Statement st = con.createStatement();
+        
+        // Load items
+        ResultSet rs = st.executeQuery("SELECT * FROM items");
+        while (rs.next()) {
+            String itemNameStr = rs.getString("itemName");
+            itemName.addItem(itemNameStr);
+            itemMap.put(itemNameStr, itemNameStr); // Assuming you want to map itemName to itself
+        }
+        
+        rs.close();
+        st.close();
+    } catch (ClassNotFoundException | SQLException e) {
+        JOptionPane.showMessageDialog(null, "Error loading items: " + e.getMessage());
+    }
+    }
+         private void setupComboBoxListeners() {
+      itemName.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String selectedName = (String) itemName.getSelectedItem();
+                if (selectedName != null && itemMap.containsKey(selectedName)) {
+                    itemName.setSelectedItem(itemMap.get(selectedName));
+                }
+            }
+        });
+            }
 
 
     /**
@@ -138,21 +171,6 @@ private void oneMonthEntry() {
         empEnt = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         itemName = new javax.swing.JComboBox<>();
-        try {
-            // Assuming DatabaseConnection is your utility class to get a connection
-            Connection con = DatabaseConnection.getConnection();
-            Statement st = con.createStatement();
-            ResultSet rs = st.executeQuery("SELECT * FROM items");
-
-            while (rs.next()) {
-                itemName.addItem(rs.getString("itemName"));
-                System.out.println(rs.getString("itemName"));
-            }
-            con.close();
-        } catch (ClassNotFoundException | SQLException e) {
-            System.out.println("Error is " + e.getMessage());
-        }
-
         AutoCompleteDecorator.decorate(itemName);
         jLabel4 = new javax.swing.JLabel();
         jDateChooserFrom = new com.toedter.calendar.JDateChooser();

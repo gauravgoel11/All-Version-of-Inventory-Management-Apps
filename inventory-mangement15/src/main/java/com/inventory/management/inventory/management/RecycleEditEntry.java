@@ -36,12 +36,15 @@ import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
 import java.text.SimpleDateFormat;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  *
  * @author gaura
  */
 public class RecycleEditEntry extends javax.swing.JFrame {
+    private Map<String, String> empMap = new HashMap<>();
 
     /**
      * Creates new form ViewEntry
@@ -52,6 +55,7 @@ public class RecycleEditEntry extends javax.swing.JFrame {
          setExtendedState(this.MAXIMIZED_BOTH);
          setupKeyBindings();
          oneMonthEntry();
+         loadItems();
     }
      private void setupKeyBindings() {
         // Get the input map for the root pane
@@ -116,6 +120,43 @@ public class RecycleEditEntry extends javax.swing.JFrame {
         JOptionPane.showMessageDialog(null, e.getMessage());
     }
 }
+  private void loadItems() { 
+ try (Connection con = DatabaseConnection.getConnection()) {
+        Statement st = con.createStatement();
+        
+        // Load items
+        ResultSet rs = st.executeQuery("SELECT * FROM emp");
+        while (rs.next()) {
+            String empNameWithID = rs.getString("empName") + " " + rs.getString("empID");
+            empName.addItem(empNameWithID);
+            empMap.put(empNameWithID, empNameWithID);        
+        }
+
+        // Load employee names with IDs
+        
+    } catch (ClassNotFoundException | SQLException e) {
+        System.out.println("Error is " + e.getMessage());
+    }
+    }
+         private void setupComboBoxListeners() {
+        empName.addActionListener(new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            String selectedEmpNameWithID = (String) empName.getSelectedItem();
+            if (selectedEmpNameWithID != null && empMap.containsKey(selectedEmpNameWithID)) {
+                // Split the selected employee name and ID
+                String[] empDetails = selectedEmpNameWithID.split(" ");
+                if (empDetails.length == 2) {
+                    String empName = empDetails[0];
+                    String empID = empDetails[1];
+                    // Perform actions based on the selected employee name and ID
+                    // For example, update a text field or display additional information
+//                    System.out.println("Selected Employee: " + empName + ", ID: " + empID);
+                }
+            }
+        }
+    });
+            }
 
 
     /**
@@ -138,16 +179,6 @@ public class RecycleEditEntry extends javax.swing.JFrame {
         jLabel5 = new javax.swing.JLabel();
         empEnt = new javax.swing.JLabel();
         empName = new javax.swing.JComboBox<>();
-        try (Connection conn = DatabaseConnection.getConnection()) {
-            Statement st = conn.createStatement();
-            ResultSet rs = st.executeQuery("SELECT * FROM emp");
-            while (rs.next()) {
-                String s = rs.getString("empName") + " " + rs.getString("empID");
-                empName.addItem(s);
-            }
-        } catch (ClassNotFoundException | SQLException e) {
-            System.out.println("Error: " + e.getMessage());
-        }
         AutoCompleteDecorator.decorate(empName);
         jButtonRestoreEntry = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();

@@ -19,6 +19,7 @@ import javax.swing.event.DocumentListener;
 import javax.swing.text.Document;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 
 /**
@@ -26,6 +27,7 @@ import java.awt.event.KeyEvent;
  * @author gaura
  */
 public class UserPart_entry2 extends javax.swing.JFrame {
+    private Map<String, String> partMap = new HashMap<>();
 
     /**
      * Creates new form AdminEntry
@@ -34,6 +36,7 @@ public class UserPart_entry2 extends javax.swing.JFrame {
         initComponents();
                 totalTA.setLineWrap(true);
         totalTA.setWrapStyleWord(true); 
+        loadItems();
         
          setExtendedState(this.MAXIMIZED_BOTH);
           setupKeyBindings();
@@ -68,6 +71,35 @@ public class UserPart_entry2 extends javax.swing.JFrame {
         new UserMenu1().setVisible(true);
         this.dispose();
     }
+     private void loadItems() { 
+ try (Connection con = DatabaseConnection.getConnection()) {
+        Statement st = con.createStatement();
+        
+        // Load items
+        ResultSet rs = st.executeQuery("SELECT DISTINCT partName FROM part_items");
+        while (rs.next()) {
+            String partName = rs.getString("partName");
+            jcombopartname.addItem(partName);
+            partMap.put(partName, partName);        
+        }
+
+        // Load employee names with IDs
+        
+    } catch (ClassNotFoundException | SQLException e) {
+        System.out.println("Error is " + e.getMessage());
+    }
+    }
+         private void setupComboBoxListeners() {
+        jcombopartname.addActionListener(new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            String selectedPartName = (String) jcombopartname.getSelectedItem();
+            if (selectedPartName != null && partMap.containsKey(selectedPartName)) {
+                jcombopartname.setSelectedItem(partMap.get(selectedPartName));
+                }
+            }
+        });
+            }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -90,26 +122,6 @@ public class UserPart_entry2 extends javax.swing.JFrame {
         totalTA = new javax.swing.JTextArea();
         jButton2 = new javax.swing.JButton();
         jcombopartname = new javax.swing.JComboBox<>();
-        try {
-            Class.forName("org.sqlite.JDBC");
-            Connection con = DriverManager.getConnection("jdbc:sqlite:inven.db");
-            Statement st = con.createStatement();
-            ResultSet rs = st.executeQuery("Select * from part_items");
-
-            Set<String> partNames = new HashSet<>();
-            while (rs.next()) {
-                String s = rs.getString("partName");
-                partNames.add(s);
-            }
-            con.close();
-
-            for (String partName : partNames) {
-                jcombopartname.addItem(partName);
-            }
-        } catch (ClassNotFoundException | SQLException e) {
-            System.out.println("Error is " + e.getMessage());
-        }
-
         AutoCompleteDecorator.decorate(jcombopartname);
         jTextFieldDate = new javax.swing.JTextField();
 
