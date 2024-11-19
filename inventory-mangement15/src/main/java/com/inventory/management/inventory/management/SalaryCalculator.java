@@ -424,71 +424,77 @@ private JFrame frame;
 
     private void jButtonCalculateSalaryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonCalculateSalaryActionPerformed
 try (Connection conn = DatabaseConnection.getConnection()) {
-        // Get selected employee name and ID
-        String selectedEmployee = (empName.getSelectedIndex() != -1) ? empName.getSelectedItem().toString() : "";
+    // Get selected employee name and ID
+    String selectedEmployee = (empName.getSelectedIndex() != -1) ? empName.getSelectedItem().toString() : "";
 
-        String empName = "";
-        String empID = "";
+    String empName = "";
+    int empID = 0; // Change empID to an integer
 
-        // Check if an employee is selected
-        if (!selectedEmployee.isEmpty()) {
-            String[] employeeData = selectedEmployee.split(" ");
-            empName = employeeData[0];
-            empID = employeeData[1];
+    // Check if an employee is selected
+    if (!selectedEmployee.isEmpty()) {
+        String[] employeeData = selectedEmployee.split(" ");
+        empName = employeeData[0];
+        try {
+            empID = Integer.parseInt(employeeData[1]); // Parse empID as an integer
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(null, "Invalid Employee ID format.");
+            return;
         }
+    }
 
-        // Get selected dates
-        java.util.Date fromDate = jDateChooserFrom.getDate();
-        java.util.Date toDate = jDateChooserTo.getDate();
+    // Get selected dates
+    java.util.Date fromDate = jDateChooserFrom.getDate();
+    java.util.Date toDate = jDateChooserTo.getDate();
 
-        // Convert java.util.Date to java.sql.Date
-        java.sql.Date sqlFromDate = (fromDate != null) ? new java.sql.Date(fromDate.getTime()) : null;
-        java.sql.Date sqlToDate = (toDate != null) ? new java.sql.Date(toDate.getTime()) : null;
+    // Convert java.util.Date to java.sql.Date
+    java.sql.Date sqlFromDate = (fromDate != null) ? new java.sql.Date(fromDate.getTime()) : null;
+    java.sql.Date sqlToDate = (toDate != null) ? new java.sql.Date(toDate.getTime()) : null;
 
-        // Fetch base salary from emp table
-        String salaryQuery = "SELECT baseSalary FROM emp WHERE empName = ? AND empID = ?";
-        PreparedStatement salaryStmt = conn.prepareStatement(salaryQuery);
-        salaryStmt.setString(1, empName);
-        salaryStmt.setString(2, empID);
-        ResultSet salaryRs = salaryStmt.executeQuery();
+    // Fetch base salary from emp table
+    String salaryQuery = "SELECT baseSalary FROM emp WHERE empName = ? AND empID = ?";
+    PreparedStatement salaryStmt = conn.prepareStatement(salaryQuery);
+    salaryStmt.setString(1, empName);
+    salaryStmt.setInt(2, empID); // Use setInt for empID
+    ResultSet salaryRs = salaryStmt.executeQuery();
 
-        BigDecimal baseSalary = BigDecimal.ZERO;
-        if (salaryRs.next()) {
-            baseSalary = salaryRs.getBigDecimal("baseSalary");
-        }
+    BigDecimal baseSalary = BigDecimal.ZERO;
+    if (salaryRs.next()) {
+        baseSalary = salaryRs.getBigDecimal("baseSalary");
+    }
 
-        // Calculate total parts cost from entry and item tables
-        String partsQuery = "SELECT SUM(e.quantity * i.cost) as totalPartsCost " +
-                            "FROM entry e JOIN item i ON e.itemName = i.itemName " +
-                            "WHERE e.empName = ? AND e.empID = ? AND e.entryDate BETWEEN ? AND ?";
-        PreparedStatement partsStmt = conn.prepareStatement(partsQuery);
-        partsStmt.setString(1, empName);
-        partsStmt.setString(2, empID);
-        partsStmt.setDate(3, sqlFromDate);
-        partsStmt.setDate(4, sqlToDate);
-        ResultSet partsRs = partsStmt.executeQuery();
+    // Calculate total parts cost from entry and item tables
+    String partsQuery = "SELECT SUM(e.quantity * i.cost) as totalPartsCost " +
+                        "FROM entry e JOIN item i ON e.itemName = i.itemName " +
+                        "WHERE e.empName = ? AND e.empID = ? AND e.entryDate BETWEEN ? AND ?";
+    PreparedStatement partsStmt = conn.prepareStatement(partsQuery);
+    partsStmt.setString(1, empName);
+    partsStmt.setInt(2, empID); // Use setInt for empID
+    partsStmt.setDate(3, sqlFromDate);
+    partsStmt.setDate(4, sqlToDate);
+    ResultSet partsRs = partsStmt.executeQuery();
 
-        BigDecimal totalPartsCost = BigDecimal.ZERO;
-        if (partsRs.next()) {
-            totalPartsCost = partsRs.getBigDecimal("totalPartsCost");
-        }
+    BigDecimal totalPartsCost = BigDecimal.ZERO;
+    if (partsRs.next()) {
+        totalPartsCost = partsRs.getBigDecimal("totalPartsCost");
+    }
 
-        // Calculate total salary
-        BigDecimal totalSalary = baseSalary.add(totalPartsCost);
+    // Calculate total salary
+    BigDecimal totalSalary = baseSalary.add(totalPartsCost);
 
-        // Display the total salary
-        JOptionPane.showMessageDialog(null, "Total Salary for " + empName + " is: " + totalSalary);
+    // Display the total salary
+    JOptionPane.showMessageDialog(null, "Total Salary for " + empName + " is: " + totalSalary);
 
-        // Close connections
-        salaryRs.close();
-        salaryStmt.close();
-        partsRs.close();
-        partsStmt.close();
-        conn.close();
+    // Close connections
+    salaryRs.close();
+    salaryStmt.close();
+    partsRs.close();
+    partsStmt.close();
+    conn.close();
 
-    } catch (SQLException | ClassNotFoundException e) {
-        JOptionPane.showMessageDialog(null, e.getMessage());
-    }        // TODO add your handling code here:
+} catch (SQLException | ClassNotFoundException e) {
+    JOptionPane.showMessageDialog(null, e.getMessage());
+}
+
     }//GEN-LAST:event_jButtonCalculateSalaryActionPerformed
 
     /**
