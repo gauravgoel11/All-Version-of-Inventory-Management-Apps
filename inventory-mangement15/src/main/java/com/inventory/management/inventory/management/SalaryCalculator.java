@@ -403,7 +403,7 @@ private JFrame frame;
     }//GEN-LAST:event_jTable1MouseClicked
 
     private void jButtonCalculateSalaryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonCalculateSalaryActionPerformed
-    try (Connection conn = DatabaseConnection.getConnection()) {
+  try (Connection conn = DatabaseConnection.getConnection()) {
         // Get selected employee name and ID
         String selectedEmployee = (empName.getSelectedIndex() != -1) ? empName.getSelectedItem().toString() : "";
 
@@ -461,20 +461,20 @@ private JFrame frame;
         // Calculate total salary
         BigDecimal totalSalary = baseSalary.add(totalPartsCost);
 
-        // Display the total salary
-        JOptionPane.showMessageDialog(null, "Total Salary for " + empName + " is: " + totalSalary);
+        // Update the JTable with the calculated salary data
+        DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+        model.setRowCount(0); // Clear existing data
+        model.addRow(new Object[]{empName, empID, baseSalary, totalPartsCost, totalSalary});
 
         // Close connections
         salaryRs.close();
         salaryStmt.close();
         partsRs.close();
         partsStmt.close();
-        conn.close();
 
     } catch (SQLException | ClassNotFoundException e) {
         JOptionPane.showMessageDialog(null, e.getMessage());
     }
-
     }//GEN-LAST:event_jButtonCalculateSalaryActionPerformed
 
     /**
