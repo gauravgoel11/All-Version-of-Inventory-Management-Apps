@@ -401,6 +401,7 @@ public class ViewpartEntry extends javax.swing.JFrame {
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
                                          
                                              
+                                          
     try (Connection conn = DatabaseConnection.getConnection()) {
         String sql = "SELECT partName, quantity, entryDate FROM partentry";
         PreparedStatement pstmt = conn.prepareStatement(sql);
@@ -412,9 +413,8 @@ public class ViewpartEntry extends javax.swing.JFrame {
         while (rs.next()) {
             String partName = rs.getString("partName");
             BigDecimal quantity = rs.getBigDecimal("quantity"); // Use BigDecimal for quantity
-            java.sql.Date entryDate = rs.getDate("entryDate");  // Assuming entryDate is stored as a Date in the database
+            java.sql.Date entryDate = rs.getDate("entryDate");
 
-            // Convert java.sql.Date to String if necessary
             String displayDate = (entryDate != null) ? entryDate.toString() : "No Date";
             model.addRow(new Object[]{partName, quantity, displayDate});
         }
@@ -424,6 +424,7 @@ public class ViewpartEntry extends javax.swing.JFrame {
     } catch (ClassNotFoundException | SQLException e) {
         JOptionPane.showMessageDialog(null, e.getMessage());
     }
+
 
 
     }//GEN-LAST:event_jButton1ActionPerformed
@@ -455,12 +456,12 @@ private JFrame frame;
 
     private void jButtonCusotmEntryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonCusotmEntryActionPerformed
                                                   
+                                                     
     try (Connection conn = DatabaseConnection.getConnection()) {
         String selectedPart = (jcombopartname.getSelectedIndex() != -1) ? jcombopartname.getSelectedItem().toString() : "";
         java.util.Date fromDate = jDateChooserFrom.getDate();
         java.util.Date toDate = jDateChooserTo.getDate();
 
-        // Convert java.util.Date to java.sql.Date
         java.sql.Date sqlFromDate = (fromDate != null) ? new java.sql.Date(fromDate.getTime()) : null;
         java.sql.Date sqlToDate = (toDate != null) ? new java.sql.Date(toDate.getTime()) : null;
 
@@ -493,7 +494,7 @@ private JFrame frame;
 
         while (rs.next()) {
             String partName = rs.getString("partName");
-            BigDecimal quantity = rs.getBigDecimal("quantity"); // Use BigDecimal for numeric values
+            BigDecimal quantity = rs.getBigDecimal("quantity"); // Use BigDecimal for quantity
             java.sql.Date entryDate = rs.getDate("entryDate");
             model.addRow(new Object[]{partName, quantity, entryDate});
         }
@@ -578,13 +579,12 @@ private JFrame frame;
 
     private void jButtonDeleteEntryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonDeleteEntryActionPerformed
                                                      
-                                                     
     int row = jTable1.getSelectedRow();
     if (row >= 0) {
         DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
-        String partNameValue = model.getValueAt(row, 0).toString(); // Assuming partName is in column 0
-        BigDecimal quantityValue = new BigDecimal(model.getValueAt(row, 1).toString()); // Assuming quantity is in column 1
-        String entryDate = model.getValueAt(row, 2).toString(); // Assuming entryDate is in column 2
+        String partNameValue = model.getValueAt(row, 0).toString();
+        BigDecimal quantityValue = new BigDecimal(model.getValueAt(row, 1).toString());
+        String entryDate = model.getValueAt(row, 2).toString();
 
         int response = JOptionPane.showConfirmDialog(null,
             "Do you want to delete the entry for part: " + partNameValue +
@@ -599,7 +599,7 @@ private JFrame frame;
                 PreparedStatement pstmt = conn.prepareStatement(sql);
                 pstmt.setString(1, partNameValue);
                 pstmt.setBigDecimal(2, quantityValue); // Use BigDecimal for quantity
-                pstmt.setDate(3, java.sql.Date.valueOf(entryDate)); // Convert string to java.sql.Date
+                pstmt.setDate(3, java.sql.Date.valueOf(entryDate));
 
                 int deletedRows = pstmt.executeUpdate();
                 if (deletedRows > 0) {
@@ -615,7 +615,6 @@ private JFrame frame;
     } else {
         JOptionPane.showMessageDialog(null, "Please select an entry to delete.");
     }
-    oneMonthEntryView(); // Refresh the view to reflect changes
 
 
 
@@ -643,12 +642,12 @@ private JFrame frame;
 
     private void jButtonChangeQuantityActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonChangeQuantityActionPerformed
                                                       
+                                                        
     int row = jTable1.getSelectedRow();
     if (row >= 0) {
         DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
         String partNameValue = model.getValueAt(row, 0).toString();
-        java.util.Date entryDateUtil = (java.util.Date) model.getValueAt(row, 2);
-        java.sql.Date entryDate = new java.sql.Date(entryDateUtil.getTime());
+        java.sql.Date entryDate = java.sql.Date.valueOf(model.getValueAt(row, 2).toString());
         String oldQuantity = model.getValueAt(row, 1).toString();
         String newQuantity = jTextFieldQuantity.getText();
 
@@ -663,7 +662,7 @@ private JFrame frame;
             try (Connection conn = DatabaseConnection.getConnection()) {
                 String sql = "UPDATE partentry SET quantity = ? WHERE partName = ? AND entryDate = ?";
                 PreparedStatement pstmt = conn.prepareStatement(sql);
-                pstmt.setBigDecimal(1, new BigDecimal(newQuantity)); // Use BigDecimal for numeric type
+                pstmt.setBigDecimal(1, new BigDecimal(newQuantity)); // Use BigDecimal for quantity
                 pstmt.setString(2, partNameValue);
                 pstmt.setDate(3, entryDate);
 
@@ -681,7 +680,7 @@ private JFrame frame;
     } else {
         JOptionPane.showMessageDialog(null, "Please select an entry to update.");
     }
-    oneMonthEntryView();
+
 
 
     }//GEN-LAST:event_jButtonChangeQuantityActionPerformed
