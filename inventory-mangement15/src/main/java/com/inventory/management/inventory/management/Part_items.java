@@ -61,6 +61,8 @@ import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.math.BigDecimal;
+
 // For formatting Date to a specific pattern
 // For autocomplete in JComboBox
 
@@ -408,7 +410,7 @@ private void loadItems() {
 
     private void jButtonAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonAddActionPerformed
                                           
-    String newPartName = jTextFieldNewPartName.getText().trim().toUpperCase();
+  String newPartName = jTextFieldNewPartName.getText().trim().toUpperCase();
     String selectedItem = (String) itemName.getSelectedItem();
     String quantity = jTextFieldQuantity.getText().trim();
 
@@ -432,19 +434,19 @@ private void loadItems() {
                 PreparedStatement insertStmt = con.prepareStatement(insertQuery);
                 insertStmt.setString(1, newPartName);
                 insertStmt.setString(2, selectedItem);
-                insertStmt.setInt(3, Integer.parseInt(quantity));
+                insertStmt.setBigDecimal(3, new BigDecimal(quantity)); // Use BigDecimal for numeric type
                 insertStmt.executeUpdate();
                 JOptionPane.showMessageDialog(null, "Item Added Successfully");
             }
         } catch (ClassNotFoundException | SQLException e) {
             JOptionPane.showMessageDialog(null, "Error: " + e.getMessage());
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(null, "Please enter a valid numeric value for quantity.");
         }
     } else {
         JOptionPane.showMessageDialog(null, "Please fill in all fields");
     }
     viewAllPartItems(); // Ensure this method is adapted to use PostgreSQL if it interacts with the database
-
-
     }//GEN-LAST:event_jButtonAddActionPerformed
 
     private void jButtonEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonEditActionPerformed
@@ -469,7 +471,7 @@ private void loadItems() {
             try (Connection conn = DatabaseConnection.getConnection()) {
                 String sql = "UPDATE part_items SET quantity = ? WHERE partName = ? AND itemName = ?";
                 PreparedStatement pstmt = conn.prepareStatement(sql);
-                pstmt.setInt(1, Integer.parseInt(newQuantity)); // Assuming quantity is an integer
+                pstmt.setBigDecimal(1, new BigDecimal(newQuantity)); // Use BigDecimal for numeric type
                 pstmt.setString(2, partNameValue);
                 pstmt.setString(3, itemNameValue);
                 pstmt.executeUpdate();
@@ -484,6 +486,7 @@ private void loadItems() {
     } else {
         JOptionPane.showMessageDialog(null, "Please select an entry to update.");
     }
+
 
 
     }//GEN-LAST:event_jButtonEditActionPerformed

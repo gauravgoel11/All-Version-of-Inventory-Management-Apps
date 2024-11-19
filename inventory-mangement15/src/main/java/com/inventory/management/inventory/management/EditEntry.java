@@ -56,11 +56,12 @@ public class EditEntry extends javax.swing.JFrame {
      */
     public EditEntry() {
         initComponents();
-        empName.setSelectedIndex(-1);
+        
          setExtendedState(this.MAXIMIZED_BOTH);
          setupKeyBindings();
          viewEntryOfThirtyDays();
          loadItems();
+         empName.setSelectedIndex(-1);
     }
      private void setupKeyBindings() {
         // Get the input map for the root pane

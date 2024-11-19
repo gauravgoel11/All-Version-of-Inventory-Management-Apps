@@ -67,11 +67,12 @@ public class ViewpartEntry extends javax.swing.JFrame {
      */
     public ViewpartEntry() {
         initComponents();
-        jcombopartname.setSelectedIndex(-1);
+        
          setExtendedState(this.MAXIMIZED_BOTH);
           setupKeyBindings();
           oneMonthEntryView();
           loadItems();
+          jcombopartname.setSelectedIndex(-1);
     }
          private void setupKeyBindings() {
         // Get the input map for the root pane
