@@ -59,7 +59,7 @@ public class SalaryCalculator extends javax.swing.JFrame {
         
          setExtendedState(this.MAXIMIZED_BOTH);
          setupKeyBindings();
-         viewSalaryOfLastMonth();
+//         viewSalaryOfLastMonth();
          loadItems();
          empName.setSelectedIndex(-1);
     }

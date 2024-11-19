@@ -167,7 +167,7 @@ public class AdminMenu extends javax.swing.JFrame {
                 jButton11ActionPerformed(evt);
             }
         });
-        jPanel1.add(jButton11, new org.netbeans.lib.awtextra.AbsoluteConstraints(570, 150, 390, 60));
+        jPanel1.add(jButton11, new org.netbeans.lib.awtextra.AbsoluteConstraints(550, 150, 390, 60));
 
         jButton13.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         jButton13.setText("Recycle Bin");
