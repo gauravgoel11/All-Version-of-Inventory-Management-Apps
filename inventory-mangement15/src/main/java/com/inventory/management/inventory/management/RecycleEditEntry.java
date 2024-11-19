@@ -38,6 +38,22 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.util.HashMap;
 import java.util.Map;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.awt.print.PrinterException;
+import javax.swing.table.DefaultTableModel;
+import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
+import java.text.SimpleDateFormat;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.math.BigDecimal;
+
 
 /**
  *
@@ -406,6 +422,7 @@ private JFrame frame;
 
     private void jButtonRestoreEntryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonRestoreEntryActionPerformed
                                                     
+                                                       
     int selectedRow = jTable1.getSelectedRow();
     if (selectedRow != -1) {
         DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
@@ -414,7 +431,7 @@ private JFrame frame;
         String empName = model.getValueAt(selectedRow, 0).toString();
         int empID = Integer.parseInt(model.getValueAt(selectedRow, 1).toString()); // Assuming empID is an integer
         String itemName = model.getValueAt(selectedRow, 2).toString();
-        int quantity = Integer.parseInt(model.getValueAt(selectedRow, 3).toString()); // Assuming quantity is an integer
+        BigDecimal quantity = new BigDecimal(model.getValueAt(selectedRow, 3).toString()); // Use BigDecimal for quantity
         java.sql.Date entryDate = java.sql.Date.valueOf(model.getValueAt(selectedRow, 4).toString()); // Convert string to java.sql.Date
 
         try (Connection conn = DatabaseConnection.getConnection()) { // Using DatabaseConnection class for PostgreSQL connection
@@ -423,7 +440,7 @@ private JFrame frame;
             pstmt.setString(1, empName);
             pstmt.setInt(2, empID);
             pstmt.setString(3, itemName);
-            pstmt.setInt(4, quantity);
+            pstmt.setBigDecimal(4, quantity); // Set BigDecimal for quantity
             pstmt.setDate(5, entryDate);
 
             // Execute the insert
@@ -439,6 +456,7 @@ private JFrame frame;
     } else {
         JOptionPane.showMessageDialog(null, "Please select a row to copy.");
     }
+
 
 
     }//GEN-LAST:event_jButtonRestoreEntryActionPerformed

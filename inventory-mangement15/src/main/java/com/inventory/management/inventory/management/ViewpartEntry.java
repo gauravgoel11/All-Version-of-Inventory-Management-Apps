@@ -141,7 +141,7 @@ public class ViewpartEntry extends javax.swing.JFrame {
         // Add rows to the model
         while (rs.next()) {
             String partName = rs.getString("partName");
-            int quantity = rs.getInt("quantity");
+            BigDecimal quantity = rs.getBigDecimal("quantity");
             java.sql.Date entryDate = rs.getDate("entryDate");
             model.addRow(new Object[]{partName, quantity, entryDate.toString()});
         }
