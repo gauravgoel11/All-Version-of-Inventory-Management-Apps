@@ -214,7 +214,7 @@ public class AdminMenu extends javax.swing.JFrame {
         });
         jPanel1.add(jButton16, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 540, 390, 60));
 
-        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 150, 1120, 720));
+        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 150, 1120, 720));
 
         pack();
         setLocationRelativeTo(null);

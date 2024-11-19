@@ -319,7 +319,7 @@ private void loadDataIntoTable() {
         jPanel1.add(jTxtBaseSalary);
         jTxtBaseSalary.setBounds(610, 190, 257, 38);
 
-        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 150, 900, 660));
+        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 150, 900, 660));
 
         pack();
         setLocationRelativeTo(null);

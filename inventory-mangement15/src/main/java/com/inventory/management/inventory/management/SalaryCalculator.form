@@ -28,7 +28,7 @@
     <Container class="javax.swing.JPanel" name="jPanel1">
       <Constraints>
         <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
-          <AbsoluteConstraints x="310" y="150" width="-1" height="-1"/>
+          <AbsoluteConstraints x="300" y="150" width="-1" height="-1"/>
         </Constraint>
       </Constraints>
 
@@ -59,9 +59,9 @@
                               <Component id="jDateChooserTo" alignment="0" min="-2" pref="160" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace pref="40" max="32767" attributes="0"/>
-                          <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                              <Component id="jButtonPrint" max="32767" attributes="0"/>
-                              <Component id="jButtonCalculateSalary" pref="139" max="32767" attributes="0"/>
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Component id="jButtonPrint" alignment="1" min="-2" pref="139" max="-2" attributes="0"/>
+                              <Component id="jButtonCalculateSalary" alignment="1" min="-2" pref="139" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">

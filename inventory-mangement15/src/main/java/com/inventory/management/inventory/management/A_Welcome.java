@@ -136,7 +136,7 @@ public class A_Welcome extends javax.swing.JFrame {
         );
 
         getContentPane().add(jPanel3);
-        jPanel3.setBounds(450, 200, 0, 0);
+        jPanel3.setBounds(300, 150, 810, 411);
 
         pack();
         setLocationRelativeTo(null);
