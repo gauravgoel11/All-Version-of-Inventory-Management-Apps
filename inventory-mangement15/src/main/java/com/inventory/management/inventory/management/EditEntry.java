@@ -40,6 +40,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.math.BigDecimal;
+
 
 
 /**
@@ -631,46 +633,44 @@ if (row >= 0) {
 
     private void jButtonChangeQuantityActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonChangeQuantityActionPerformed
  int row = jTable1.getSelectedRow();
-if (row >= 0) {
-    DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
-    String empNameValue = model.getValueAt(row, 0).toString();
-    String itemNameValue = model.getValueAt(row, 2).toString(); // Assuming itemName is in column 2
-    String entryDate = model.getValueAt(row, 4).toString();
-    String oldQuantity = model.getValueAt(row, 3).toString();
-    String newQuantity = jTextFieldQuantity.getText();
+    if (row >= 0) {
+        DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+        String empNameValue = model.getValueAt(row, 0).toString();
+        String itemNameValue = model.getValueAt(row, 2).toString(); // Assuming itemName is in column 2
+        String entryDate = model.getValueAt(row, 4).toString();
+        String oldQuantity = model.getValueAt(row, 3).toString();
+        String newQuantity = jTextFieldQuantity.getText();
 
-    // Show confirmation dialog before updating quantity
-    int response = JOptionPane.showConfirmDialog(null, 
-            "Do you want to change the quantity for item " + itemNameValue + 
-            " from " + oldQuantity + " to " + newQuantity + "?", 
-            "Confirm Quantity Update", 
-            JOptionPane.YES_NO_OPTION, 
-            JOptionPane.QUESTION_MESSAGE);
+        // Show confirmation dialog before updating quantity
+        int response = JOptionPane.showConfirmDialog(null, 
+                "Do you want to change the quantity for item " + itemNameValue + 
+                " from " + oldQuantity + " to " + newQuantity + "?", 
+                "Confirm Quantity Update", 
+                JOptionPane.YES_NO_OPTION, 
+                JOptionPane.QUESTION_MESSAGE);
 
-    if (response == JOptionPane.YES_OPTION) {
-        try (Connection conn = DatabaseConnection.getConnection()) {
-            String sql = "UPDATE entry SET quantity = ? WHERE empName = ? AND itemName = ? AND entryDate = ?";
-            PreparedStatement pstmt = conn.prepareStatement(sql);
-            pstmt.setInt(1, Integer.parseInt(newQuantity)); // Assuming quantity is an integer
-            pstmt.setString(2, empNameValue);
-            pstmt.setString(3, itemNameValue);
-            pstmt.setDate(4, java.sql.Date.valueOf(entryDate)); // Convert string to java.sql.Date
-            pstmt.executeUpdate();
-            
-            // Update table display
-            model.setValueAt(newQuantity, row, 3);
-            JOptionPane.showMessageDialog(null, "Quantity updated successfully.");
-        } catch (SQLException | ClassNotFoundException e) {
-            JOptionPane.showMessageDialog(null, e.getMessage());
-            Logger.getLogger(EditEntry.class.getName()).log(Level.SEVERE, null, e);
+        if (response == JOptionPane.YES_OPTION) {
+            try (Connection conn = DatabaseConnection.getConnection()) {
+                String sql = "UPDATE entry SET quantity = ? WHERE empName = ? AND itemName = ? AND entryDate = ?";
+                PreparedStatement pstmt = conn.prepareStatement(sql);
+                pstmt.setBigDecimal(1, new BigDecimal(newQuantity)); // Use BigDecimal for numeric values
+                pstmt.setString(2, empNameValue);
+                pstmt.setString(3, itemNameValue);
+                pstmt.setDate(4, java.sql.Date.valueOf(entryDate)); // Convert string to java.sql.Date
+                pstmt.executeUpdate();
+                
+                // Update table display
+                model.setValueAt(newQuantity, row, 3);
+                JOptionPane.showMessageDialog(null, "Quantity updated successfully.");
+            } catch (SQLException | ClassNotFoundException e) {
+                JOptionPane.showMessageDialog(null, e.getMessage());
+                Logger.getLogger(EditEntry.class.getName()).log(Level.SEVERE, null, e);
+            } 
         } 
-    } 
-} else {
-    JOptionPane.showMessageDialog(null, "Please select an entry to update.");
-}
-viewEntryOfThirtyDays();
-
-            // TODO add your handling code here:
+    } else {
+        JOptionPane.showMessageDialog(null, "Please select an entry to update.");
+    }
+    viewEntryOfThirtyDays();          // TODO add your handling code here:
     }//GEN-LAST:event_jButtonChangeQuantityActionPerformed
 
     private void jBtnTotalWorkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnTotalWorkActionPerformed
@@ -742,7 +742,7 @@ viewEntryOfThirtyDays();
             String resultEmpName = rs.getString("empName");
             String resultEmpID = rs.getString("empID");
             String itemName = rs.getString("itemName");
-            int totalQuantity = rs.getInt("totalQuantity");
+            BigDecimal totalQuantity = rs.getBigDecimal("totalQuantity");
 
             // Add a new row to the table model
             model.addRow(new Object[]{resultEmpName, resultEmpID, itemName, totalQuantity});
@@ -756,8 +756,6 @@ viewEntryOfThirtyDays();
     } catch (SQLException | ClassNotFoundException e) {
         JOptionPane.showMessageDialog(null, e.getMessage());
     }
-
-
 
     }//GEN-LAST:event_jBtnTotalWorkActionPerformed
 

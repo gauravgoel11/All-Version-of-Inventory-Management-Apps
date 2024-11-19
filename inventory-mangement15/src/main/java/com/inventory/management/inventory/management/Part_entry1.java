@@ -29,6 +29,8 @@ import java.awt.event.ActionListener;
 import java.sql.*;
 import java.util.HashMap;
 import java.util.Map;
+import java.math.BigDecimal;
+
 
 /**
  *
@@ -209,9 +211,9 @@ public class Part_entry1 extends javax.swing.JFrame {
                                         
 
     String item = (String) jcombopartname.getSelectedItem();
-    int qn;
+    BigDecimal qn;
     try {
-        qn = Integer.parseInt(quan.getText());
+        qn = new BigDecimal(quan.getText().trim());
     } catch (NumberFormatException e) {
         totalTA.append("\nPlease enter a valid quantity.");
         return;
@@ -234,7 +236,7 @@ public class Part_entry1 extends javax.swing.JFrame {
         String query1 = "INSERT INTO partentry(partName, quantity, entryDate) VALUES (?, ?, ?)";
         try (PreparedStatement pst1 = con.prepareStatement(query1)) {
             pst1.setString(1, item);
-            pst1.setInt(2, qn);
+            pst1.setBigDecimal(2, qn);
             pst1.setDate(3, sqlEntryDate); // Use setDate for entryDate
 
             int result1 = pst1.executeUpdate();
@@ -243,7 +245,7 @@ public class Part_entry1 extends javax.swing.JFrame {
             String query2 = "INSERT INTO temp_partentry(partName, quantity, entryDate) VALUES (?, ?, ?)";
             try (PreparedStatement pst2 = con.prepareStatement(query2)) {
                 pst2.setString(1, item);
-                pst2.setInt(2, qn);
+                pst2.setBigDecimal(2, qn);
                 pst2.setDate(3, sqlEntryDate); // Use setDate for entryDate
 
                 int result2 = pst2.executeUpdate();

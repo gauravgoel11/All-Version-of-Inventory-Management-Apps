@@ -39,6 +39,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.util.HashMap;
 import java.util.Map;
+import java.math.BigDecimal;
+
 
 /**
  *
@@ -224,12 +226,12 @@ try (Connection con = DatabaseConnection.getConnection()) {
         jDateChooserTo = new com.toedter.calendar.JDateChooser();
         jLabel5 = new javax.swing.JLabel();
         empEnt = new javax.swing.JLabel();
-        jBtnDebit = new javax.swing.JButton();
         jButtonReset = new javax.swing.JButton();
         jBtnTotalStock = new javax.swing.JButton();
         itemName = new javax.swing.JComboBox<>();
         AutoCompleteDecorator.decorate(itemName);
         jButton1 = new javax.swing.JButton();
+        jBtnDebit = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -284,14 +286,6 @@ try (Connection con = DatabaseConnection.getConnection()) {
         empEnt.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         empEnt.setText("View Godown Stock");
 
-        jBtnDebit.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
-        jBtnDebit.setText("Debit");
-        jBtnDebit.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jBtnDebitActionPerformed(evt);
-            }
-        });
-
         jButtonReset.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         jButtonReset.setText("Erase");
         jButtonReset.addActionListener(new java.awt.event.ActionListener() {
@@ -324,6 +318,14 @@ try (Connection con = DatabaseConnection.getConnection()) {
             }
         });
 
+        jBtnDebit.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        jBtnDebit.setText("Debit");
+        jBtnDebit.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBtnDebitActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -351,9 +353,8 @@ try (Connection con = DatabaseConnection.getConnection()) {
                                 .addGap(71, 71, 71)
                                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                                     .addComponent(jBtnCredit, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                        .addComponent(jBtnDebit, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(jBtnTotalStock, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                                    .addComponent(jBtnTotalStock)
+                                    .addComponent(jBtnDebit, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addGap(18, 18, 18)
                                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(jButtonPrint, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -409,7 +410,7 @@ try (Connection con = DatabaseConnection.getConnection()) {
 
     private void jBtnCreditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnCreditActionPerformed
                                            
-    try (Connection conn = DatabaseConnection.getConnection()) {
+      try (Connection conn = DatabaseConnection.getConnection()) {
         String selectedItem = (itemName.getSelectedIndex() != -1) ? itemName.getSelectedItem().toString() : "";
         java.util.Date fromDate = jDateChooserFrom.getDate();
         java.util.Date toDate = jDateChooserTo.getDate();
@@ -447,7 +448,7 @@ try (Connection con = DatabaseConnection.getConnection()) {
         model.setRowCount(0);
         while (rs.next()) {
             String itemName = rs.getString("itemName");
-            int totalQuantity = rs.getInt("totalQuantity");
+            BigDecimal totalQuantity = rs.getBigDecimal("totalQuantity"); // Use BigDecimal for numeric types
             model.addRow(new Object[]{itemName, totalQuantity});
         }
 
@@ -456,10 +457,6 @@ try (Connection con = DatabaseConnection.getConnection()) {
     } catch (ClassNotFoundException | SQLException e) {
         JOptionPane.showMessageDialog(null, e.getMessage());
     }
-
-
-
-
     }//GEN-LAST:event_jBtnCreditActionPerformed
 
     private void jButtonPrintActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonPrintActionPerformed
@@ -486,60 +483,6 @@ private JFrame frame;
         System.exit(0); }
 
     }//GEN-LAST:event_jButtonExitActionPerformed
-
-    private void jBtnDebitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnDebitActionPerformed
-                                         
-    try (Connection conn = DatabaseConnection.getConnection()) {
-        String selectedItem = (itemName.getSelectedIndex() != -1) ? itemName.getSelectedItem().toString() : "";
-        java.util.Date fromDate = jDateChooserFrom.getDate();
-        java.util.Date toDate = jDateChooserTo.getDate();
-
-        // Convert java.util.Date to java.sql.Date
-        java.sql.Date sqlFromDate = (fromDate != null) ? new java.sql.Date(fromDate.getTime()) : null;
-        java.sql.Date sqlToDate = (toDate != null) ? new java.sql.Date(toDate.getTime()) : null;
-
-        StringBuilder query = new StringBuilder("SELECT itemName, SUM(quantity) as totalQuantity FROM entry WHERE 1=1");
-        if (!selectedItem.isEmpty()) {
-            query.append(" AND itemName = ?");
-        }
-        if (sqlFromDate != null) {
-            query.append(" AND entryDate >= ?");
-        }
-        if (sqlToDate != null) {
-            query.append(" AND entryDate <= ?");
-        }
-        query.append(" GROUP BY itemName");
-
-        PreparedStatement pstmt = conn.prepareStatement(query.toString());
-        int paramIndex = 1;
-        if (!selectedItem.isEmpty()) {
-            pstmt.setString(paramIndex++, selectedItem);
-        }
-        if (sqlFromDate != null) {
-            pstmt.setDate(paramIndex++, sqlFromDate);
-        }
-        if (sqlToDate != null) {
-            pstmt.setDate(paramIndex++, sqlToDate);
-        }
-
-        ResultSet rs = pstmt.executeQuery();
-        DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
-        model.setRowCount(0);
-
-        while (rs.next()) {
-            String itemName = rs.getString("itemName");
-            int totalQuantity = rs.getInt("totalQuantity");
-            model.addRow(new Object[]{itemName, totalQuantity});
-        }
-
-        rs.close();
-        pstmt.close();
-    } catch (ClassNotFoundException | SQLException e) {
-        JOptionPane.showMessageDialog(null, e.getMessage());
-    }
-
-
-    }//GEN-LAST:event_jBtnDebitActionPerformed
 
     private void jButtonResetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonResetActionPerformed
         // TODO add your handling code here:
@@ -629,7 +572,7 @@ private JFrame frame;
 
         while (rs.next()) {
             String itemName = rs.getString("itemName");
-            int totalStock = rs.getInt("totalStock");
+            BigDecimal totalStock = rs.getBigDecimal("totalStock"); // Use BigDecimal for NUMERIC type
             model.addRow(new Object[]{itemName, totalStock});
         }
 
@@ -638,8 +581,6 @@ private JFrame frame;
     } catch (ClassNotFoundException | SQLException e) {
         JOptionPane.showMessageDialog(null, e.getMessage());
     }
-
-
                         
     }//GEN-LAST:event_jBtnTotalStockActionPerformed
 
@@ -651,6 +592,57 @@ private JFrame frame;
       new AdminMenu().setVisible(true);
         this.dispose();         // TODO add your handling code here:
     }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jBtnDebitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnDebitActionPerformed
+         try (Connection conn = DatabaseConnection.getConnection()) {
+        String selectedItem = (itemName.getSelectedIndex() != -1) ? itemName.getSelectedItem().toString() : "";
+        java.util.Date fromDate = jDateChooserFrom.getDate();
+        java.util.Date toDate = jDateChooserTo.getDate();
+
+        // Convert java.util.Date to java.sql.Date
+        java.sql.Date sqlFromDate = (fromDate != null) ? new java.sql.Date(fromDate.getTime()) : null;
+        java.sql.Date sqlToDate = (toDate != null) ? new java.sql.Date(toDate.getTime()) : null;
+
+        StringBuilder query = new StringBuilder("SELECT itemName, SUM(quantity) as totalQuantity FROM entry WHERE 1=1");
+        if (!selectedItem.isEmpty()) {
+            query.append(" AND itemName = ?");
+        }
+        if (sqlFromDate != null) {
+            query.append(" AND entryDate >= ?");
+        }
+        if (sqlToDate != null) {
+            query.append(" AND entryDate <= ?");
+        }
+        query.append(" GROUP BY itemName");
+
+        PreparedStatement pstmt = conn.prepareStatement(query.toString());
+        int paramIndex = 1;
+        if (!selectedItem.isEmpty()) {
+            pstmt.setString(paramIndex++, selectedItem);
+        }
+        if (sqlFromDate != null) {
+            pstmt.setDate(paramIndex++, sqlFromDate);
+        }
+        if (sqlToDate != null) {
+            pstmt.setDate(paramIndex++, sqlToDate);
+        }
+
+        ResultSet rs = pstmt.executeQuery();
+        DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+        model.setRowCount(0);
+
+        while (rs.next()) {
+            String itemName = rs.getString("itemName");
+            BigDecimal totalQuantity = rs.getBigDecimal("totalQuantity"); // Use BigDecimal
+            model.addRow(new Object[]{itemName, totalQuantity});
+        }
+
+        rs.close();
+        pstmt.close();
+    } catch (ClassNotFoundException | SQLException e) {
+        JOptionPane.showMessageDialog(null, e.getMessage());
+    }        // TODO add your handling code here:
+    }//GEN-LAST:event_jBtnDebitActionPerformed
 
     /**
      * @param args the command line arguments

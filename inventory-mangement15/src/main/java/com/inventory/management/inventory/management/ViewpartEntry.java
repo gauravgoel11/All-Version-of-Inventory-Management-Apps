@@ -51,6 +51,8 @@ import javax.swing.text.Document;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.math.BigDecimal;
+
 
 
 /**
@@ -512,7 +514,7 @@ private JFrame frame;
     }//GEN-LAST:event_jButtonResetActionPerformed
 
     private void jBtnTotalWorkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnTotalWorkActionPerformed
-                                              
+                                               
     try (Connection conn = DatabaseConnection.getConnection()) {
         String selectedPart = (jcombopartname.getSelectedIndex() != -1) ? jcombopartname.getSelectedItem().toString() : "";
         java.util.Date fromDate = jDateChooserFrom.getDate();
@@ -552,7 +554,7 @@ private JFrame frame;
 
         while (rs.next()) {
             String partName = rs.getString("partName");
-            int totalQuantity = rs.getInt("totalQuantity");
+            BigDecimal totalQuantity = rs.getBigDecimal("totalQuantity"); // Use BigDecimal for numeric values
             model.addRow(new Object[]{partName, totalQuantity});
         }
 
@@ -562,8 +564,6 @@ private JFrame frame;
         JOptionPane.showMessageDialog(null, e.getMessage());
     }
 
-                                         
-   
 
 
     }//GEN-LAST:event_jBtnTotalWorkActionPerformed
@@ -615,7 +615,7 @@ private JFrame frame;
 
     private void jButtonChangeQuantityActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonChangeQuantityActionPerformed
                                                   
-    int row = jTable1.getSelectedRow();
+int row = jTable1.getSelectedRow();
     if (row >= 0) {
         DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
         String partNameValue = model.getValueAt(row, 0).toString();
@@ -635,10 +635,10 @@ private JFrame frame;
             try (Connection conn = DatabaseConnection.getConnection()) {
                 String sql = "UPDATE partentry SET quantity = ? WHERE partName = ? AND entryDate = ? AND quantity = ?";
                 PreparedStatement pstmt = conn.prepareStatement(sql);
-                pstmt.setInt(1, Integer.parseInt(newQuantity)); // Assuming quantity is an integer
+                pstmt.setBigDecimal(1, new BigDecimal(newQuantity)); // Use BigDecimal for numeric type
                 pstmt.setString(2, partNameValue);
                 pstmt.setDate(3, entryDate);
-                pstmt.setInt(4, Integer.parseInt(oldQuantity)); // Assuming old quantity is an integer
+                pstmt.setBigDecimal(4, new BigDecimal(oldQuantity)); // Use BigDecimal for numeric type
 
                 int updatedRows = pstmt.executeUpdate();
                 if (updatedRows > 0) {
@@ -654,9 +654,7 @@ private JFrame frame;
     } else {
         JOptionPane.showMessageDialog(null, "Please select an entry to update.");
     }
-    oneMonthEntryView(); // Assuming this method refreshes the view
-
-
+    oneMonthEntryView();
     }//GEN-LAST:event_jButtonChangeQuantityActionPerformed
 
     private void jTable1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable1MouseClicked
