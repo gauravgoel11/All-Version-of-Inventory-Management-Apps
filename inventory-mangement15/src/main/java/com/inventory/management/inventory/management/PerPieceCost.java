@@ -24,6 +24,7 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -52,6 +53,7 @@ public class PerPieceCost extends javax.swing.JFrame {
         loadItems();
         itemName.setSelectedIndex(-1);
          setExtendedState(this.MAXIMIZED_BOTH);
+         setupKeyBindings();
     }
     private void loadItems() { 
 try (Connection con = DatabaseConnection.getConnection()) {
@@ -82,6 +84,29 @@ try (Connection con = DatabaseConnection.getConnection()) {
             }
         });
             }
+                  private void setupKeyBindings() {
+        // Get the input map for the root pane
+        JRootPane rootPane = this.getRootPane();
+        InputMap inputMap = rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+        ActionMap actionMap = rootPane.getActionMap();
+
+        // Bind the ESC key to an action
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "ESCAPE");
+        actionMap.put("ESCAPE", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Action to perform when ESC is pressed
+                goBack();
+            }
+        });
+    }
+
+    private void goBack() {
+        // Implement the action to go back or close the frame
+        // For example, dispose the current frame and show the previous one
+        new AdminMenu().setVisible(true);
+        this.dispose();
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.

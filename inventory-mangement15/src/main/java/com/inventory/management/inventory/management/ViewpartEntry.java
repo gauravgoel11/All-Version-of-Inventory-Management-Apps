@@ -351,9 +351,9 @@ public class ViewpartEntry extends javax.swing.JFrame {
                             .addComponent(jButtonExit, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(jButtonChangeQuantity, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(jButtonDeleteEntry, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                            .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jButtonChangeQuantity, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                 .addContainerGap(16, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
@@ -614,50 +614,6 @@ private JFrame frame;
 
     }//GEN-LAST:event_jButtonDeleteEntryActionPerformed
 
-    private void jButtonChangeQuantityActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonChangeQuantityActionPerformed
-                                                  
-int row = jTable1.getSelectedRow();
-    if (row >= 0) {
-        DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
-        String partNameValue = model.getValueAt(row, 0).toString();
-        java.util.Date entryDateUtil = (java.util.Date) model.getValueAt(row, 2);
-        java.sql.Date entryDate = new java.sql.Date(entryDateUtil.getTime());
-        String oldQuantity = model.getValueAt(row, 1).toString();
-        String newQuantity = jTextFieldQuantity.getText();
-
-        int response = JOptionPane.showConfirmDialog(null,
-            "Do you want to change the quantity for part " + partNameValue +
-            " from " + oldQuantity + " to " + newQuantity + "?",
-            "Confirm Quantity Update",
-            JOptionPane.YES_NO_OPTION,
-            JOptionPane.QUESTION_MESSAGE);
-
-        if (response == JOptionPane.YES_OPTION) {
-            try (Connection conn = DatabaseConnection.getConnection()) {
-                String sql = "UPDATE partentry SET quantity = ? WHERE partName = ? AND entryDate = ? AND quantity = ?";
-                PreparedStatement pstmt = conn.prepareStatement(sql);
-                pstmt.setBigDecimal(1, new BigDecimal(newQuantity)); // Use BigDecimal for numeric type
-                pstmt.setString(2, partNameValue);
-                pstmt.setDate(3, entryDate);
-                pstmt.setBigDecimal(4, new BigDecimal(oldQuantity)); // Use BigDecimal for numeric type
-
-                int updatedRows = pstmt.executeUpdate();
-                if (updatedRows > 0) {
-                    model.setValueAt(newQuantity, row, 1);
-                    JOptionPane.showMessageDialog(null, "Quantity updated successfully.");
-                } else {
-                    JOptionPane.showMessageDialog(null, "No rows updated, check your data.");
-                }
-            } catch (ClassNotFoundException | SQLException e) {
-                JOptionPane.showMessageDialog(null, e.getMessage());
-            }
-        }
-    } else {
-        JOptionPane.showMessageDialog(null, "Please select an entry to update.");
-    }
-    oneMonthEntryView();
-    }//GEN-LAST:event_jButtonChangeQuantityActionPerformed
-
     private void jTable1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable1MouseClicked
     int row = jTable1.getSelectedRow();
     DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
@@ -677,6 +633,49 @@ int row = jTable1.getSelectedRow();
         JOptionPane.showMessageDialog(null, "Date Parse Error: " + e.getMessage());
     }
     }//GEN-LAST:event_jTable1MouseClicked
+
+    private void jButtonChangeQuantityActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonChangeQuantityActionPerformed
+        // TODO add your handling code here:
+        int row = jTable1.getSelectedRow();
+    if (row >= 0) {
+        DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+        String partNameValue = model.getValueAt(row, 0).toString();
+        java.util.Date entryDateUtil = (java.util.Date) model.getValueAt(row, 2);
+        java.sql.Date entryDate = new java.sql.Date(entryDateUtil.getTime());
+        String oldQuantity = model.getValueAt(row, 1).toString();
+        String newQuantity = jTextFieldQuantity.getText();
+
+        int response = JOptionPane.showConfirmDialog(null,
+            "Do you want to change the quantity for part " + partNameValue +
+            " from " + oldQuantity + " to " + newQuantity + "?",
+            "Confirm Quantity Update",
+            JOptionPane.YES_NO_OPTION,
+            JOptionPane.QUESTION_MESSAGE);
+
+        if (response == JOptionPane.YES_OPTION) {
+            try (Connection conn = DatabaseConnection.getConnection()) {
+                String sql = "UPDATE partentry SET quantity = ? WHERE partName = ? AND entryDate = ?";
+                PreparedStatement pstmt = conn.prepareStatement(sql);
+                pstmt.setBigDecimal(1, new BigDecimal(newQuantity)); // Use BigDecimal for numeric type
+                pstmt.setString(2, partNameValue);
+                pstmt.setDate(3, entryDate);
+
+                int updatedRows = pstmt.executeUpdate();
+                if (updatedRows > 0) {
+                    model.setValueAt(newQuantity, row, 1);
+                    JOptionPane.showMessageDialog(null, "Quantity updated successfully.");
+                } else {
+                    JOptionPane.showMessageDialog(null, "No rows updated, check your data.");
+                }
+            } catch (ClassNotFoundException | SQLException e) {
+                JOptionPane.showMessageDialog(null, e.getMessage());
+            }
+        }
+    } else {
+        JOptionPane.showMessageDialog(null, "Please select an entry to update.");
+    }
+    oneMonthEntryView();
+    }//GEN-LAST:event_jButtonChangeQuantityActionPerformed
 
     /**
      * @param args the command line arguments

@@ -595,25 +595,28 @@ private JFrame frame;
         String adminNameValue = model.getValueAt(row, 0).toString(); // Assuming adminName is the first column
         String itemNameValue = model.getValueAt(row, 1).toString();  // Assuming itemName is in the second column
         String entryDateString = model.getValueAt(row, 3).toString(); // Assuming date is the fourth column
+        String quantityString = model.getValueAt(row, 2).toString(); // Assuming quantity is the third column
 
         // Convert the date string to java.sql.Date
         java.sql.Date entryDate = java.sql.Date.valueOf(entryDateString);
+        int quantity = Integer.parseInt(quantityString); // Convert quantity to integer
 
         // Show confirmation dialog before deletion
         int response = JOptionPane.showConfirmDialog(null,
                 "Do you want to delete the entry for admin: " + adminNameValue + 
-                ", item: " + itemNameValue + " on " + entryDateString + "?",
+                ", item: " + itemNameValue + " on " + entryDateString + " with quantity: " + quantity + "?",
                 "Confirm Deletion",
                 JOptionPane.YES_NO_OPTION,
                 JOptionPane.WARNING_MESSAGE);
 
         if (response == JOptionPane.YES_OPTION) {
             try (Connection conn = DatabaseConnection.getConnection()) {
-                String sql = "DELETE FROM adminentry WHERE adminName = ? AND itemName = ? AND entryDate = ?";
+                String sql = "DELETE FROM adminentry WHERE adminName = ? AND itemName = ? AND entryDate = ? AND quantity = ?";
                 try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
                     pstmt.setString(1, adminNameValue);
                     pstmt.setString(2, itemNameValue);
                     pstmt.setDate(3, entryDate);
+                    pstmt.setInt(4, quantity); // Set the quantity parameter
                     int affectedRows = pstmt.executeUpdate();
 
                     if (affectedRows > 0) {
@@ -634,11 +637,11 @@ private JFrame frame;
     oneMonthAdminEntry();
 
 
-
     }//GEN-LAST:event_jButtonDeleteEntryActionPerformed
 
     private void jButtonChangeQuantityActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonChangeQuantityActionPerformed
  
+                                                      
     int row = jTable1.getSelectedRow();
     if (row >= 0) {
         DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
@@ -649,7 +652,6 @@ private JFrame frame;
 
         String oldQuantity = model.getValueAt(row, 2).toString();
         String newQuantity = jTextFieldQuantity.getText();
-        
 
         int response = JOptionPane.showConfirmDialog(null,
                 "Do you want to change the quantity from " + oldQuantity + " to " + newQuantity + "?",
@@ -659,12 +661,13 @@ private JFrame frame;
 
         if (response == JOptionPane.YES_OPTION) {
             try (Connection conn = DatabaseConnection.getConnection()) {
-                String sql = "UPDATE adminentry SET quantity = ? WHERE adminName = ? AND itemName = ? AND entryDate = ?";
+                String sql = "UPDATE adminentry SET quantity = ? WHERE adminName = ? AND itemName = ? AND entryDate = ? AND quantity = ?";
                 try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
                     pstmt.setBigDecimal(1, new BigDecimal(newQuantity));
                     pstmt.setString(2, adminNameValue);
                     pstmt.setString(3, itemNameValue);
                     pstmt.setDate(4, entryDate);
+                    pstmt.setBigDecimal(5, new BigDecimal(oldQuantity)); // Add old quantity condition
 
                     int affectedRows = pstmt.executeUpdate();
 
@@ -672,7 +675,7 @@ private JFrame frame;
                         model.setValueAt(newQuantity, row, 2);
                         JOptionPane.showMessageDialog(null, "Quantity updated successfully.");
                     } else {
-                        JOptionPane.showMessageDialog(null, "No entry was updated.");
+                        JOptionPane.showMessageDialog(null, "No entry was updated. The old quantity may not match.");
                     }
                 }
             } catch (ClassNotFoundException | SQLException e) {
@@ -683,6 +686,7 @@ private JFrame frame;
         JOptionPane.showMessageDialog(null, "Please select an entry to update.");
     }
     oneMonthAdminEntry();
+
 
 
     }//GEN-LAST:event_jButtonChangeQuantityActionPerformed

@@ -77,9 +77,9 @@
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                              <Component id="jButtonChangeQuantity" max="32767" attributes="0"/>
                               <Component id="jButtonDeleteEntry" alignment="0" max="32767" attributes="0"/>
                               <Component id="jButton2" alignment="0" max="32767" attributes="0"/>
+                              <Component id="jButtonChangeQuantity" alignment="0" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                   </Group>
