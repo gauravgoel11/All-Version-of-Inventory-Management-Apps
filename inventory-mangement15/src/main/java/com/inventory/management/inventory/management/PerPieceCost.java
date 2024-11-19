@@ -34,21 +34,54 @@ import java.awt.print.PrinterException;
 import javax.swing.table.DefaultTableModel;
 import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
 import java.text.SimpleDateFormat;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  *
  * @author gaura
  */
 public class PerPieceCost extends javax.swing.JFrame {
+    private Map<String, String> itemMap = new HashMap<>();
 
     /**
      * Creates new form PerPieceCost
      */
     public PerPieceCost() {
         initComponents();
+        loadItems();
         itemName.setSelectedIndex(-1);
          setExtendedState(this.MAXIMIZED_BOTH);
     }
+    private void loadItems() { 
+try (Connection con = DatabaseConnection.getConnection()) {
+        Statement st = con.createStatement();
+        
+        // Load items
+        ResultSet rs = st.executeQuery("SELECT * FROM items");
+        while (rs.next()) {
+            String itemNameStr = rs.getString("itemName");
+            itemName.addItem(itemNameStr);
+            itemMap.put(itemNameStr, itemNameStr); // Assuming you want to map itemName to itself
+        }
+        
+        rs.close();
+        st.close();
+    } catch (ClassNotFoundException | SQLException e) {
+        JOptionPane.showMessageDialog(null, "Error loading items: " + e.getMessage());
+    }
+    }
+         private void setupComboBoxListeners() {
+      itemName.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String selectedName = (String) itemName.getSelectedItem();
+                if (selectedName != null && itemMap.containsKey(selectedName)) {
+                    itemName.setSelectedItem(itemMap.get(selectedName));
+                }
+            }
+        });
+            }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -64,21 +97,6 @@ public class PerPieceCost extends javax.swing.JFrame {
         jSeparator1 = new javax.swing.JSeparator();
         jLabel3 = new javax.swing.JLabel();
         itemName = new javax.swing.JComboBox<>();
-        try{
-            Class.forName("org.sqlite.JDBC");
-            Connection con = DriverManager.getConnection("jdbc:sqlite:inven.db");
-            Statement st = con.createStatement();
-            ResultSet rs = st.executeQuery("Select * from items");
-            while(rs.next()){
-                itemName.addItem(rs.getString("itemName"));
-                System.out.println(rs.getString("itemName"));
-            }
-            con.close();
-        }
-        catch(ClassNotFoundException | SQLException e){
-            System.out.println("Error is "+e.getMessage());
-        }
-
         AutoCompleteDecorator.decorate(itemName);
         jLabel4 = new javax.swing.JLabel();
         jTextFieldCost = new javax.swing.JTextField();
@@ -126,17 +144,17 @@ public class PerPieceCost extends javax.swing.JFrame {
             }
         });
         jPanel1.add(jBtnView);
-        jBtnView.setBounds(495, 100, 90, 32);
+        jBtnView.setBounds(495, 100, 100, 32);
 
         jButtonAdd.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
-        jButtonAdd.setText("Add");
+        jButtonAdd.setText("Update");
         jButtonAdd.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButtonAddActionPerformed(evt);
             }
         });
         jPanel1.add(jButtonAdd);
-        jButtonAdd.setBounds(495, 140, 90, 32);
+        jButtonAdd.setBounds(495, 140, 100, 32);
 
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -180,9 +198,8 @@ String selectedItem = (String) itemName.getSelectedItem();
     String costStr = jTextFieldCost.getText();
 
     if (selectedItem != null && !costStr.isEmpty()) {
-        try {
-            Class.forName("org.sqlite.JDBC");
-            Connection con = DriverManager.getConnection("jdbc:sqlite:inven.db");
+        try(Connection con = DatabaseConnection.getConnection()) {
+            
 
             String updateQuery = "UPDATE items SET cost = ? WHERE itemName = ?";
             PreparedStatement pstmt = con.prepareStatement(updateQuery);
@@ -220,9 +237,8 @@ String selectedItem = (String) itemName.getSelectedItem();
 
     private void jBtnViewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnViewActionPerformed
 
-    try {
-        Class.forName("org.sqlite.JDBC");
-        Connection con = DriverManager.getConnection("jdbc:sqlite:inven.db");
+    try (Connection con = DatabaseConnection.getConnection()){
+        
 
         String query = "SELECT itemName, cost FROM items";
         Statement stmt = con.createStatement();

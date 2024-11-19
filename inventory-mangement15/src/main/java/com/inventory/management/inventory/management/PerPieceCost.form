@@ -79,7 +79,7 @@
             <Property name="toolTipText" type="java.lang.String" value=""/>
           </Properties>
           <AuxValues>
-            <AuxValue name="JavaCodeGenerator_CreateCodePost" type="java.lang.String" value="try{&#xa;    Class.forName(&quot;org.sqlite.JDBC&quot;);&#xa;    Connection con = DriverManager.getConnection(&quot;jdbc:sqlite:inven.db&quot;);&#xa;    Statement st = con.createStatement();&#xa;    ResultSet rs = st.executeQuery(&quot;Select * from items&quot;);&#xa;    while(rs.next()){&#xa;        itemName.addItem(rs.getString(&quot;itemName&quot;));&#xa;        System.out.println(rs.getString(&quot;itemName&quot;));&#xa;    }&#xa;    con.close();&#xa;}&#xa;catch(ClassNotFoundException | SQLException e){&#xa;    System.out.println(&quot;Error is &quot;+e.getMessage());&#xa; }&#xa;&#xa;AutoCompleteDecorator.decorate(itemName);"/>
+            <AuxValue name="JavaCodeGenerator_CreateCodePost" type="java.lang.String" value="AutoCompleteDecorator.decorate(itemName);"/>
             <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
           </AuxValues>
           <Constraints>
@@ -120,7 +120,7 @@
           </Events>
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
-              <AbsoluteConstraints x="495" y="100" width="90" height="-1"/>
+              <AbsoluteConstraints x="495" y="100" width="100" height="-1"/>
             </Constraint>
           </Constraints>
         </Component>
@@ -129,14 +129,14 @@
             <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
               <Font name="Segoe UI" size="18" style="1"/>
             </Property>
-            <Property name="text" type="java.lang.String" value="Add"/>
+            <Property name="text" type="java.lang.String" value="Update"/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButtonAddActionPerformed"/>
           </Events>
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
-              <AbsoluteConstraints x="495" y="140" width="90" height="-1"/>
+              <AbsoluteConstraints x="495" y="140" width="100" height="-1"/>
             </Constraint>
           </Constraints>
         </Component>
