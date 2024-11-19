@@ -592,6 +592,7 @@ private JFrame frame;
 
     private void jButtonDeleteEntryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonDeleteEntryActionPerformed
                                                   
+                                                       
     int row = jTable1.getSelectedRow();
     if (row >= 0) {
         DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
@@ -602,7 +603,7 @@ private JFrame frame;
 
         // Convert the date string to java.sql.Date
         java.sql.Date entryDate = java.sql.Date.valueOf(entryDateString);
-        int quantity = Integer.parseInt(quantityString); // Convert quantity to integer
+        BigDecimal quantity = new BigDecimal(quantityString); // Convert quantity to BigDecimal
 
         // Show confirmation dialog before deletion
         int response = JOptionPane.showConfirmDialog(null,
@@ -619,7 +620,7 @@ private JFrame frame;
                     pstmt.setString(1, empNameValue);
                     pstmt.setString(2, itemNameValue);
                     pstmt.setDate(3, entryDate);
-                    pstmt.setInt(4, quantity); // Set the quantity parameter
+                    pstmt.setBigDecimal(4, quantity); // Set the quantity parameter as BigDecimal
                     int affectedRows = pstmt.executeUpdate();
 
                     if (affectedRows > 0) {
@@ -638,6 +639,7 @@ private JFrame frame;
         JOptionPane.showMessageDialog(null, "Please select an entry to delete.");
     }
     viewEntryOfThirtyDays();
+
 
 
     }//GEN-LAST:event_jButtonDeleteEntryActionPerformed
