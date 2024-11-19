@@ -201,7 +201,7 @@ public class Part_entry1 extends javax.swing.JFrame {
         jPanel1.add(jcombopartname);
         jcombopartname.setBounds(10, 110, 200, 30);
 
-        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(425, 200, 610, 490));
+        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 150, 610, 490));
 
         pack();
         setLocationRelativeTo(null);
