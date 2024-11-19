@@ -26,6 +26,8 @@ import java.awt.event.ActionListener;
 import java.sql.*;
 import java.util.HashMap;
 import java.util.Map;
+import java.math.BigDecimal;
+
 
 /**
  *
@@ -281,6 +283,7 @@ public class AdminEntry extends javax.swing.JFrame {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
                                         
+  
     String adminName = jTextFieldAdminName.getText().toUpperCase(); // Convert to uppercase immediately
     String selectedItem = itemName.getSelectedItem().toString();
     String quantityText = jTextFieldQuantity.getText();
@@ -292,7 +295,7 @@ public class AdminEntry extends javax.swing.JFrame {
     }
 
     try {
-        int quantity = Integer.parseInt(quantityText);
+        BigDecimal quantity = new BigDecimal(quantityText); // Use BigDecimal for decimal values
         java.sql.Date sqlDate = new java.sql.Date(selectedDate.getTime()); // Convert java.util.Date to java.sql.Date
 
         try (Connection con = DatabaseConnection.getConnection()) {
@@ -301,7 +304,7 @@ public class AdminEntry extends javax.swing.JFrame {
                 "INSERT INTO adminentry (adminName, itemName, quantity, entryDate) VALUES (?, ?, ?, ?)");
             pst1.setString(1, adminName);
             pst1.setString(2, selectedItem);
-            pst1.setInt(3, quantity);
+            pst1.setBigDecimal(3, quantity); // Set BigDecimal value
             pst1.setDate(4, sqlDate);
 
             // Insert into temp_adminentry table
@@ -309,7 +312,7 @@ public class AdminEntry extends javax.swing.JFrame {
                 "INSERT INTO temp_adminentry (adminName, itemName, quantity, entryDate) VALUES (?, ?, ?, ?)");
             pst2.setString(1, adminName);
             pst2.setString(2, selectedItem);
-            pst2.setInt(3, quantity);
+            pst2.setBigDecimal(3, quantity); // Set BigDecimal value
             pst2.setDate(4, sqlDate);
 
             int rowsAffected1 = pst1.executeUpdate();

@@ -39,6 +39,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.util.HashMap;
 import java.util.Map;
+import java.math.BigDecimal;
+
 
 /**
  *
@@ -635,21 +637,19 @@ private JFrame frame;
     }//GEN-LAST:event_jButtonDeleteEntryActionPerformed
 
     private void jButtonChangeQuantityActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonChangeQuantityActionPerformed
-                                                    
+ 
     int row = jTable1.getSelectedRow();
     if (row >= 0) {
         DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
-        String adminNameValue = model.getValueAt(row, 0).toString();  // Assuming adminName is the first column
-        String itemNameValue = model.getValueAt(row, 1).toString();   // Assuming itemName is the second column
-        String entryDateString = model.getValueAt(row, 3).toString(); // Assuming entryDate is the fourth column
-
-        // Convert the date string to java.sql.Date
+        String adminNameValue = model.getValueAt(row, 0).toString();
+        String itemNameValue = model.getValueAt(row, 1).toString();
+        String entryDateString = model.getValueAt(row, 3).toString();
         java.sql.Date entryDate = java.sql.Date.valueOf(entryDateString);
 
-        String oldQuantity = model.getValueAt(row, 2).toString();     // Assuming quantity is in the third column
+        String oldQuantity = model.getValueAt(row, 2).toString();
         String newQuantity = jTextFieldQuantity.getText();
+        
 
-        // Show confirmation dialog before updating quantity
         int response = JOptionPane.showConfirmDialog(null,
                 "Do you want to change the quantity from " + oldQuantity + " to " + newQuantity + "?",
                 "Confirm Quantity Update",
@@ -660,16 +660,15 @@ private JFrame frame;
             try (Connection conn = DatabaseConnection.getConnection()) {
                 String sql = "UPDATE adminentry SET quantity = ? WHERE adminName = ? AND itemName = ? AND entryDate = ?";
                 try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
-                    pstmt.setInt(1, Integer.parseInt(newQuantity)); // Assuming quantity is an integer
+                    pstmt.setBigDecimal(1, new BigDecimal(newQuantity));
                     pstmt.setString(2, adminNameValue);
                     pstmt.setString(3, itemNameValue);
-                    pstmt.setDate(4, entryDate); // Use setDate for entryDate
+                    pstmt.setDate(4, entryDate);
 
                     int affectedRows = pstmt.executeUpdate();
 
                     if (affectedRows > 0) {
-                        // Update table display
-                        model.setValueAt(newQuantity, row, 2); // Update the quantity in the table
+                        model.setValueAt(newQuantity, row, 2);
                         JOptionPane.showMessageDialog(null, "Quantity updated successfully.");
                     } else {
                         JOptionPane.showMessageDialog(null, "No entry was updated.");
@@ -682,7 +681,7 @@ private JFrame frame;
     } else {
         JOptionPane.showMessageDialog(null, "Please select an entry to update.");
     }
-    oneMonthAdminEntry(); // Refresh the table to show updated data
+    oneMonthAdminEntry();
 
 
     }//GEN-LAST:event_jButtonChangeQuantityActionPerformed
