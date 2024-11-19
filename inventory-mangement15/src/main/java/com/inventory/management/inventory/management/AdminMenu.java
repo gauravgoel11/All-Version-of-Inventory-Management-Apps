@@ -70,6 +70,8 @@ public class AdminMenu extends javax.swing.JFrame {
         jButton13 = new javax.swing.JButton();
         jButton14 = new javax.swing.JButton();
         jButton4 = new javax.swing.JButton();
+        jButton15 = new javax.swing.JButton();
+        jButton16 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         addKeyListener(new java.awt.event.KeyAdapter() {
@@ -185,6 +187,7 @@ public class AdminMenu extends javax.swing.JFrame {
         });
         jPanel1.add(jButton14, new org.netbeans.lib.awtextra.AbsoluteConstraints(550, 390, 390, 60));
 
+        jButton4.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         jButton4.setText("Sync");
         jButton4.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -192,6 +195,24 @@ public class AdminMenu extends javax.swing.JFrame {
             }
         });
         jPanel1.add(jButton4, new org.netbeans.lib.awtextra.AbsoluteConstraints(550, 470, 390, 60));
+
+        jButton15.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        jButton15.setText("Salary calculator");
+        jButton15.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton15ActionPerformed(evt);
+            }
+        });
+        jPanel1.add(jButton15, new org.netbeans.lib.awtextra.AbsoluteConstraints(550, 540, 390, 60));
+
+        jButton16.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        jButton16.setText("Per Piece Cost");
+        jButton16.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton16ActionPerformed(evt);
+            }
+        });
+        jPanel1.add(jButton16, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 540, 390, 60));
 
         getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 150, 1120, 720));
 
@@ -284,6 +305,15 @@ new EditEntry().setVisible(true);
                 }
     }//GEN-LAST:event_jButton4ActionPerformed
 
+    private void jButton15ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton15ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jButton15ActionPerformed
+
+    private void jButton16ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton16ActionPerformed
+    new PerPieceCost().setVisible(true);
+    this.dispose();// TODO add your handling code here:
+    }//GEN-LAST:event_jButton16ActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -327,6 +357,8 @@ new EditEntry().setVisible(true);
     private javax.swing.JButton jButton11;
     private javax.swing.JButton jButton13;
     private javax.swing.JButton jButton14;
+    private javax.swing.JButton jButton15;
+    private javax.swing.JButton jButton16;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
