@@ -400,6 +400,7 @@ public class ViewpartEntry extends javax.swing.JFrame {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
                                          
+                                             
     try (Connection conn = DatabaseConnection.getConnection()) {
         String sql = "SELECT partName, quantity, entryDate FROM partentry";
         PreparedStatement pstmt = conn.prepareStatement(sql);
@@ -410,7 +411,7 @@ public class ViewpartEntry extends javax.swing.JFrame {
 
         while (rs.next()) {
             String partName = rs.getString("partName");
-            int quantity = rs.getInt("quantity");
+            BigDecimal quantity = rs.getBigDecimal("quantity"); // Use BigDecimal for quantity
             java.sql.Date entryDate = rs.getDate("entryDate");  // Assuming entryDate is stored as a Date in the database
 
             // Convert java.sql.Date to String if necessary
@@ -453,7 +454,7 @@ private JFrame frame;
     }//GEN-LAST:event_jButtonExitActionPerformed
 
     private void jButtonCusotmEntryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonCusotmEntryActionPerformed
-                                                   
+                                                  
     try (Connection conn = DatabaseConnection.getConnection()) {
         String selectedPart = (jcombopartname.getSelectedIndex() != -1) ? jcombopartname.getSelectedItem().toString() : "";
         java.util.Date fromDate = jDateChooserFrom.getDate();
@@ -492,7 +493,7 @@ private JFrame frame;
 
         while (rs.next()) {
             String partName = rs.getString("partName");
-            int quantity = rs.getInt("quantity");
+            BigDecimal quantity = rs.getBigDecimal("quantity"); // Use BigDecimal for numeric values
             java.sql.Date entryDate = rs.getDate("entryDate");
             model.addRow(new Object[]{partName, quantity, entryDate});
         }
@@ -567,6 +568,7 @@ private JFrame frame;
 
 
 
+
     }//GEN-LAST:event_jBtnTotalWorkActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
@@ -576,32 +578,45 @@ private JFrame frame;
 
     private void jButtonDeleteEntryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonDeleteEntryActionPerformed
                                                      
+                                                     
     int row = jTable1.getSelectedRow();
-    DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+    if (row >= 0) {
+        DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+        String partNameValue = model.getValueAt(row, 0).toString(); // Assuming partName is in column 0
+        BigDecimal quantityValue = new BigDecimal(model.getValueAt(row, 1).toString()); // Assuming quantity is in column 1
+        String entryDate = model.getValueAt(row, 2).toString(); // Assuming entryDate is in column 2
 
-    // Ensure the column indices match your table's structure
-    String empNameValue = model.getValueAt(row, 0).toString(); // Assuming empName is in column 0
-    String quantityValue = model.getValueAt(row, 1).toString(); // Assuming quantity is in column 1
-    String dateValue = model.getValueAt(row, 2).toString(); // Assuming date is in column 2
+        int response = JOptionPane.showConfirmDialog(null,
+            "Do you want to delete the entry for part: " + partNameValue +
+            " with quantity: " + quantityValue + " on " + entryDate + "?",
+            "Confirm Deletion",
+            JOptionPane.YES_NO_OPTION,
+            JOptionPane.WARNING_MESSAGE);
 
-    // Set the selected item in the combo box
-    jcombopartname.setSelectedItem(empNameValue);  // Assuming empName is a combo box
+        if (response == JOptionPane.YES_OPTION) {
+            try (Connection conn = DatabaseConnection.getConnection()) {
+                String sql = "DELETE FROM partentry WHERE partName = ? AND quantity = ? AND entryDate = ?";
+                PreparedStatement pstmt = conn.prepareStatement(sql);
+                pstmt.setString(1, partNameValue);
+                pstmt.setBigDecimal(2, quantityValue); // Use BigDecimal for quantity
+                pstmt.setDate(3, java.sql.Date.valueOf(entryDate)); // Convert string to java.sql.Date
 
-    // Convert quantity to BigDecimal for precision handling
-    try {
-        BigDecimal quantity = new BigDecimal(quantityValue);
-        jTextFieldQuantity.setText(quantity.toString());
-    } catch (NumberFormatException e) {
-        JOptionPane.showMessageDialog(null, "Invalid quantity format: " + e.getMessage());
+                int deletedRows = pstmt.executeUpdate();
+                if (deletedRows > 0) {
+                    model.removeRow(row);
+                    JOptionPane.showMessageDialog(null, "Entry deleted successfully.");
+                } else {
+                    JOptionPane.showMessageDialog(null, "No rows deleted, check your data.");
+                }
+            } catch (ClassNotFoundException | SQLException e) {
+                JOptionPane.showMessageDialog(null, e.getMessage());
+            }
+        }
+    } else {
+        JOptionPane.showMessageDialog(null, "Please select an entry to delete.");
     }
+    oneMonthEntryView(); // Refresh the view to reflect changes
 
-    // Parse and set the date
-    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-    try {
-        jDateChooserFrom.setDate(sdf.parse(dateValue));  // Set date field
-    } catch (Exception e) {
-        JOptionPane.showMessageDialog(null, "Date Parse Error: " + e.getMessage());
-    }
 
 
     }//GEN-LAST:event_jButtonDeleteEntryActionPerformed
@@ -627,8 +642,8 @@ private JFrame frame;
     }//GEN-LAST:event_jTable1MouseClicked
 
     private void jButtonChangeQuantityActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonChangeQuantityActionPerformed
-        // TODO add your handling code here:
-        int row = jTable1.getSelectedRow();
+                                                      
+    int row = jTable1.getSelectedRow();
     if (row >= 0) {
         DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
         String partNameValue = model.getValueAt(row, 0).toString();
@@ -667,6 +682,8 @@ private JFrame frame;
         JOptionPane.showMessageDialog(null, "Please select an entry to update.");
     }
     oneMonthEntryView();
+
+
     }//GEN-LAST:event_jButtonChangeQuantityActionPerformed
 
     /**
