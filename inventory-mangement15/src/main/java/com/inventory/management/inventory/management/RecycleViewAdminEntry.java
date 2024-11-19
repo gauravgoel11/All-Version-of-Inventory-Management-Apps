@@ -53,10 +53,11 @@ public class RecycleViewAdminEntry extends javax.swing.JFrame {
     public RecycleViewAdminEntry() {
         initComponents();
         itemName.setSelectedIndex(-1);
-        setExtendedState(this.MAXIMIZED_BOTH);
+       
          setupKeyBindings();
          oneMonthEntry();
          loadItems();
+          setExtendedState(this.MAXIMIZED_BOTH);
     }
          private void setupKeyBindings() {
         // Get the input map for the root pane

@@ -65,11 +65,12 @@ public class RecycleViewpartEntry extends javax.swing.JFrame {
      */
     public RecycleViewpartEntry() {
         initComponents();
-        jcombopartname.setSelectedIndex(-1);
+        
          setExtendedState(this.MAXIMIZED_BOTH);
           setupKeyBindings();
           oneMonthEntry();
           loadItems();
+          jcombopartname.setSelectedIndex(-1);
     }
          private void setupKeyBindings() {
         // Get the input map for the root pane

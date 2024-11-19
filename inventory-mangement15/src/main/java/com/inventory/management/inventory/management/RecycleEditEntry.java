@@ -51,11 +51,12 @@ public class RecycleEditEntry extends javax.swing.JFrame {
      */
     public RecycleEditEntry() {
         initComponents();
+        loadItems();
         empName.setSelectedIndex(-1);
          setExtendedState(this.MAXIMIZED_BOTH);
          setupKeyBindings();
          oneMonthEntry();
-         loadItems();
+         
     }
      private void setupKeyBindings() {
         // Get the input map for the root pane

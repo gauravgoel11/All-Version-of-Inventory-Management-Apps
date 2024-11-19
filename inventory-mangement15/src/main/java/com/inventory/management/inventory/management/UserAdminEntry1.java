@@ -23,6 +23,7 @@ import java.awt.event.KeyEvent;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.math.BigDecimal;
 import java.sql.*;
 import java.util.HashMap;
 import java.util.Map;
@@ -294,60 +295,54 @@ private void loadItems() {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+                                       
 
-
- String adminName = jTextFieldAdminName.getText();
-    String UpperadminName = adminName.toUpperCase();
+    String adminName = jTextFieldAdminName.getText().toUpperCase(); // Convert to uppercase immediately
     String selectedItem = itemName.getSelectedItem().toString();
     String quantityText = jTextFieldQuantity.getText();
-   Date selectedDate = new Date(); 
+    java.util.Date selectedDate = new Date(); // Assuming you have a date chooser component
 
-    if (UpperadminName.isEmpty() || selectedItem.isEmpty() || quantityText.isEmpty() || selectedDate == null) {
+    if (adminName.isEmpty() || selectedItem.isEmpty() || quantityText.isEmpty() || selectedDate == null) {
         totalTA.setText("Please fill in all fields.");
         return;
     }
 
     try {
-        int quantity = Integer.parseInt(quantityText);
+        BigDecimal quantity = new BigDecimal(quantityText); // Use int for quantity
+        java.sql.Date sqlDate = new java.sql.Date(selectedDate.getTime()); // Convert java.util.Date to java.sql.Date
 
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        String formattedDate = dateFormat.format(selectedDate);
+        try (Connection con = DatabaseConnection.getConnection()) {
+            // Insert into adminentry table
+            PreparedStatement pst1 = con.prepareStatement(
+                "INSERT INTO adminentry (adminName, itemName, quantity, entryDate) VALUES (?, ?, ?, ?)");
+            pst1.setString(1, adminName);
+            pst1.setString(2, selectedItem);
+             pst1.setBigDecimal(3, quantity); // Set int value
+            pst1.setDate(4, sqlDate);
 
-        Class.forName("org.sqlite.JDBC");
-        Connection con = DriverManager.getConnection("jdbc:sqlite:inven.db");
+            // Insert into temp_adminentry table
+            PreparedStatement pst2 = con.prepareStatement(
+                "INSERT INTO temp_adminentry (adminName, itemName, quantity, entryDate) VALUES (?, ?, ?, ?)");
+            pst2.setString(1, adminName);
+            pst2.setString(2, selectedItem);
+            pst2.setBigDecimal(3, quantity); // Set int value
+            pst2.setDate(4, sqlDate);
 
-        // Insert into adminentry table
-        PreparedStatement pst1 = con.prepareStatement(
-            "INSERT INTO adminentry (adminName, itemName, quantity, entryDate) VALUES (?, ?, ?, ?)");
-        pst1.setString(1, UpperadminName);
-        pst1.setString(2, selectedItem);
-        pst1.setInt(3, quantity);
-        pst1.setString(4, formattedDate);
-        int rowsAffected1 = pst1.executeUpdate();
+            int rowsAffected1 = pst1.executeUpdate();
+            int rowsAffected2 = pst2.executeUpdate();
 
-        // Insert into tempadminentry table
-        PreparedStatement pst2 = con.prepareStatement(
-            "INSERT INTO temp_adminentry (adminName, itemName, quantity, entryDate) VALUES (?, ?, ?, ?)");
-        pst2.setString(1, UpperadminName);
-        pst2.setString(2, selectedItem);
-        pst2.setInt(3, quantity);
-        pst2.setString(4, formattedDate);
-        int rowsAffected2 = pst2.executeUpdate();
-
-        if (rowsAffected1 > 0 && rowsAffected2 > 0) {
-            totalTA.append("\nEntry added to the table: " + selectedItem + " : " + quantity + " on " + formattedDate);
-        } else {
-            totalTA.append("\nFailed to add entry to one or both tables.");
+            if (rowsAffected1 > 0 && rowsAffected2 > 0) {
+                totalTA.append("\nEntry added to both tables: " + selectedItem + " : " + quantity + " on " + sqlDate);
+            } else {
+                totalTA.append("\nFailed to add entry to one or both tables.");
+            }
         }
-
-        con.close();
     } catch (NumberFormatException e) {
         totalTA.setText("Please enter a valid quantity.");
-    } catch (Exception e) {
+    } catch (ClassNotFoundException | SQLException e) {
         totalTA.setText("Error: " + e.getMessage());
     }
     jTextFieldQuantity.setText("");
-
 
 
 

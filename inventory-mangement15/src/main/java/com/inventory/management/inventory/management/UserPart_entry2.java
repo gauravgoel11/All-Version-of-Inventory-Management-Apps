@@ -21,6 +21,7 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.math.BigDecimal;
 
 /**
  *
@@ -204,64 +205,61 @@ public class UserPart_entry2 extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+                                        
 
- String item = (String) jcombopartname.getSelectedItem();
-int qn;
-try {
-    qn = Integer.parseInt(quan.getText());
-} catch (NumberFormatException e) {
-    totalTA.append("\nPlease enter a valid quantity.");
-    return;
-}
-
-// Get the selected date
-Date selectedDate = new Date(); 
-if (selectedDate == null) {
-    totalTA.append("\nPlease select a date.");
-    return;
-}
-
-// Format the date to "yyyy-MM-dd"
-SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-String entryDate = formatter.format(selectedDate);
-
-// Insert data into the database
-try {
-    Class.forName("org.sqlite.JDBC");
-    Connection con = DriverManager.getConnection("jdbc:sqlite:inven.db");
-
-    // Insert into partentry table
-    String query1 = "INSERT INTO partentry(partName, quantity, entryDate) VALUES (?, ?, ?)";
-    PreparedStatement pst1 = con.prepareStatement(query1);
-    pst1.setString(1, item);
-    pst1.setInt(2, qn);
-    pst1.setString(3, entryDate);
-
-    int result1 = pst1.executeUpdate();
-
-    // Insert into temp_partentry table
-    String query2 = "INSERT INTO temp_partentry(partName, quantity, entryDate) VALUES (?, ?, ?)";
-    PreparedStatement pst2 = con.prepareStatement(query2);
-    pst2.setString(1, item);
-    pst2.setInt(2, qn);
-    pst2.setString(3, entryDate);
-
-    int result2 = pst2.executeUpdate();
-
-    if (result1 > 0 && result2 > 0) {
-        totalTA.append("\nEntry added to the table: " + item + " : " + qn + " on " + entryDate);
-    } else {
-        totalTA.append("\nFailed to add entry to one or both tables.");
+    String item = (String) jcombopartname.getSelectedItem();
+    BigDecimal qn;
+    try {
+        qn = new BigDecimal(quan.getText().trim());
+    } catch (NumberFormatException e) {
+        totalTA.append("\nPlease enter a valid quantity.");
+        return;
     }
 
-    pst1.close();
-    pst2.close();
-    con.close();
-} catch (ClassNotFoundException | SQLException e) {
-    System.out.println("Error: " + e.getMessage());
-    totalTA.append("\nError: " + e.getMessage());
-}
-quan.setText("");
+    // Get the selected date
+    Date selectedDate = new Date();
+    if (selectedDate == null) {
+        totalTA.append("\nPlease select a date.");
+        return;
+    }
+
+    // Convert java.util.Date to java.sql.Date
+    java.sql.Date sqlEntryDate = new java.sql.Date(selectedDate.getTime());
+
+    // Insert data into the database
+    try (Connection con = DatabaseConnection.getConnection()) { // Assuming DatabaseConnection is your utility class to get a connection
+
+        // Insert into partentry table
+        String query1 = "INSERT INTO partentry(partName, quantity, entryDate) VALUES (?, ?, ?)";
+        try (PreparedStatement pst1 = con.prepareStatement(query1)) {
+            pst1.setString(1, item);
+            pst1.setBigDecimal(2, qn);
+            pst1.setDate(3, sqlEntryDate); // Use setDate for entryDate
+
+            int result1 = pst1.executeUpdate();
+
+            // Insert into temp_partentry table
+            String query2 = "INSERT INTO temp_partentry(partName, quantity, entryDate) VALUES (?, ?, ?)";
+            try (PreparedStatement pst2 = con.prepareStatement(query2)) {
+                pst2.setString(1, item);
+                pst2.setBigDecimal(2, qn);
+                pst2.setDate(3, sqlEntryDate); // Use setDate for entryDate
+
+                int result2 = pst2.executeUpdate();
+
+                if (result1 > 0 && result2 > 0) {
+                    totalTA.append("\nEntry added to the table: " + item + " : " + qn + " on " + sqlEntryDate);
+                } else {
+                    totalTA.append("\nFailed to add entry to one or both tables.");
+                }
+            }
+        }
+    } catch (ClassNotFoundException | SQLException e) {
+        System.out.println("Error: " + e.getMessage());
+        totalTA.append("\nError: " + e.getMessage());
+    }
+    quan.setText("");
+
 
     }//GEN-LAST:event_jButton1ActionPerformed
 

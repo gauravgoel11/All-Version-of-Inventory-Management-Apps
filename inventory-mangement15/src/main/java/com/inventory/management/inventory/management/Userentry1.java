@@ -47,6 +47,7 @@ import javax.swing.text.Document;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.math.BigDecimal;
 
 
 /**
@@ -300,63 +301,78 @@ private void loadItems() {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-String emp = (String) empName.getSelectedItem();
-String item = (String) itemName.getSelectedItem();
-int qn = Integer.parseInt(quan.getText());
+                                         
 
-// Split the employee name to get empName and empID
-String[] empDetails = emp.split(" ");
-String empName = empDetails[0];
-String empID = empDetails[1];
+    String emp = (String) empName.getSelectedItem();
+    String item = (String) itemName.getSelectedItem();
+    BigDecimal qn;
 
-// Get the selected date
-Date selectedDate = new Date(); 
-
-// Format the date to "yyyy-MM-dd"
-SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-String entryDate = formatter.format(selectedDate);
-
-// Insert data into the database
-try {
-    Class.forName("org.sqlite.JDBC");
-    Connection con = DriverManager.getConnection("jdbc:sqlite:inven.db");
-
-    // Insert into entry table
-    String query1 = "INSERT INTO entry (empName, empID, itemName, quantity, entryDate) VALUES (?, ?, ?, ?, ?)";
-    PreparedStatement pst1 = con.prepareStatement(query1);
-    pst1.setString(1, empName);
-    pst1.setString(2, empID);
-    pst1.setString(3, item);
-    pst1.setInt(4, qn);
-    pst1.setString(5, entryDate);
-
-    int result1 = pst1.executeUpdate();
-
-    // Insert into temp_entry table
-    String query2 = "INSERT INTO temp_entry (empName, empID, itemName, quantity, entryDate) VALUES (?, ?, ?, ?, ?)";
-    PreparedStatement pst2 = con.prepareStatement(query2);
-    pst2.setString(1, empName);
-    pst2.setString(2, empID);
-    pst2.setString(3, item);
-    pst2.setInt(4, qn);
-    pst2.setString(5, entryDate);
-
-    int result2 = pst2.executeUpdate();
-
-    if (result1 > 0 && result2 > 0) {
-        totalTA.append("\nEntry added to the table: " + item + " : " + qn + " on " + entryDate);
-    } else {
-        totalTA.append("\nFailed to add entry to one or both tables.");
+    try {
+        qn = new BigDecimal(quan.getText().trim());
+    } catch (NumberFormatException e) {
+        totalTA.append("\nPlease enter a valid quantity.");
+        return;
     }
 
-    pst1.close();
-    pst2.close();
-    con.close();
-} catch (ClassNotFoundException | SQLException e) {
-    System.out.println("Error: " + e.getMessage());
-    totalTA.append("\nError: " + e.getMessage());
-}
-quan.setText("");
+    // Split the employee name to get empName and empID
+    String[] empDetails = emp.split(" ");
+    String empName = empDetails[0];
+    int empID;
+
+    try {
+        empID = Integer.parseInt(empDetails[1]);
+    } catch (NumberFormatException e) {
+        totalTA.append("\nInvalid Employee ID format.");
+        return;
+    }
+
+    // Get the selected date
+    Date selectedDate = new Date(); // Assuming you want the current date
+    if (selectedDate == null) {
+        totalTA.append("\nPlease select a date.");
+        return;
+    }
+
+    // Convert java.util.Date to java.sql.Date
+    java.sql.Date sqlEntryDate = new java.sql.Date(selectedDate.getTime());
+
+    // Insert data into the database
+    try (Connection con = DatabaseConnection.getConnection()) {
+        // Insert into entry table
+        String query1 = "INSERT INTO entry (empName, empID, itemName, quantity, entryDate) VALUES (?, ?, ?, ?, ?)";
+        try (PreparedStatement pst1 = con.prepareStatement(query1)) {
+            pst1.setString(1, empName);
+            pst1.setInt(2, empID);
+            pst1.setString(3, item);
+            pst1.setBigDecimal(4, qn); // Use setBigDecimal for quantity
+            pst1.setDate(5, sqlEntryDate);
+
+            int result1 = pst1.executeUpdate();
+
+            // Insert into temp_entry table
+            String query2 = "INSERT INTO temp_entry (empName, empID, itemName, quantity, entryDate) VALUES (?, ?, ?, ?, ?)";
+            try (PreparedStatement pst2 = con.prepareStatement(query2)) {
+                pst2.setString(1, empName);
+                pst2.setInt(2, empID);
+                pst2.setString(3, item);
+                pst2.setBigDecimal(4, qn); // Use setBigDecimal for quantity
+                pst2.setDate(5, sqlEntryDate);
+
+                int result2 = pst2.executeUpdate();
+
+                if (result1 > 0 && result2 > 0) {
+                    totalTA.append("\nEntry added to the table: " + item + " : " + qn + " on " + sqlEntryDate);
+                } else {
+                    totalTA.append("\nFailed to add entry to one or both tables.");
+                }
+            }
+        }
+    } catch (ClassNotFoundException | SQLException e) {
+        System.out.println("Error: " + e.getMessage());
+        totalTA.append("\nError: " + e.getMessage());
+    }
+    quan.setText("");
+
 
     }//GEN-LAST:event_jButton1ActionPerformed
 
