@@ -403,7 +403,7 @@ private JFrame frame;
     }//GEN-LAST:event_jTable1MouseClicked
 
     private void jButtonCalculateSalaryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonCalculateSalaryActionPerformed
-  try (Connection conn = DatabaseConnection.getConnection()) {
+    try (Connection conn = DatabaseConnection.getConnection()) {
         // Get selected employee name and ID
         String selectedEmployee = (empName.getSelectedIndex() != -1) ? empName.getSelectedItem().toString() : "";
 
@@ -430,47 +430,54 @@ private JFrame frame;
         java.sql.Date sqlFromDate = (fromDate != null) ? new java.sql.Date(fromDate.getTime()) : null;
         java.sql.Date sqlToDate = (toDate != null) ? new java.sql.Date(toDate.getTime()) : null;
 
-        // Fetch base salary from emp table
-        String salaryQuery = "SELECT baseSalary FROM emp WHERE empName = ? AND empID = ?";
-        PreparedStatement salaryStmt = conn.prepareStatement(salaryQuery);
-        salaryStmt.setString(1, empName);
-        salaryStmt.setInt(2, empID); // Use setInt for empID
-        ResultSet salaryRs = salaryStmt.executeQuery();
+        // Prepare SQL query dynamically
+        StringBuilder query = new StringBuilder("SELECT empName, empID, baseSalary, SUM(e.quantity * i.cost) as totalPartsCost " +
+                                                "FROM emp e LEFT JOIN items i ON e.itemName = i.itemName WHERE 1=1");
 
-        BigDecimal baseSalary = BigDecimal.ZERO;
-        if (salaryRs.next()) {
-            baseSalary = salaryRs.getBigDecimal("baseSalary");
+        if (!empName.isEmpty()) {
+            query.append(" AND e.empName = ? AND e.empID = ?");
+        }
+        if (sqlFromDate != null) {
+            query.append(" AND e.entryDate >= ?");
+        }
+        if (sqlToDate != null) {
+            query.append(" AND e.entryDate <= ?");
+        }
+        query.append(" GROUP BY empName, empID, baseSalary");
+
+        PreparedStatement pstmt = conn.prepareStatement(query.toString());
+        int paramIndex = 1;
+
+        if (!empName.isEmpty()) {
+            pstmt.setString(paramIndex++, empName);
+            pstmt.setInt(paramIndex++, empID);
+        }
+        if (sqlFromDate != null) {
+            pstmt.setDate(paramIndex++, sqlFromDate);
+        }
+        if (sqlToDate != null) {
+            pstmt.setDate(paramIndex++, sqlToDate);
         }
 
-        // Calculate total parts cost from entry and items tables
-        String partsQuery = "SELECT SUM(e.quantity * i.cost) as totalPartsCost " +
-                            "FROM entry e JOIN items i ON e.itemName = i.itemName " +
-                            "WHERE e.empName = ? AND e.empID = ? AND e.entryDate BETWEEN ? AND ?";
-        PreparedStatement partsStmt = conn.prepareStatement(partsQuery);
-        partsStmt.setString(1, empName);
-        partsStmt.setInt(2, empID); // Use setInt for empID
-        partsStmt.setDate(3, sqlFromDate);
-        partsStmt.setDate(4, sqlToDate);
-        ResultSet partsRs = partsStmt.executeQuery();
-
-        BigDecimal totalPartsCost = BigDecimal.ZERO;
-        if (partsRs.next()) {
-            totalPartsCost = partsRs.getBigDecimal("totalPartsCost");
-        }
-
-        // Calculate total salary
-        BigDecimal totalSalary = baseSalary.add(totalPartsCost);
+        ResultSet rs = pstmt.executeQuery();
 
         // Update the JTable with the calculated salary data
         DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
         model.setRowCount(0); // Clear existing data
-        model.addRow(new Object[]{empName, empID, baseSalary, totalPartsCost, totalSalary});
+
+        while (rs.next()) {
+            String resultEmpName = rs.getString("empName");
+            int resultEmpID = rs.getInt("empID");
+            BigDecimal baseSalary = rs.getBigDecimal("baseSalary");
+            BigDecimal totalPartsCost = rs.getBigDecimal("totalPartsCost");
+            BigDecimal totalSalary = baseSalary.add(totalPartsCost);
+
+            model.addRow(new Object[]{resultEmpName, resultEmpID, baseSalary, totalPartsCost, totalSalary});
+        }
 
         // Close connections
-        salaryRs.close();
-        salaryStmt.close();
-        partsRs.close();
-        partsStmt.close();
+        rs.close();
+        pstmt.close();
 
     } catch (SQLException | ClassNotFoundException e) {
         JOptionPane.showMessageDialog(null, e.getMessage());
