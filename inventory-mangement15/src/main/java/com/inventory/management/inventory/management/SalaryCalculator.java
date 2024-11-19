@@ -408,14 +408,14 @@ private JFrame frame;
         String selectedEmployee = (empName.getSelectedIndex() != -1) ? empName.getSelectedItem().toString() : "";
 
         String empName = "";
-        int empID = 0;
+        int empID = 0; // Change empID to an integer
 
         // Check if an employee is selected
         if (!selectedEmployee.isEmpty()) {
             String[] employeeData = selectedEmployee.split(" ");
             empName = employeeData[0];
             try {
-                empID = Integer.parseInt(employeeData[1]);
+                empID = Integer.parseInt(employeeData[1]); // Parse empID as an integer
             } catch (NumberFormatException e) {
                 JOptionPane.showMessageDialog(null, "Invalid Employee ID format.");
                 return;
@@ -430,52 +430,29 @@ private JFrame frame;
         java.sql.Date sqlFromDate = (fromDate != null) ? new java.sql.Date(fromDate.getTime()) : null;
         java.sql.Date sqlToDate = (toDate != null) ? new java.sql.Date(toDate.getTime()) : null;
 
-        // Dynamic Query Building
-        StringBuilder salaryQuery = new StringBuilder("SELECT baseSalary FROM emp WHERE 1=1");
-        if (!empName.isEmpty()) {
-            salaryQuery.append(" AND empName = ? AND empID = ?");
-        }
-
-        PreparedStatement salaryStmt = conn.prepareStatement(salaryQuery.toString());
-        int paramIndex = 1;
-        if (!empName.isEmpty()) {
-            salaryStmt.setString(paramIndex++, empName);
-            salaryStmt.setInt(paramIndex++, empID);
-        }
-
+        // Fetch base salary from emp table
+        String salaryQuery = "SELECT baseSalary FROM emp WHERE empName = ? AND empID = ?";
+        PreparedStatement salaryStmt = conn.prepareStatement(salaryQuery);
+        salaryStmt.setString(1, empName);
+        salaryStmt.setInt(2, empID); // Use setInt for empID
         ResultSet salaryRs = salaryStmt.executeQuery();
+
         BigDecimal baseSalary = BigDecimal.ZERO;
         if (salaryRs.next()) {
             baseSalary = salaryRs.getBigDecimal("baseSalary");
         }
 
-        // Dynamic Query Building for parts cost
-        StringBuilder partsQuery = new StringBuilder("SELECT SUM(e.quantity * i.cost) as totalPartsCost " +
-                                                     "FROM entry e JOIN items i ON e.itemName = i.itemName WHERE 1=1");
-        if (!empName.isEmpty()) {
-            partsQuery.append(" AND e.empName = ? AND e.empID = ?");
-        }
-        if (sqlFromDate != null) {
-            partsQuery.append(" AND e.entryDate >= ?");
-        }
-        if (sqlToDate != null) {
-            partsQuery.append(" AND e.entryDate <= ?");
-        }
-
-        PreparedStatement partsStmt = conn.prepareStatement(partsQuery.toString());
-        paramIndex = 1;
-        if (!empName.isEmpty()) {
-            partsStmt.setString(paramIndex++, empName);
-            partsStmt.setInt(paramIndex++, empID);
-        }
-        if (sqlFromDate != null) {
-            partsStmt.setDate(paramIndex++, sqlFromDate);
-        }
-        if (sqlToDate != null) {
-            partsStmt.setDate(paramIndex++, sqlToDate);
-        }
-
+        // Calculate total parts cost from entry and items tables
+        String partsQuery = "SELECT SUM(e.quantity * i.cost) as totalPartsCost " +
+                            "FROM entry e JOIN items i ON e.itemName = i.itemName " +
+                            "WHERE e.empName = ? AND e.empID = ? AND e.entryDate BETWEEN ? AND ?";
+        PreparedStatement partsStmt = conn.prepareStatement(partsQuery);
+        partsStmt.setString(1, empName);
+        partsStmt.setInt(2, empID); // Use setInt for empID
+        partsStmt.setDate(3, sqlFromDate);
+        partsStmt.setDate(4, sqlToDate);
         ResultSet partsRs = partsStmt.executeQuery();
+
         BigDecimal totalPartsCost = BigDecimal.ZERO;
         if (partsRs.next()) {
             totalPartsCost = partsRs.getBigDecimal("totalPartsCost");
@@ -484,7 +461,7 @@ private JFrame frame;
         // Calculate total salary
         BigDecimal totalSalary = baseSalary.add(totalPartsCost);
 
-        // Result Handling: Update the JTable with the calculated salary data
+        // Update the JTable with the calculated salary data
         DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
         model.setRowCount(0); // Clear existing data
         model.addRow(new Object[]{empName, empID, baseSalary, totalPartsCost, totalSalary});
