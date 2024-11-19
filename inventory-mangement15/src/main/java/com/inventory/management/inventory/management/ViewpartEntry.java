@@ -575,41 +575,33 @@ private JFrame frame;
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButtonDeleteEntryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonDeleteEntryActionPerformed
-                                                   
+                                                     
     int row = jTable1.getSelectedRow();
-    if (row >= 0) {
-        DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
-        String partNameValue = model.getValueAt(row, 0).toString();
-        String quantityValue = model.getValueAt(row, 1).toString(); // Assuming quantity is in column 1
-        String entryDate = model.getValueAt(row, 2).toString(); // Assuming entryDate is in column 2
+    DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
 
-        int response = JOptionPane.showConfirmDialog(null,
-            "Do you want to delete the entry for part: " + partNameValue +
-            " with quantity: " + quantityValue + " on " + entryDate + "?",
-            "Confirm Deletion",
-            JOptionPane.YES_NO_OPTION,
-            JOptionPane.WARNING_MESSAGE);
+    // Ensure the column indices match your table's structure
+    String empNameValue = model.getValueAt(row, 0).toString(); // Assuming empName is in column 0
+    String quantityValue = model.getValueAt(row, 1).toString(); // Assuming quantity is in column 1
+    String dateValue = model.getValueAt(row, 2).toString(); // Assuming date is in column 2
 
-        if (response == JOptionPane.YES_OPTION) {
-            String sql = "DELETE FROM partentry WHERE partName = ? AND quantity = ? AND entryDate = ?";
-            try (Connection conn = DatabaseConnection.getConnection();
-                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
-                pstmt.setString(1, partNameValue);
-                pstmt.setInt(2, Integer.parseInt(quantityValue)); // Assuming quantity is an integer
-                pstmt.setDate(3, java.sql.Date.valueOf(entryDate)); // Convert string to java.sql.Date
-                pstmt.executeUpdate();
+    // Set the selected item in the combo box
+    jcombopartname.setSelectedItem(empNameValue);  // Assuming empName is a combo box
 
-                model.removeRow(row);
-                JOptionPane.showMessageDialog(null, "Entry deleted successfully.");
-            } catch (ClassNotFoundException | SQLException e) {
-                JOptionPane.showMessageDialog(null, e.getMessage());
-            }
-        }
-    } else {
-        JOptionPane.showMessageDialog(null, "Please select an entry to delete.");
+    // Convert quantity to BigDecimal for precision handling
+    try {
+        BigDecimal quantity = new BigDecimal(quantityValue);
+        jTextFieldQuantity.setText(quantity.toString());
+    } catch (NumberFormatException e) {
+        JOptionPane.showMessageDialog(null, "Invalid quantity format: " + e.getMessage());
     }
-    oneMonthEntryView(); // Assuming this method refreshes the view
 
+    // Parse and set the date
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+    try {
+        jDateChooserFrom.setDate(sdf.parse(dateValue));  // Set date field
+    } catch (Exception e) {
+        JOptionPane.showMessageDialog(null, "Date Parse Error: " + e.getMessage());
+    }
 
 
     }//GEN-LAST:event_jButtonDeleteEntryActionPerformed
