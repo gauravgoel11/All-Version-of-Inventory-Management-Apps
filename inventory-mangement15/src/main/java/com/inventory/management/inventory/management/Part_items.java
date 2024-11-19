@@ -139,7 +139,7 @@ private void loadItems() {
             itemCode.addItem(code);
             itemMap.put(name, code); // Store the relationship in the map
         }
-        rs = st.executeQuery("SELECT * FROM part_items");
+        rs = st.executeQuery("SELECT DISTINCT partName FROM part_items");
         while (rs.next()) {
             String partName = rs.getString("partName");
             empName.addItem(partName);
