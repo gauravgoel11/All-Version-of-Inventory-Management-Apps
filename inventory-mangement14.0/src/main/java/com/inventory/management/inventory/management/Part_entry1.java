@@ -87,26 +87,6 @@ public class Part_entry1 extends javax.swing.JFrame {
         totalTA = new javax.swing.JTextArea();
         jButton2 = new javax.swing.JButton();
         jcombopartname = new javax.swing.JComboBox<>();
-        try {
-            Class.forName("org.sqlite.JDBC");
-            Connection con = DriverManager.getConnection("jdbc:sqlite:inven.db");
-            Statement st = con.createStatement();
-            ResultSet rs = st.executeQuery("Select * from part_items");
-
-            Set<String> partNames = new HashSet<>();
-            while (rs.next()) {
-                String s = rs.getString("partName");
-                partNames.add(s);
-            }
-            con.close();
-
-            for (String partName : partNames) {
-                jcombopartname.addItem(partName);
-            }
-        } catch (ClassNotFoundException | SQLException e) {
-            System.out.println("Error is " + e.getMessage());
-        }
-
         AutoCompleteDecorator.decorate(jcombopartname);
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
