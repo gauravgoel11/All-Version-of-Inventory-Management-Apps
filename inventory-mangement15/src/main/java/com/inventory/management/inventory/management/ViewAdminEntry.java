@@ -523,6 +523,7 @@ private JFrame frame;
 
     private void jBtnTotalCreditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnTotalCreditActionPerformed
                                                   
+   
     try (Connection conn = DatabaseConnection.getConnection()) {
         String selectedItem = (itemName.getSelectedIndex() != -1) ? itemName.getSelectedItem().toString() : "";
         java.util.Date fromDate = jDateChooserFrom.getDate();
@@ -562,7 +563,7 @@ private JFrame frame;
 
         while (rs.next()) {
             String itemName = rs.getString("itemName");
-            int totalQuantity = rs.getInt("totalQuantity");
+            BigDecimal totalQuantity = rs.getBigDecimal("totalQuantity");
             model.addRow(new Object[]{itemName, totalQuantity});
         }
 
@@ -571,7 +572,6 @@ private JFrame frame;
     } catch (ClassNotFoundException | SQLException e) {
         JOptionPane.showMessageDialog(null, e.getMessage());
     }
-
 
 
 
