@@ -54,11 +54,12 @@ public class ViewInventoryStock extends javax.swing.JFrame {
      */
     public ViewInventoryStock() {
         initComponents();
-        itemName.setSelectedIndex(-1);
+        
          setExtendedState(this.MAXIMIZED_BOTH);
           setupKeyBindings();
           totalStockLeft();
           loadItems();
+          itemName.setSelectedIndex(-1);
     }
          private void setupKeyBindings() {
         // Get the input map for the root pane
