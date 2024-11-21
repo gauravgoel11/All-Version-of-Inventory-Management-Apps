@@ -59,7 +59,7 @@ public class SalaryCalculator extends javax.swing.JFrame {
         
          setExtendedState(this.MAXIMIZED_BOTH);
          setupKeyBindings();
-//         viewSalaryOfLastMonth();
+         viewSalaryOfLastMonth();
          loadItems();
          empName.setSelectedIndex(-1);
     }
@@ -89,7 +89,7 @@ public class SalaryCalculator extends javax.swing.JFrame {
     }
 
 public void viewSalaryOfLastMonth() {
-     try (Connection conn = DatabaseConnection.getConnection()) {
+    try (Connection conn = DatabaseConnection.getConnection()) {
         // Calculate the date one month ago from today
         java.util.Calendar cal = java.util.Calendar.getInstance();
         cal.add(java.util.Calendar.MONTH, -1);
@@ -125,9 +125,10 @@ public void viewSalaryOfLastMonth() {
             }
 
             // Calculate total parts cost from entry and item tables for the last month
-            String partsQuery = "SELECT SUM(e.quantity * i.cost) as totalPartsCost " +
-                                "FROM entry e JOIN item i ON e.itemName = i.itemName " +
-                                "WHERE e.empName = ? AND e.empID = ? AND e.entryDate >= ?";
+            String partsQuery = "SELECT SUM(en.quantity * i.cost) AS totalPartsCost " +
+                                "FROM entry en " +
+                                "JOIN items i ON en.itemName = i.itemName " +
+                                "WHERE en.empName = ? AND en.empID = ? AND en.entryDate >= ?";
             PreparedStatement partsStmt = conn.prepareStatement(partsQuery);
             partsStmt.setString(1, empName);
             partsStmt.setString(2, empID);
@@ -159,6 +160,7 @@ public void viewSalaryOfLastMonth() {
         JOptionPane.showMessageDialog(null, e.getMessage());
     }
 }
+
  private void loadItems() { 
  try (Connection con = DatabaseConnection.getConnection()) {
         Statement st = con.createStatement();
