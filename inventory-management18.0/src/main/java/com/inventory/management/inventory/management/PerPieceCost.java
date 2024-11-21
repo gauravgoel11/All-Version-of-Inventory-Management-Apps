@@ -54,7 +54,30 @@ public class PerPieceCost extends javax.swing.JFrame {
         itemName.setSelectedIndex(-1);
          setExtendedState(this.MAXIMIZED_BOTH);
          setupKeyBindings();
+         viewTableContent();
     }
+    public void viewTableContent(){
+      try (Connection con = DatabaseConnection.getConnection()){
+        
+
+        String query = "SELECT itemName, cost FROM items";
+        Statement stmt = con.createStatement();
+        ResultSet rs = stmt.executeQuery(query);
+
+        DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+        model.setRowCount(0);  // Clear the table before inserting data
+
+        while (rs.next()) {
+            String itemName = rs.getString("itemName");
+            double cost = rs.getDouble("cost");
+            model.addRow(new Object[]{itemName, cost});
+        }
+
+        con.close();
+    } catch (ClassNotFoundException | SQLException e) {
+        JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
+    }
+}
     private void loadItems() { 
 try (Connection con = DatabaseConnection.getConnection()) {
         Statement st = con.createStatement();
@@ -244,7 +267,8 @@ String selectedItem = (String) itemName.getSelectedItem();
         }
     } else {
         JOptionPane.showMessageDialog(this, "Please select an item and enter the cost.");
-    }        // TODO add your handling code here:
+    }
+    viewTableContent();// TODO add your handling code here:
     }//GEN-LAST:event_jButtonAddActionPerformed
 
     private void jTable1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable1MouseClicked
