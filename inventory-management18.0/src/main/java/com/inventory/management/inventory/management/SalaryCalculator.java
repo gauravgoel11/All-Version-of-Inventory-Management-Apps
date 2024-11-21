@@ -90,16 +90,27 @@ public class SalaryCalculator extends javax.swing.JFrame {
 
 public void viewSalaryOfLastMonth() {
     try (Connection conn = DatabaseConnection.getConnection()) {
-        // Calculate the date one month ago from today
+        // Get the current date
         java.util.Calendar cal = java.util.Calendar.getInstance();
-        cal.add(java.util.Calendar.MONTH, -1);
-        java.util.Date oneMonthAgo = cal.getTime();
-        java.sql.Date sqlDate = new java.sql.Date(oneMonthAgo.getTime());
+        
+        // Set the calendar to the first day of the current month
+        cal.set(java.util.Calendar.DAY_OF_MONTH, 1);
+        
+        // Subtract one day to get the last day of the previous month
+        cal.add(java.util.Calendar.DAY_OF_MONTH, -1);
+        java.util.Date endDate = cal.getTime();
+        java.sql.Date sqlEndDate = new java.sql.Date(endDate.getTime());
+        
+        // Set the calendar to the first day of the previous month
+        cal.set(java.util.Calendar.DAY_OF_MONTH, 1);
+        java.util.Date startDate = cal.getTime();
+        java.sql.Date sqlStartDate = new java.sql.Date(startDate.getTime());
 
         // Prepare SQL query to select distinct employees from the entry table for the last month
-        String employeeQuery = "SELECT DISTINCT empName, empID FROM entry WHERE entryDate >= ?";
+        String employeeQuery = "SELECT DISTINCT empName, empID FROM entry WHERE entryDate BETWEEN ? AND ?";
         PreparedStatement employeeStmt = conn.prepareStatement(employeeQuery);
-        employeeStmt.setDate(1, sqlDate);
+        employeeStmt.setDate(1, sqlStartDate);
+        employeeStmt.setDate(2, sqlEndDate);
 
         ResultSet employeeRs = employeeStmt.executeQuery();
 
@@ -110,13 +121,13 @@ public void viewSalaryOfLastMonth() {
 
         while (employeeRs.next()) {
             String empName = employeeRs.getString("empName");
-            int empID = employeeRs.getInt("empID"); // Parse empID as an integer
+            int empID = employeeRs.getInt("empID");
 
             // Fetch base salary from emp table
             String salaryQuery = "SELECT baseSalary FROM emp WHERE empName = ? AND empID = ?";
             PreparedStatement salaryStmt = conn.prepareStatement(salaryQuery);
             salaryStmt.setString(1, empName);
-            salaryStmt.setInt(2, empID); // Set empID as an integer
+            salaryStmt.setInt(2, empID);
             ResultSet salaryRs = salaryStmt.executeQuery();
 
             BigDecimal baseSalary = BigDecimal.ZERO;
@@ -128,11 +139,12 @@ public void viewSalaryOfLastMonth() {
             String partsQuery = "SELECT SUM(en.quantity * i.cost) AS totalPartsCost " +
                                 "FROM entry en " +
                                 "JOIN items i ON en.itemName = i.itemName " +
-                                "WHERE en.empName = ? AND en.empID = ? AND en.entryDate >= ?";
+                                "WHERE en.empName = ? AND en.empID = ? AND en.entryDate BETWEEN ? AND ?";
             PreparedStatement partsStmt = conn.prepareStatement(partsQuery);
             partsStmt.setString(1, empName);
-            partsStmt.setInt(2, empID); // Set empID as an integer
-            partsStmt.setDate(3, sqlDate);
+            partsStmt.setInt(2, empID);
+            partsStmt.setDate(3, sqlStartDate);
+            partsStmt.setDate(4, sqlEndDate);
             ResultSet partsRs = partsStmt.executeQuery();
 
             BigDecimal totalPartsCost = BigDecimal.ZERO;
@@ -160,6 +172,7 @@ public void viewSalaryOfLastMonth() {
         JOptionPane.showMessageDialog(null, e.getMessage());
     }
 }
+
 
 
  private void loadItems() { 
