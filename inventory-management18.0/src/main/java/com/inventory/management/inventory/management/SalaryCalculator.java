@@ -110,13 +110,13 @@ public void viewSalaryOfLastMonth() {
 
         while (employeeRs.next()) {
             String empName = employeeRs.getString("empName");
-            String empID = employeeRs.getString("empID");
+            int empID = employeeRs.getInt("empID"); // Parse empID as an integer
 
             // Fetch base salary from emp table
             String salaryQuery = "SELECT baseSalary FROM emp WHERE empName = ? AND empID = ?";
             PreparedStatement salaryStmt = conn.prepareStatement(salaryQuery);
             salaryStmt.setString(1, empName);
-            salaryStmt.setString(2, empID);
+            salaryStmt.setInt(2, empID); // Set empID as an integer
             ResultSet salaryRs = salaryStmt.executeQuery();
 
             BigDecimal baseSalary = BigDecimal.ZERO;
@@ -131,7 +131,7 @@ public void viewSalaryOfLastMonth() {
                                 "WHERE en.empName = ? AND en.empID = ? AND en.entryDate >= ?";
             PreparedStatement partsStmt = conn.prepareStatement(partsQuery);
             partsStmt.setString(1, empName);
-            partsStmt.setString(2, empID);
+            partsStmt.setInt(2, empID); // Set empID as an integer
             partsStmt.setDate(3, sqlDate);
             ResultSet partsRs = partsStmt.executeQuery();
 
@@ -160,6 +160,7 @@ public void viewSalaryOfLastMonth() {
         JOptionPane.showMessageDialog(null, e.getMessage());
     }
 }
+
 
  private void loadItems() { 
  try (Connection con = DatabaseConnection.getConnection()) {
