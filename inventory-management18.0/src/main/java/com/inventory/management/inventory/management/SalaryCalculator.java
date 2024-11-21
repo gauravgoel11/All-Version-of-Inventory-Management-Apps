@@ -419,19 +419,61 @@ private JFrame frame;
     }//GEN-LAST:event_jTable1MouseClicked
 
     private void jButtonCalculateSalaryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonCalculateSalaryActionPerformed
-   
+
+    // Get selected employee name and ID from the combo box
+    String selectedEmpNameWithID = (String) empName.getSelectedItem();
+    String selectedEmpName = null;
+    Integer selectedEmpID = null;
+
+    if (selectedEmpNameWithID != null && !selectedEmpNameWithID.isEmpty()) {
+        String[] empDetails = selectedEmpNameWithID.split(" ");
+        if (empDetails.length == 2) {
+            selectedEmpName = empDetails[0];
+            try {
+                selectedEmpID = Integer.parseInt(empDetails[1]);
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(null, "Invalid employee ID.");
+                return;
+            }
+        } else {
+            JOptionPane.showMessageDialog(null, "Invalid employee selection.");
+            return;
+        }
+    }
+
+    // Get the selected date range from the date choosers
+    java.util.Date fromDate = jDateChooserFrom.getDate();
+    java.util.Date toDate = jDateChooserTo.getDate();
+
+    // Use default dates if not selected
+    java.sql.Date sqlFromDate = (fromDate != null) ? new java.sql.Date(fromDate.getTime()) : java.sql.Date.valueOf("1970-01-01");
+    java.sql.Date sqlToDate = (toDate != null) ? new java.sql.Date(toDate.getTime()) : new java.sql.Date(System.currentTimeMillis());
+
     try (Connection conn = DatabaseConnection.getConnection()) {
         // Prepare SQL query to calculate salary details
-        String query = "SELECT e.empName, e.empID, e.baseSalary, " +
-                       "SUM(en.quantity * i.cost) AS commission, " +
-                       "(e.baseSalary + SUM(en.quantity * i.cost)) AS totalSalary " +
-                       "FROM emp e " +
-                       "JOIN entry en ON e.empID = en.empID " +
-                       "JOIN items i ON en.itemName = i.itemName " +
-                       "GROUP BY e.empName, e.empID, e.baseSalary";
+        StringBuilder query = new StringBuilder("SELECT e.empName, e.empID, e.baseSalary, ")
+            .append("SUM(en.quantity * i.cost) AS commission, ")
+            .append("(e.baseSalary + SUM(en.quantity * i.cost)) AS totalSalary ")
+            .append("FROM emp e ")
+            .append("JOIN entry en ON e.empID = en.empID ")
+            .append("JOIN items i ON en.itemName = i.itemName ")
+            .append("WHERE en.entryDate BETWEEN ? AND ? ");
+
+        if (selectedEmpName != null && selectedEmpID != null) {
+            query.append("AND e.empName = ? AND e.empID = ? ");
+        }
+
+        query.append("GROUP BY e.empName, e.empID, e.baseSalary");
 
         // Prepare statement
-        PreparedStatement pstmt = conn.prepareStatement(query);
+        PreparedStatement pstmt = conn.prepareStatement(query.toString());
+        pstmt.setDate(1, sqlFromDate);
+        pstmt.setDate(2, sqlToDate);
+
+        if (selectedEmpName != null && selectedEmpID != null) {
+            pstmt.setString(3, selectedEmpName);
+            pstmt.setInt(4, selectedEmpID);
+        }
 
         // Execute query
         ResultSet rs = pstmt.executeQuery();
@@ -457,7 +499,6 @@ private JFrame frame;
         // Close connections
         rs.close();
         pstmt.close();
-        conn.close();
 
     } catch (SQLException | ClassNotFoundException e) {
         JOptionPane.showMessageDialog(null, e.getMessage());
