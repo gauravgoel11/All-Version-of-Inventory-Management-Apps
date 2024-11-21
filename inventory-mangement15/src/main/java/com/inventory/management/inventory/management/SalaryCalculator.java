@@ -365,7 +365,7 @@ public void viewSalaryOfLastMonth() {
                 .addGap(41, 41, 41))
         );
 
-        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 150, -1, -1));
+        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 70, -1, -1));
 
         pack();
         setLocationRelativeTo(null);
