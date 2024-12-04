@@ -277,6 +277,8 @@ public class entry1 extends javax.swing.JFrame {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
 
+                                         
+
     String emp = (String) empName.getSelectedItem();
     String item = (String) itemName.getSelectedItem();
     BigDecimal qn;
@@ -289,12 +291,18 @@ public class entry1 extends javax.swing.JFrame {
     }
 
     // Split the employee name to get empName and empID
-    String[] empDetails = emp.split(" ");
-    String empName = empDetails[0];
+    int lastSpaceIndex = emp.lastIndexOf(" ");
+    if (lastSpaceIndex == -1) {
+        totalTA.append("\nInvalid Employee ID format.");
+        return;
+    }
+
+    String empName = emp.substring(0, lastSpaceIndex);
+    String empIDStr = emp.substring(lastSpaceIndex + 1);
     int empID;
 
     try {
-        empID = Integer.parseInt(empDetails[1]);
+        empID = Integer.parseInt(empIDStr);
     } catch (NumberFormatException e) {
         totalTA.append("\nInvalid Employee ID format.");
         return;
@@ -346,7 +354,6 @@ public class entry1 extends javax.swing.JFrame {
         totalTA.append("\nError: " + e.getMessage());
     }
     quan.setText("");
-
 
 
     }//GEN-LAST:event_jButton1ActionPerformed
