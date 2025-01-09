@@ -638,7 +638,7 @@ private JFrame frame;
     } else {
         JOptionPane.showMessageDialog(null, "Please select an entry to delete.");
     }
-    viewEntryOfThirtyDays();
+//    viewEntryOfThirtyDays();
 
 
 
@@ -690,7 +690,7 @@ private JFrame frame;
     } else {
         JOptionPane.showMessageDialog(null, "Please select an entry to update.");
     }
-    viewEntryOfThirtyDays();
+//    viewEntryOfThirtyDays();
 
     }//GEN-LAST:event_jButtonChangeQuantityActionPerformed
 

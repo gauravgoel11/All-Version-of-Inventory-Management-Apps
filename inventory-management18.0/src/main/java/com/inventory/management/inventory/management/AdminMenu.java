@@ -188,7 +188,7 @@ public class AdminMenu extends javax.swing.JFrame {
         jPanel1.add(jButton14, new org.netbeans.lib.awtextra.AbsoluteConstraints(550, 390, 390, 60));
 
         jButton4.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
-        jButton4.setText("Sync");
+        jButton4.setText("Holidays");
         jButton4.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton4ActionPerformed(evt);
@@ -292,17 +292,8 @@ new EditEntry().setVisible(true);
     }//GEN-LAST:event_jButton14ActionPerformed
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
-        // TODO add your handling code here:
-                      String sourceUrl = "jdbc:postgresql://192.168.1.2:5432/inven";
-                String targetUrl = "jdbc:postgresql://192.168.1.3:5432/inven2";
-                String user = "postgres";
-                String password = "1234";
-                try {
-                    EnhancedDataSynchronizer.synchronizeAllTables(sourceUrl, targetUrl, user, password);
-                    JOptionPane.showMessageDialog(null, "Synchronization Complete");
-                } catch (Exception ex) {
-                    JOptionPane.showMessageDialog(null, "Synchronization Failed: " + ex.getMessage());
-                }
+        new Holidays().setVisible(true);
+            this.dispose();
     }//GEN-LAST:event_jButton4ActionPerformed
 
     private void jButton15ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton15ActionPerformed

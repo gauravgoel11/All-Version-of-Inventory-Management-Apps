@@ -8,6 +8,8 @@ import java.sql.*;
 /**
  *
  * @author gaura
+ * 
+ * 
  */
 public class DatabaseConnection {
    
@@ -16,7 +18,7 @@ public class DatabaseConnection {
         Class.forName("org.postgresql.Driver");
 
         // Connect to PostgreSQL database
-        String url = "jdbc:postgresql://192.168.1.2:5432/inven"; // Replace with your server IP ,adding nwe comment
+        String url = "jdbc:postgresql://192.168.1.43:5432/inven"; // Replace with your server IP ,adding nwe comment
         String user = "postgres"; // Your PostgreSQL username
         String password = "1234"; // Your PostgreSQL password
 
