@@ -1,0 +1,444 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
+ */
+package com.inventory.management.inventory.management;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.awt.print.PrinterException;
+import java.sql.ResultSetMetaData;
+import java.sql.Statement;
+import javax.swing.table.DefaultTableModel;
+import java.sql.Connection;
+import java.sql.DriverManager;
+//import org.apache.commons.dbutils.DbUtils;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.JTable;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.awt.print.PrinterException;
+import javax.swing.table.DefaultTableModel;
+import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
+import java.text.SimpleDateFormat;
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import java.text.SimpleDateFormat;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.awt.print.PrinterException;
+import java.sql.ResultSetMetaData;
+import java.sql.Statement;
+import javax.swing.table.DefaultTableModel;
+import java.sql.Connection;
+import java.sql.DriverManager;
+//import org.apache.commons.dbutils.DbUtils;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.JTable;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.awt.print.PrinterException;
+import javax.swing.table.DefaultTableModel;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.awt.print.PrinterException;
+import javax.swing.table.DefaultTableModel;
+import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
+import java.text.SimpleDateFormat;
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import java.math.BigDecimal;
+
+
+/**
+ *
+ * @author gaura
+ */
+public class Holidays extends javax.swing.JFrame {
+
+    /**
+     * Creates new form EditItems
+     */
+    public Holidays() {
+        initComponents();
+         setExtendedState(this.MAXIMIZED_BOTH);
+          setupKeyBindings();
+//          viewItems();
+    }
+         private void setupKeyBindings() {
+        // Get the input map for the root pane
+        JRootPane rootPane = this.getRootPane();
+        InputMap inputMap = rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+        ActionMap actionMap = rootPane.getActionMap();
+
+        // Bind the ESC key to an action
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "ESCAPE");
+        actionMap.put("ESCAPE", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Action to perform when ESC is pressed
+                goBack();
+            }
+        });
+    }
+
+    private void goBack() {
+        // Implement the action to go back or close the frame
+        // For example, dispose the current frame and show the previous one
+        new AdminMenu().setVisible(true);
+        this.dispose();
+    }
+    private void viewItems(){
+        DefaultTableModel model = (DefaultTableModel) jTableHoliday.getModel();
+    model.setRowCount(0); // Clear the table before populating it
+
+    try (Connection conn = DatabaseConnection.getConnection()) {
+        String query = "SELECT itemName, itemCode FROM items";
+        Statement stmt = conn.createStatement();
+        ResultSet rs = stmt.executeQuery(query);
+
+        while (rs.next()) {
+            String itemName = rs.getString("itemName");
+            String itemCode = rs.getString("itemCode");
+            model.addRow(new Object[]{itemName, itemCode});
+        }
+    } catch (ClassNotFoundException | SQLException e) {
+        JOptionPane.showMessageDialog(null, e.getMessage());
+    }
+    }
+
+    /**
+     * This method is called from within the constructor to initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is always
+     * regenerated by the Form Editor.
+     */
+    @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    private void initComponents() {
+
+        jPanel1 = new javax.swing.JPanel();
+        empEnt = new javax.swing.JLabel();
+        jSeparator1 = new javax.swing.JSeparator();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jTableHoliday = new javax.swing.JTable();
+        jLabel4 = new javax.swing.JLabel();
+        jTFReason = new javax.swing.JTextField();
+        jBtnAdd = new javax.swing.JButton();
+        jBtnView = new javax.swing.JButton();
+        jLabel5 = new javax.swing.JLabel();
+        jDateChooserHolidays = new com.toedter.calendar.JDateChooser();
+        jButton2 = new javax.swing.JButton();
+        jBtnDelete = new javax.swing.JButton();
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        jPanel1.setLayout(null);
+
+        empEnt.setFont(new java.awt.Font("Segoe UI", 1, 48)); // NOI18N
+        empEnt.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        empEnt.setText("Holidays");
+        jPanel1.add(empEnt);
+        empEnt.setBounds(30, 0, 650, 70);
+        jPanel1.add(jSeparator1);
+        jSeparator1.setBounds(0, 70, 740, 10);
+
+        jTableHoliday.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null},
+                {null, null},
+                {null, null},
+                {null, null}
+            },
+            new String [] {
+                "Date", "reason"
+            }
+        ));
+        jTableHoliday.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jTableHolidayMouseClicked(evt);
+            }
+        });
+        jScrollPane1.setViewportView(jTableHoliday);
+
+        jPanel1.add(jScrollPane1);
+        jScrollPane1.setBounds(30, 192, 710, 410);
+
+        jLabel4.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        jLabel4.setText("Reason");
+        jPanel1.add(jLabel4);
+        jLabel4.setBounds(30, 150, 100, 20);
+        jPanel1.add(jTFReason);
+        jTFReason.setBounds(130, 140, 210, 40);
+
+        jBtnAdd.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        jBtnAdd.setText("Add");
+        jBtnAdd.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBtnAddActionPerformed(evt);
+            }
+        });
+        jPanel1.add(jBtnAdd);
+        jBtnAdd.setBounds(380, 140, 90, 27);
+
+        jBtnView.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        jBtnView.setText("View");
+        jBtnView.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBtnViewActionPerformed(evt);
+            }
+        });
+        jPanel1.add(jBtnView);
+        jBtnView.setBounds(380, 90, 90, 27);
+
+        jLabel5.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        jLabel5.setText("Date");
+        jPanel1.add(jLabel5);
+        jLabel5.setBounds(30, 100, 100, 20);
+        jPanel1.add(jDateChooserHolidays);
+        jDateChooserHolidays.setBounds(130, 90, 210, 38);
+
+        jButton2.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        jButton2.setText("Back");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
+        jPanel1.add(jButton2);
+        jButton2.setBounds(500, 90, 90, 30);
+
+        jBtnDelete.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        jBtnDelete.setText("Delete");
+        jBtnDelete.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBtnDeleteActionPerformed(evt);
+            }
+        });
+        jPanel1.add(jBtnDelete);
+        jBtnDelete.setBounds(500, 140, 90, 30);
+
+        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 70, 760, 610));
+
+        pack();
+        setLocationRelativeTo(null);
+    }// </editor-fold>//GEN-END:initComponents
+
+    private void jTableHolidayMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTableHolidayMouseClicked
+
+    int selectedRow = jTableHoliday.getSelectedRow();
+    if (selectedRow != -1) {
+        // Get the date and reason from the selected row
+        java.sql.Date holidayDate = (java.sql.Date) jTableHoliday.getValueAt(selectedRow, 0);
+        String reason = jTableHoliday.getValueAt(selectedRow, 1).toString();
+
+        // Set the date and reason in the date chooser and text field
+        jDateChooserHolidays.setDate(holidayDate);
+        jTFReason.setText(reason);
+    }
+
+    }//GEN-LAST:event_jTableHolidayMouseClicked
+
+    private void jBtnAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnAddActionPerformed
+                                      
+    
+    // Get the selected date from the date chooser
+    java.util.Date  selectedDate = jDateChooserHolidays.getDate();
+    String reason = jTFReason.getText().trim();
+
+    if (selectedDate == null || reason.isEmpty()) {
+        JOptionPane.showMessageDialog(null, "Please select a date and enter a reason.");
+        return;
+    }
+
+    // Convert the selected date to a SQL date
+    java.sql.Date sqlDate = new java.sql.Date(selectedDate.getTime());
+
+    try (Connection conn = DatabaseConnection.getConnection()) {
+        // Check if the date already exists in the holidays table
+        String checkQuery = "SELECT COUNT(*) FROM holidays WHERE date = ?";
+        PreparedStatement checkStmt = conn.prepareStatement(checkQuery);
+        checkStmt.setDate(1, sqlDate);
+        ResultSet rs = checkStmt.executeQuery();
+        rs.next();
+        int count = rs.getInt(1);
+
+        if (count > 0) {
+            JOptionPane.showMessageDialog(null, "A holiday already exists for this date.");
+        } else {
+            // Insert the new holiday
+            String insertQuery = "INSERT INTO holidays (date, reason) VALUES (?, ?)";
+            PreparedStatement insertStmt = conn.prepareStatement(insertQuery);
+            insertStmt.setDate(1, sqlDate);
+            insertStmt.setString(2, reason);
+
+            int rowsInserted = insertStmt.executeUpdate();
+            if (rowsInserted > 0) {
+                JOptionPane.showMessageDialog(null, "Holiday added successfully.");
+                jDateChooserHolidays.setDate(null); // Clear the date chooser
+                jTFReason.setText(""); // Clear the reason text field
+                jBtnViewActionPerformed(null); // Refresh the table
+            }
+        }
+    } catch (ClassNotFoundException | SQLException e) {
+        JOptionPane.showMessageDialog(null, e.getMessage());
+    }
+
+
+
+    }//GEN-LAST:event_jBtnAddActionPerformed
+
+    private void jBtnViewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnViewActionPerformed
+                                       
+   
+    DefaultTableModel model = (DefaultTableModel) jTableHoliday.getModel();
+    model.setRowCount(0); // Clear the table before populating it
+
+    try (Connection conn = DatabaseConnection.getConnection()) {
+        String query = "SELECT date, reason FROM holidays ORDER BY date";
+        PreparedStatement pstmt = conn.prepareStatement(query);
+        ResultSet rs = pstmt.executeQuery();
+
+        while (rs.next()) {
+            java.sql.Date holidayDate = rs.getDate("date");
+            String reason = rs.getString("reason");
+            model.addRow(new Object[]{holidayDate, reason});
+        }
+    } catch (ClassNotFoundException | SQLException e) {
+        JOptionPane.showMessageDialog(null, e.getMessage());
+    }
+
+
+    }//GEN-LAST:event_jBtnViewActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        new AdminMenu().setVisible(true);
+        this.dispose();        // TODO add your handling code here:
+    }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void jBtnDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnDeleteActionPerformed
+
+                                           
+    // Get the selected row from the table
+    int selectedRow = jTableHoliday.getSelectedRow();
+    if (selectedRow != -1) {
+        // Get the date and reason from the selected row
+        java.sql.Date holidayDate = (java.sql.Date) jTableHoliday.getValueAt(selectedRow, 0);
+        String reason = jTableHoliday.getValueAt(selectedRow, 1).toString();
+
+        // Confirm deletion with the user
+        int response = JOptionPane.showConfirmDialog(null,
+            "Are you sure you want to delete the holiday on " + holidayDate + " with reason: " + reason + "?",
+            "Confirm Deletion",
+            JOptionPane.YES_NO_OPTION,
+            JOptionPane.WARNING_MESSAGE);
+
+        if (response == JOptionPane.YES_OPTION) {
+            try (Connection conn = DatabaseConnection.getConnection()) {
+                // Delete the holiday from the database
+                String query = "DELETE FROM holidays WHERE date = ? AND reason = ?";
+                PreparedStatement pstmt = conn.prepareStatement(query);
+                pstmt.setDate(1, holidayDate);
+                pstmt.setString(2, reason);
+
+                int rowsDeleted = pstmt.executeUpdate();
+                if (rowsDeleted > 0) {
+                    JOptionPane.showMessageDialog(null, "Holiday deleted successfully.");
+                    jBtnViewActionPerformed(null); // Refresh the table
+                }
+            } catch (ClassNotFoundException | SQLException e) {
+                JOptionPane.showMessageDialog(null, e.getMessage());
+            }
+        }
+    } else {
+        JOptionPane.showMessageDialog(null, "Please select a holiday to delete.");
+    }
+
+    }//GEN-LAST:event_jBtnDeleteActionPerformed
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String args[]) {
+        /* Set the Nimbus look and feel */
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         */
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ClassNotFoundException ex) {
+            java.util.logging.Logger.getLogger(Holidays.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (InstantiationException ex) {
+            java.util.logging.Logger.getLogger(Holidays.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            java.util.logging.Logger.getLogger(Holidays.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+            java.util.logging.Logger.getLogger(Holidays.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
+        //</editor-fold>
+        //</editor-fold>
+
+        /* Create and display the form */
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                new Holidays().setVisible(true);
+            }
+        });
+        SwingUtilities.invokeLater(() -> new AdminMenu().setVisible(true));
+    }
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel empEnt;
+    private javax.swing.JButton jBtnAdd;
+    private javax.swing.JButton jBtnDelete;
+    private javax.swing.JButton jBtnView;
+    private javax.swing.JButton jButton2;
+    private com.toedter.calendar.JDateChooser jDateChooserHolidays;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JSeparator jSeparator1;
+    private javax.swing.JTextField jTFReason;
+    private javax.swing.JTable jTableHoliday;
+    // End of variables declaration//GEN-END:variables
+}
